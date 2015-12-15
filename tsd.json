@@ -1,0 +1,72 @@
+{
+  "version": "v4",
+  "repo": "borisyankov/DefinitelyTyped",
+  "ref": "master",
+  "path": "typings",
+  "bundle": "typings/tsd.d.ts",
+  "installed": {
+    "orchestrator/orchestrator.d.ts": {
+      "commit": "78d36dd49b6b55b9fdfe61776a12bf05c8b07777"
+    },
+    "gulp/gulp.d.ts": {
+      "commit": "78d36dd49b6b55b9fdfe61776a12bf05c8b07777"
+    },
+    "q/Q.d.ts": {
+      "commit": "78d36dd49b6b55b9fdfe61776a12bf05c8b07777"
+    },
+    "node/node.d.ts": {
+      "commit": "5ec258a90630c25d54f6e62d17eab746abcc58e1"
+    },
+    "serve-static/serve-static.d.ts": {
+      "commit": "78d36dd49b6b55b9fdfe61776a12bf05c8b07777"
+    },
+    "mime/mime.d.ts": {
+      "commit": "78d36dd49b6b55b9fdfe61776a12bf05c8b07777"
+    },
+    "express/express.d.ts": {
+      "commit": "78d36dd49b6b55b9fdfe61776a12bf05c8b07777"
+    },
+    "gulp-typescript/gulp-typescript.d.ts": {
+      "commit": "e5a27ea95e47b95333784f1f0d590127b4e39a89"
+    },
+    "gulp-sourcemaps/gulp-sourcemaps.d.ts": {
+      "commit": "e5a27ea95e47b95333784f1f0d590127b4e39a89"
+    },
+    "gulp-concat/gulp-concat.d.ts": {
+      "commit": "e5a27ea95e47b95333784f1f0d590127b4e39a89"
+    },
+    "connect/connect.d.ts": {
+      "commit": "e5a27ea95e47b95333784f1f0d590127b4e39a89"
+    },
+    "connect-livereload/connect-livereload.d.ts": {
+      "commit": "e5a27ea95e47b95333784f1f0d590127b4e39a89"
+    },
+    "gulp-sass/gulp-sass.d.ts": {
+      "commit": "8cd79728efa7652d934b2703feeb68bb4802aebb"
+    },
+    "del/del.d.ts": {
+      "commit": "8cd79728efa7652d934b2703feeb68bb4802aebb"
+    },
+    "glob/glob.d.ts": {
+      "commit": "8cd79728efa7652d934b2703feeb68bb4802aebb"
+    },
+    "minimatch/minimatch.d.ts": {
+      "commit": "8cd79728efa7652d934b2703feeb68bb4802aebb"
+    },
+    "es6-promise/es6-promise.d.ts": {
+      "commit": "8cd79728efa7652d934b2703feeb68bb4802aebb"
+    },
+    "gulp-shell/gulp-shell.d.ts": {
+      "commit": "5c3e47967affa3c4128a3875d1664ba206ae1b0f"
+    },
+    "gulp-autoprefixer/gulp-autoprefixer.d.ts": {
+      "commit": "5c3e47967affa3c4128a3875d1664ba206ae1b0f"
+    },
+    "gulp-uglify/gulp-uglify.d.ts": {
+      "commit": "17dd34132c2a1a4d6a8bf1816effcff3ec922034"
+    },
+    "gulp-replace/gulp-replace.d.ts": {
+      "commit": "5ec258a90630c25d54f6e62d17eab746abcc58e1"
+    }
+  }
+}

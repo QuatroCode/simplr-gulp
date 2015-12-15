@@ -1,0 +1,37 @@
+{
+  "name": "simplr-gulp-tests",
+  "version": "1.0.0",
+  "private": true,
+  "author": "QuatroDev",
+  "devDependencies": {
+    "connect-livereload": "^0.5.4",
+    "del": "^2.2.0",
+    "express": "^4.13.3",
+    "gulp": "^3.9.0",
+    "gulp-autoprefixer": "^3.1.0",
+    "gulp-replace": "^0.5.4",
+    "gulp-sass": "^2.1.0",
+    "gulp-shell": "^0.5.1",
+    "gulp-typescript": "^2.10.0",
+    "gulp-uglify": "^1.5.1",
+    "jspm": "^0.16.15",
+    "path": "^0.12.7",
+    "replace-ext": "0.0.1",
+    "tiny-lr": "^0.2.1",
+    "tsd": "^0.6.5",
+    "typescript": "^1.7.3"
+  },
+  "dependencies": {},
+  "jspm": {
+    "directories": {
+      "packages": "wwwroot/libs"
+    },
+    "configFile": "src/config.js",
+    "dependencies": {
+      "css": "github:systemjs/plugin-css@^0.1.20"
+    },
+    "devDependencies": {
+      "typescript": "npm:typescript@^1.7.3"
+    }
+  }
+}

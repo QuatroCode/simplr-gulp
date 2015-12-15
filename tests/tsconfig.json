@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "noImplicitAny": true,
+    "preserveConstEnums": true,
+    "removeComments": true,
+    "outDir": "wwwroot",
+    "rootDir": "src",
+    "sourceMap": true,
+    "inlineSources": true,
+    "jsx": "react",
+    "listFiles": true
+  },
+  "exclude": [
+    "node_modules",
+    "wwwroot",
+    "src/libs"
+  ]
+}

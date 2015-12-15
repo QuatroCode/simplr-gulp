@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "noImplicitAny": true,
+    "preserveConstEnums": true,
+    "removeComments": true,
+    "outDir": "wwwroot",
+    "rootDir": "src",
+    "sourceMap": false,
+    "inlineSources": false
+  },
+  "exclude": [
+    "node_modules",
+    "wwwroot",
+    "src/libs"
+  ]
+}

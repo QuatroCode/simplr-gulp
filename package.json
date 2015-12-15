@@ -1,0 +1,23 @@
+{
+  "name": "simplr-gulp",
+  "version": "1.0.0",
+  "private": true,
+  "author": "QuatroDev",
+  "scripts": {
+    "build": "tsc -p .",
+    "build:tests": "tsc -p . --outDir tests",
+    "watch": "tsc -p . -w",
+    "watch:tests": "tsc -p . -w --outDir tests",
+    "build:config": "copyfiles gulpfile.json build/*.json out",
+    "build:config:tests": "COPY gulpconfig.json tests/gulpconfig.json"
+  },
+  "devDependencies": {
+    "tsd": "^0.6.5",
+    "typescript": "^1.7.3"
+  },
+  "dependencies": {
+    "express": "^4.13.3",
+    "gulp": "^3.9.0",
+    "path": "^0.12.7"
+  }
+}
