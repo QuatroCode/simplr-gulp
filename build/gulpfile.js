@@ -497,7 +497,7 @@ var GulpTasks = (function () {
         this.registerGulpTask('_ts:prod', this.buildTypescript.bind(this, true));
         this.registerGulpTask('_sass', this.buildSass.bind(this, false));
         this.registerGulpTask('_sass:prod', this.buildSass.bind(this, true));
-        this.registerGulpTask('_assets', this.copyFiles.bind(this, Paths.AllDirectoriesInSource('assets'), Paths.BuildDirectory));
+        this.registerGulpTask('_assets', this.copyFiles.bind(this, Paths.AllDirectoriesInSource('assets'), Paths.BuildDirectory, null));
         this.registerGulpTask('_configs', this.configs);
         this.registerGulpTask(':bundle', this.bundle.bind(this, false));
         this.registerGulpTask(':bundle:prod', this.bundle.bind(this, true));
