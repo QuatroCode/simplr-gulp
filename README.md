@@ -7,7 +7,7 @@ Simply copy [build/gulpfile.js](https://github.com/QuatroCode/simplr-gulp/blob/m
 After first run, `gulpconfig.json` file will be generated for you to edit for your own use.
 
 ### Prerequisites
-You need global npm scripts ([`gulp`](https://github.com/gulpjs/gulp), [`tsd`](https://github.com/DefinitelyTyped/tsd), [`jspm`](https://github.com/jspm/jspm-cli))):
+You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp), [`tsd`](https://github.com/DefinitelyTyped/tsd), [`jspm`](https://github.com/jspm/jspm-cli))):
 
 1. `npm install gulp -g`
 2. `npm install tsd -g`
