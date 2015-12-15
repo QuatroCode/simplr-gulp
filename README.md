@@ -2,7 +2,9 @@
 
 ### I just want to use gulpfile.js
 Simply copy [build/gulpfile.js](https://github.com/QuatroCode/simplr-gulp/blob/master/build/gulpfile.js) to your project and run task:
-`gulp`
+```
+gulp
+```
 Which will run `gulp default` task and start watching your files (`*.ts`, `*.scss`, `index.html`, `configs`, etc.) and compiling them from source to build directory. Also it starts server tailored for Single Page Application.
 
 All directories, server and live-reload settings are configured in `gulpconfig.json`.
@@ -24,6 +26,7 @@ After first run, `gulpconfig.json` file will be generated for you to edit for yo
 * `_sass` - compiles SCSS files from source to build directory
 * `_sass:prod` - compiles and minifies SCSS files from source to build directory
 * `_assets` - copies all `assets` folders and their contents from source to build directory
+* `_configs` - copies `web.config` (for Asp.Net 5 projects) and JSPM `config.js` from source to build directory
 
 ### Prerequisites
 You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp), [`tsd`](https://github.com/DefinitelyTyped/tsd), [`jspm`](https://github.com/jspm/jspm-cli))):
