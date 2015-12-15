@@ -7,9 +7,7 @@
     "build": "tsc -p .",
     "build:tests": "tsc -p . --outDir tests",
     "watch": "tsc -p . -w",
-    "watch:tests": "tsc -p . -w --outDir tests",
-    "build:config": "copyfiles gulpfile.json build/*.json out",
-    "build:config:tests": "COPY gulpconfig.json tests/gulpconfig.json"
+    "watch:tests": "tsc -p . -w --outDir tests"
   },
   "devDependencies": {
     "tsd": "^0.6.5",
