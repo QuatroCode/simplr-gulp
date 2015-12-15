@@ -1,10 +1,29 @@
 # simplr-gulp
 
 ### I just want to use gulpfile.js
-Simply copy [build/gulpfile.js](https://github.com/QuatroCode/simplr-gulp/blob/master/build/gulpfile.js) to your project and run command:
+Simply copy [build/gulpfile.js](https://github.com/QuatroCode/simplr-gulp/blob/master/build/gulpfile.js) to your project and run task:
 `gulp`
+Which will run `gulp default` task and start watching your files (`*.ts`, `*.scss`, `index.html`, `configs`, etc.) and compiling them from source to build directory. Also it starts server tailored for Single Page Application.
+
+All directories, server and live-reload settings are configured in `gulpconfig.json`.
 
 After first run, `gulpconfig.json` file will be generated for you to edit for your own use.
+
+### Available commands:
+**Main tasks**
+* `:build` - compiles files (`*.ts`, `*.scss`, `index.html`, `configs`, etc.)
+* `:buid:prod` - compiles, minifies and uglifies files (`*.ts`, `*.scss`, `index.html`, `configs`, etc.)
+* `:clean` - cleans build directory (`wwwroot` by default)
+* `:bundle` - bundles the app with `jspm bundle`
+* `:bundle:prod`: bundles the app with `jspm budle` and minifies bundle file
+
+**Specific tasks**
+* `_html` - copies `index.html` file from source to build directory
+* `_ts` - compiles TypeScript from source to build directory
+* `_ts:prod` - compiles, minifies and uglifies TypeScript from source to build
+* `_sass` - compiles SCSS files from source to build directory
+* `_sass:prod` - compiles and minifies SCSS files from source to build directory
+* `_assets` - copies all `assets` folders and their contents from source to build directory
 
 ### Prerequisites
 You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp), [`tsd`](https://github.com/DefinitelyTyped/tsd), [`jspm`](https://github.com/jspm/jspm-cli))):
