@@ -63,7 +63,7 @@ module Configuration {
         App: string;
     }
 
-    export interface TypescriptConfig {
+    export interface TypeScriptConfig {
         Development: string;
         Production: string;
     }
@@ -77,7 +77,7 @@ module Configuration {
 
     export interface IConfig {
         Directories: Directories;
-        TypescriptConfig: TypescriptConfig;
+        TypeScriptConfig: TypeScriptConfig;
         BundleConfig: Bundle;
         ServerPort: number;
         LiveReloadPort: number;
@@ -95,7 +95,7 @@ module Configuration {
                 Build: "wwwroot",
                 App: "app"
             },
-            TypescriptConfig: {
+            TypeScriptConfig: {
                 Development: "tsconfig.json",
                 Production: "tsconfig.production.json"
             },
@@ -160,8 +160,8 @@ module Configuration {
             return this.config.Directories;
         }
 
-        get TypescriptConfig() {
-            return this.config.TypescriptConfig;
+        get TypeScriptConfig() {
+            return this.config.TypeScriptConfig;
         }
 
         get ServerPort() {
@@ -323,7 +323,7 @@ class ShellCommands {
 
 }
 
-class TypescriptProject {
+class TypeScriptProject {
 
     private project: ts.Project;
 
@@ -450,8 +450,8 @@ class GulpTasks {
     constructor() {
         this.registerGulpTask('default', this.startWatcherAndServer);
         this.registerGulpTask('_html', this.buildHtml);
-        this.registerGulpTask('_ts', this.buildTypescript.bind(this, false));
-        this.registerGulpTask('_ts:prod', this.buildTypescript.bind(this, true));
+        this.registerGulpTask('_ts', this.buildTypeScript.bind(this, false));
+        this.registerGulpTask('_ts:prod', this.buildTypeScript.bind(this, true));
         this.registerGulpTask('_sass', this.buildSass.bind(this, false));
         this.registerGulpTask('_sass:prod', this.buildSass.bind(this, true));
         this.registerGulpTask('_assets', this.copyFiles.bind(this, Paths.AllDirectoriesInSource('assets'), Paths.BuildDirectory, null));
@@ -531,9 +531,9 @@ class GulpTasks {
     }
 
 
-    private buildTypescript = (production: boolean) => {
-        let configFile = (production) ? Config.TypescriptConfig.Production : Config.TypescriptConfig.Development;
-        let tsProject = new TypescriptProject(configFile);
+    private buildTypeScript = (production: boolean) => {
+        let configFile = (production) ? Config.TypeScriptConfig.Production : Config.TypeScriptConfig.Development;
+        let tsProject = new TypeScriptProject(configFile);
         let task: NodeJS.ReadWriteStream;
         if (production)
             task = tsProject.BuildProduction();

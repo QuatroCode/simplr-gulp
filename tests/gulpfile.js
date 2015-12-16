@@ -60,7 +60,7 @@ var Configuration;
                     Build: "wwwroot",
                     App: "app"
                 },
-                TypescriptConfig: {
+                TypeScriptConfig: {
                     Development: "tsconfig.json",
                     Production: "tsconfig.production.json"
                 },
@@ -123,9 +123,9 @@ var Configuration;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Config.prototype, "TypescriptConfig", {
+        Object.defineProperty(Config.prototype, "TypeScriptConfig", {
             get: function () {
-                return this.config.TypescriptConfig;
+                return this.config.TypeScriptConfig;
             },
             enumerable: true,
             configurable: true
@@ -309,19 +309,19 @@ var ShellCommands = (function () {
     };
     return ShellCommands;
 })();
-var TypescriptProject = (function () {
-    function TypescriptProject(configFile) {
+var TypeScriptProject = (function () {
+    function TypeScriptProject(configFile) {
         this.configFile = configFile;
         this.project = ts.createProject(configFile);
     }
-    Object.defineProperty(TypescriptProject.prototype, "Project", {
+    Object.defineProperty(TypeScriptProject.prototype, "Project", {
         get: function () {
             return this.project;
         },
         enumerable: true,
         configurable: true
     });
-    TypescriptProject.prototype.build = function (sourceMap) {
+    TypeScriptProject.prototype.build = function (sourceMap) {
         var src = [Paths.AllFilesInSource('.ts*'), ("!" + Paths.OneDirectoryInSource('libs'))];
         var task = gulp.src(src);
         if (sourceMap)
@@ -336,13 +336,13 @@ var TypescriptProject = (function () {
             }));
         return task.pipe(gulp.dest(this.project.config.compilerOptions.outDir));
     };
-    TypescriptProject.prototype.BuildDevelopment = function () {
+    TypeScriptProject.prototype.BuildDevelopment = function () {
         return this.build(true);
     };
-    TypescriptProject.prototype.BuildProduction = function () {
+    TypeScriptProject.prototype.BuildProduction = function () {
         return this.build(false);
     };
-    return TypescriptProject;
+    return TypeScriptProject;
 })();
 var SassBuilder = (function () {
     function SassBuilder() {
@@ -459,9 +459,9 @@ var GulpTasks = (function () {
                 task = task.pipe(ShellCommands.PipeLiveReload());
             return task;
         };
-        this.buildTypescript = function (production) {
-            var configFile = (production) ? Config.TypescriptConfig.Production : Config.TypescriptConfig.Development;
-            var tsProject = new TypescriptProject(configFile);
+        this.buildTypeScript = function (production) {
+            var configFile = (production) ? Config.TypeScriptConfig.Production : Config.TypeScriptConfig.Development;
+            var tsProject = new TypeScriptProject(configFile);
             var task;
             if (production)
                 task = tsProject.BuildProduction();
@@ -493,8 +493,8 @@ var GulpTasks = (function () {
         };
         this.registerGulpTask('default', this.startWatcherAndServer);
         this.registerGulpTask('_html', this.buildHtml);
-        this.registerGulpTask('_ts', this.buildTypescript.bind(this, false));
-        this.registerGulpTask('_ts:prod', this.buildTypescript.bind(this, true));
+        this.registerGulpTask('_ts', this.buildTypeScript.bind(this, false));
+        this.registerGulpTask('_ts:prod', this.buildTypeScript.bind(this, true));
         this.registerGulpTask('_sass', this.buildSass.bind(this, false));
         this.registerGulpTask('_sass:prod', this.buildSass.bind(this, true));
         this.registerGulpTask('_assets', this.copyFiles.bind(this, Paths.AllDirectoriesInSource('assets'), Paths.BuildDirectory, null));
