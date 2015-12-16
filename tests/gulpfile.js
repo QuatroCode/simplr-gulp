@@ -70,7 +70,7 @@ var Configuration;
                     Include: [],
                     Exclude: ['[wwwroot/js/app/**/*]']
                 },
-                Extensions: {
+                ExtensionsMap: {
                     "ts": "js",
                     "tsx": "js",
                     "scss": "css"
@@ -79,7 +79,7 @@ var Configuration;
                 ServerPort: 4000,
                 LiveReloadPort: 4400,
                 ServerIp: '127.0.0.1',
-                CfgVersion: 1.01
+                CfgVersion: 2.01
             };
             this.status = Status.Init;
             this.tryToReadConfigurationFile();
@@ -182,9 +182,9 @@ var Configuration;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Config.prototype, "Extensions", {
+        Object.defineProperty(Config.prototype, "ExtensionsMap", {
             get: function () {
-                return this.config.Extensions;
+                return this.config.ExtensionsMap;
             },
             enumerable: true,
             configurable: true
@@ -272,10 +272,10 @@ var PathBuilder = (function () {
         return generatedPath;
     };
     PathBuilder.prototype.ReplaceExtensionFromList = function (pathName) {
-        var extensions = Config.Extensions;
+        var extensionsMap = Config.ExtensionsMap;
         var current = path.extname(pathName).substring(1);
-        if (extensions[current] != null) {
-            var replaceTo = extensions[current];
+        if (extensionsMap[current] != null) {
+            var replaceTo = extensionsMap[current];
             return replaceExt(pathName, "." + replaceTo);
         }
         else {

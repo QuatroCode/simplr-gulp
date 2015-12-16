@@ -84,7 +84,7 @@ module Configuration {
         ServerIp: string;
         WebConfig: string;
         CfgVersion: number;
-        Extensions: { [ext: string]: string };
+        ExtensionsMap: { [ext: string]: string };
     }
 
     export class Config {
@@ -105,7 +105,7 @@ module Configuration {
                 Include: [],
                 Exclude: ['[wwwroot/js/app/**/*]']
             },
-            Extensions: {
+            ExtensionsMap: {
                 "ts": "js",
                 "tsx": "js",
                 "scss": "css"
@@ -114,7 +114,7 @@ module Configuration {
             ServerPort: 4000,
             LiveReloadPort: 4400,
             ServerIp: '127.0.0.1',
-            CfgVersion: 1.01
+            CfgVersion: 2.01
         }
 
         private config: IConfig;
@@ -196,8 +196,8 @@ module Configuration {
             return this.config.CfgVersion;
         }
 
-        get Extensions() {
-            return this.config.Extensions;
+        get ExtensionsMap() {
+            return this.config.ExtensionsMap;
         }
     }
 
@@ -285,11 +285,11 @@ class PathBuilder {
 
     public ReplaceExtensionFromList(pathName: string) {
 
-        let extensions = Config.Extensions;
+        let extensionsMap = Config.ExtensionsMap;
 
         let current = path.extname(pathName).substring(1);
-        if (extensions[current] != null) {
-            let replaceTo = extensions[current];
+        if (extensionsMap[current] != null) {
+            let replaceTo = extensionsMap[current];
             return replaceExt(pathName, `.${replaceTo}`);
         } else {
             return pathName;
