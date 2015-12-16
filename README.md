@@ -11,6 +11,8 @@ All directories, server and live-reload settings are configured in `gulpconfig.j
 
 After first run, `gulpconfig.json` file will be generated for you to edit for your own use.
 
+**NB!** For now, you have to manually add `tsconfig.json` file. More info can be found [here](https://github.com/QuatroCode/simplr-gulp/issues/5).
+
 ### Available commands:
 **Main tasks**
 * `:build` - compiles files (`*.ts`, `*.scss`, `index.html`, `configs`, etc.)
