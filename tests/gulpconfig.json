@@ -8,10 +8,17 @@
         "Development": "tsconfig.json",
         "Production": "tsconfig.production.json"
     },
+    "ServerConfig": {
+        "Ip": "127.0.0.1",
+        "Port": 4000,
+        "LiveReloadPort": 4400
+    },
     "BundleConfig": {
         "AppFile": "app.js",
         "BuildFile": "build.js",
-        "Include": [],
+        "Include": [
+          "css"
+        ],
         "Exclude": [
             "[wwwroot/js/app/**/*]"
         ]
@@ -22,8 +29,5 @@
         "scss": "css"
     },
     "WebConfig": "web.config",
-    "ServerPort": 4000,
-    "LiveReloadPort": 4400,
-    "ServerIp": "127.0.0.1",
     "CfgVersion": 2.01
 }

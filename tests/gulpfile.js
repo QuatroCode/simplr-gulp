@@ -64,6 +64,11 @@ var Configuration;
                     Development: "tsconfig.json",
                     Production: "tsconfig.production.json"
                 },
+                ServerConfig: {
+                    Ip: "127.0.0.1",
+                    Port: 4000,
+                    LiveReloadPort: 4400
+                },
                 BundleConfig: {
                     AppFile: "app.js",
                     BuildFile: "build.js",
@@ -76,9 +81,6 @@ var Configuration;
                     "scss": "css"
                 },
                 WebConfig: "web.config",
-                ServerPort: 4000,
-                LiveReloadPort: 4400,
-                ServerIp: '127.0.0.1',
                 CfgVersion: 2.01
             };
             this.status = Status.Init;
@@ -130,23 +132,9 @@ var Configuration;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Config.prototype, "ServerPort", {
+        Object.defineProperty(Config.prototype, "ServerConfig", {
             get: function () {
-                return this.config.ServerPort;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Config.prototype, "LiveReloadPort", {
-            get: function () {
-                return this.config.LiveReloadPort;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Config.prototype, "ServerIp", {
-            get: function () {
-                return this.config.ServerIp;
+                return this.config.ServerConfig;
             },
             enumerable: true,
             configurable: true
@@ -289,15 +277,15 @@ var StartServer = (function () {
     function StartServer() {
         this.server = express();
         this.liveReload = tinylr();
-        var livereload = connectLiveReload({ port: Config.LiveReloadPort });
-        Console.info("Server started at " + Config.ServerIp + ":" + Config.ServerPort);
+        var livereload = connectLiveReload({ port: Config.ServerConfig.LiveReloadPort });
+        Console.info("Server started at " + Config.ServerConfig.Ip + ":" + Config.ServerConfig.Port);
         this.server.use(livereload);
         this.server.use(express.static(Config.Directories.Build));
-        this.server.listen(Config.ServerPort);
+        this.server.listen(Config.ServerConfig.Port);
         this.server.all('/*', function (req, res) {
             res.sendFile('index.html', { root: Config.Directories.Build });
         });
-        this.liveReload.listen(Config.LiveReloadPort);
+        this.liveReload.listen(Config.ServerConfig.LiveReloadPort);
     }
     return StartServer;
 })();
@@ -305,7 +293,7 @@ var ShellCommands = (function () {
     function ShellCommands() {
     }
     ShellCommands.PipeLiveReload = function () {
-        return shell("curl http://" + Config.ServerIp + ":" + Config.LiveReloadPort + "/changed?files=<%= file.path %>", { quiet: true });
+        return shell("curl http://" + Config.ServerConfig.Ip + ":" + Config.ServerConfig.LiveReloadPort + "/changed?files=<%= file.path %>", { quiet: true });
     };
     return ShellCommands;
 })();

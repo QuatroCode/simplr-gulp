@@ -75,13 +75,17 @@ module Configuration {
         Exclude: Array<string>;
     }
 
+    export interface ServerConfiguration {
+        Ip: string;
+        Port: number;
+        LiveReloadPort: number;
+    }
+
     export interface IConfig {
         Directories: Directories;
         TypeScriptConfig: TypeScriptConfig;
         BundleConfig: Bundle;
-        ServerPort: number;
-        LiveReloadPort: number;
-        ServerIp: string;
+        ServerConfig: ServerConfiguration;
         WebConfig: string;
         CfgVersion: number;
         ExtensionsMap: { [ext: string]: string };
@@ -99,6 +103,11 @@ module Configuration {
                 Development: "tsconfig.json",
                 Production: "tsconfig.production.json"
             },
+            ServerConfig: {
+                Ip: "127.0.0.1",
+                Port: 4000,
+                LiveReloadPort: 4400
+            },
             BundleConfig: {
                 AppFile: "app.js",
                 BuildFile: "build.js",
@@ -111,9 +120,6 @@ module Configuration {
                 "scss": "css"
             },
             WebConfig: "web.config",
-            ServerPort: 4000,
-            LiveReloadPort: 4400,
-            ServerIp: '127.0.0.1',
             CfgVersion: 2.01
         }
 
@@ -164,16 +170,8 @@ module Configuration {
             return this.config.TypeScriptConfig;
         }
 
-        get ServerPort() {
-            return this.config.ServerPort;
-        }
-
-        get LiveReloadPort() {
-            return this.config.LiveReloadPort;
-        }
-
-        get ServerIp() {
-            return this.config.ServerIp;
+        get ServerConfig() {
+            return this.config.ServerConfig;
         }
 
         get Status() {
@@ -303,22 +301,22 @@ class StartServer {
     private liveReload = tinylr();
 
     constructor() {
-        let livereload = connectLiveReload({ port: Config.LiveReloadPort }) as express.Handler;
-        Console.info(`Server started at ${Config.ServerIp}:${Config.ServerPort}`);
+        let livereload = connectLiveReload({ port: Config.ServerConfig.LiveReloadPort }) as express.Handler;
+        Console.info(`Server started at ${Config.ServerConfig.Ip}:${Config.ServerConfig.Port}`);
         this.server.use(livereload);
         this.server.use(express.static(Config.Directories.Build));
-        this.server.listen(Config.ServerPort);
+        this.server.listen(Config.ServerConfig.Port);
         this.server.all('/*', function (req, res) {
             res.sendFile('index.html', { root: Config.Directories.Build });
         });
-        this.liveReload.listen(Config.LiveReloadPort);
+        this.liveReload.listen(Config.ServerConfig.LiveReloadPort);
     }
 }
 
 class ShellCommands {
 
     static PipeLiveReload() {
-        return shell(`curl http://${Config.ServerIp}:${Config.LiveReloadPort}/changed?files=<%= file.path %>`, { quiet: true });
+        return shell(`curl http://${Config.ServerConfig.Ip}:${Config.ServerConfig.LiveReloadPort}/changed?files=<%= file.path %>`, { quiet: true });
     }
 
 }
