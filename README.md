@@ -43,6 +43,41 @@ You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp), [`tsd`](
 5. `gulp`
 6. Go to [http://localhost:4000](http://localhost:4000)
 
+## Default `gulpconfig.json` (can be customized)
+```json
+{
+    "Directories": {
+        "Source": "src",
+        "Build": "wwwroot",
+        "App": "app"
+    },
+    "TypescriptConfig": {
+        "Development": "tsconfig.json",
+        "Production": "tsconfig.production.json"
+    },
+    "BundleConfig": {
+        "AppFile": "app.js",
+        "BuildFile": "build.js",
+        "Include": [
+            "css"
+        ],
+        "Exclude": [
+            "[wwwroot/js/app/**/*]"
+        ]
+    },
+    "Extensions": {
+        "ts": "js",
+        "tsx": "js",
+        "scss": "css",
+        "less": "css"
+    },
+    "WebConfig": "web.config",
+    "ServerPort": 4000,
+    "LiveReloadPort": 4400,
+    "ServerIp": "127.0.0.1",
+    "CfgVersion": 1.01
+}
+```
 
 ## Development
 #### If you want to update gulpfile.ts yourself
