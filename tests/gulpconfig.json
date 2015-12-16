@@ -28,6 +28,6 @@
         "tsx": "js",
         "scss": "css"
     },
-    "WebConfig": "web.config",
+    "WebConfig": null,
     "CfgVersion": 2.01
 }

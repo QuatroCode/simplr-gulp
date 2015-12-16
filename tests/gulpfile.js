@@ -370,11 +370,19 @@ var FilesWatcher = (function () {
         this.watcher(Paths.AllFilesInSource('.html'), ['_html']);
         this.watcher(Paths.AllFilesInSourceApp('.scss'), ['_sass']);
         this.watcher(Paths.AllDirectoriesInSource('assets'), ['_assets']);
-        this.watcher([Paths.OneFileInSource(Config.WebConfig), Paths.OneFileInSource('config.js')], ['_configs']);
+        this.watcher(this.generateConfigurationFilesList(), ['_configs']);
         Console.info("Started watching files in '" + rootDir + "' folder.");
     }
     FilesWatcher.prototype.watcher = function (dir, gulpTask) {
         return gulp.watch(dir, gulpTask).on('change', this.onFileChanged);
+    };
+    FilesWatcher.prototype.generateConfigurationFilesList = function () {
+        var files = [];
+        files.push(Paths.OneFileInSource('config.js'));
+        if (Config.WebConfig != null && Config.WebConfig.length > 0) {
+            files.push(Paths.OneFileInSource(Config.WebConfig));
+        }
+        return files;
     };
     FilesWatcher.prototype.deleteFile = function (pathName) {
         var pathNames = pathName.split(path.sep);
@@ -396,7 +404,9 @@ var GulpTasks = (function () {
     function GulpTasks() {
         var _this = this;
         this.configs = function () {
-            _this.copyFiles(Paths.OneFileInSource(Config.WebConfig), Paths.BuildDirectory);
+            if (Config.WebConfig != null && Config.WebConfig.length > 0) {
+                _this.copyFiles(Paths.OneFileInSource(Config.WebConfig), Paths.BuildDirectory);
+            }
             _this.copyFiles(Paths.OneFileInSource("config.js"), Paths.BuildDirectory, replace('wwwroot/', ''));
         };
         this.bundle = function (production) {

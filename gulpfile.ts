@@ -396,8 +396,17 @@ class FilesWatcher {
         this.watcher(Paths.AllFilesInSource('.html'), ['_html']);
         this.watcher(Paths.AllFilesInSourceApp('.scss'), ['_sass']);
         this.watcher(Paths.AllDirectoriesInSource('assets'), ['_assets']);
-        this.watcher([Paths.OneFileInSource(Config.WebConfig), Paths.OneFileInSource('config.js')], ['_configs']);
+        this.watcher(this.generateConfigurationFilesList(), ['_configs']);
         Console.info(`Started watching files in '${rootDir}' folder.`);
+    }
+
+    private generateConfigurationFilesList() {
+        let files: Array<string> = [];
+        files.push(Paths.OneFileInSource('config.js'));
+        if (Config.WebConfig != null && Config.WebConfig.length > 0) {
+            files.push(Paths.OneFileInSource(Config.WebConfig));
+        }
+        return files;
     }
 
     private onFileChanged = (event: gulp.WatchEvent) => {
@@ -462,8 +471,9 @@ class GulpTasks {
     }
 
     private configs = () => {
-
-        this.copyFiles(Paths.OneFileInSource(Config.WebConfig), Paths.BuildDirectory);
+        if (Config.WebConfig != null && Config.WebConfig.length > 0) {
+            this.copyFiles(Paths.OneFileInSource(Config.WebConfig), Paths.BuildDirectory);
+        }
         this.copyFiles(Paths.OneFileInSource("config.js"), Paths.BuildDirectory, replace('wwwroot/', ''));
     }
 
