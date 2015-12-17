@@ -53,31 +53,30 @@ You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp), [`tsd`](
         "Build": "wwwroot",
         "App": "app"
     },
-    "TypescriptConfig": {
+    "TypeScriptConfig": {
         "Development": "tsconfig.json",
         "Production": "tsconfig.production.json"
+    },
+    "ServerConfig": {
+        "Ip": "127.0.0.1",
+        "Port": 4000,
+        "LiveReloadPort": 4400
     },
     "BundleConfig": {
         "AppFile": "app.js",
         "BuildFile": "build.js",
-        "Include": [
-            "css"
-        ],
+        "Include": [],
         "Exclude": [
             "[wwwroot/js/app/**/*]"
         ]
     },
-    "Extensions": {
+    "ExtensionsMap": {
         "ts": "js",
         "tsx": "js",
-        "scss": "css",
-        "less": "css"
+        "scss": "css"
     },
     "WebConfig": "web.config",
-    "ServerPort": 4000,
-    "LiveReloadPort": 4400,
-    "ServerIp": "127.0.0.1",
-    "CfgVersion": 1.01
+    "CfgVersion": 2.01
 }
 ```
 
