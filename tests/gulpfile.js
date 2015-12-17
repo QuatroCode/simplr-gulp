@@ -60,9 +60,14 @@ var Configuration;
                     Build: "wwwroot",
                     App: "app"
                 },
-                TypescriptConfig: {
+                TypeScriptConfig: {
                     Development: "tsconfig.json",
                     Production: "tsconfig.production.json"
+                },
+                ServerConfig: {
+                    Ip: "127.0.0.1",
+                    Port: 4000,
+                    LiveReloadPort: 4400
                 },
                 BundleConfig: {
                     AppFile: "app.js",
@@ -70,19 +75,17 @@ var Configuration;
                     Include: [],
                     Exclude: ['[wwwroot/js/app/**/*]']
                 },
-                Extensions: {
+                ExtensionsMap: {
                     "ts": "js",
                     "tsx": "js",
                     "scss": "css"
                 },
                 WebConfig: "web.config",
-                ServerPort: 4000,
-                LiveReloadPort: 4400,
-                ServerIp: '127.0.0.1',
-                CfgVersion: 1.01
+                CfgVersion: 2.01
             };
             this.status = Status.Init;
             this.tryToReadConfigurationFile();
+            this.checkTypeScriptConfigurationFiles();
         }
         Config.prototype.tryToReadConfigurationFile = function (cfgFileName) {
             if (cfgFileName === void 0) { cfgFileName = 'gulpconfig'; }
@@ -113,6 +116,24 @@ var Configuration;
                 Console.warn("gulpconfig.json was not found or is not valid. Creating default configuration...");
             }
         };
+        Config.prototype.checkTypeScriptConfigurationFiles = function () {
+            try {
+                if (!fs.statSync("./" + this.config.TypeScriptConfig.Development).isFile())
+                    throw new Error();
+            }
+            catch (e) {
+                Console.error("File '" + this.config.TypeScriptConfig.Development + "' not found!");
+                gulp.stop();
+            }
+            try {
+                if (!fs.statSync("./" + this.config.TypeScriptConfig.Production).isFile())
+                    throw new Error();
+            }
+            catch (e) {
+                Console.error("File '" + this.config.TypeScriptConfig.Production + "' not found!");
+                gulp.stop();
+            }
+        };
         Config.prototype.writeToConfigFile = function (fileName, config) {
             fs.writeFile(fileName, JSON.stringify(config, null, 4));
         };
@@ -123,30 +144,16 @@ var Configuration;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Config.prototype, "TypescriptConfig", {
+        Object.defineProperty(Config.prototype, "TypeScriptConfig", {
             get: function () {
-                return this.config.TypescriptConfig;
+                return this.config.TypeScriptConfig;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Config.prototype, "ServerPort", {
+        Object.defineProperty(Config.prototype, "ServerConfig", {
             get: function () {
-                return this.config.ServerPort;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Config.prototype, "LiveReloadPort", {
-            get: function () {
-                return this.config.LiveReloadPort;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Config.prototype, "ServerIp", {
-            get: function () {
-                return this.config.ServerIp;
+                return this.config.ServerConfig;
             },
             enumerable: true,
             configurable: true
@@ -182,9 +189,9 @@ var Configuration;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Config.prototype, "Extensions", {
+        Object.defineProperty(Config.prototype, "ExtensionsMap", {
             get: function () {
-                return this.config.Extensions;
+                return this.config.ExtensionsMap;
             },
             enumerable: true,
             configurable: true
@@ -272,10 +279,10 @@ var PathBuilder = (function () {
         return generatedPath;
     };
     PathBuilder.prototype.ReplaceExtensionFromList = function (pathName) {
-        var extensions = Config.Extensions;
+        var extensionsMap = Config.ExtensionsMap;
         var current = path.extname(pathName).substring(1);
-        if (extensions[current] != null) {
-            var replaceTo = extensions[current];
+        if (extensionsMap[current] != null) {
+            var replaceTo = extensionsMap[current];
             return replaceExt(pathName, "." + replaceTo);
         }
         else {
@@ -289,15 +296,15 @@ var StartServer = (function () {
     function StartServer() {
         this.server = express();
         this.liveReload = tinylr();
-        var livereload = connectLiveReload({ port: Config.LiveReloadPort });
-        Console.info("Server started at " + Config.ServerIp + ":" + Config.ServerPort);
+        var livereload = connectLiveReload({ port: Config.ServerConfig.LiveReloadPort });
+        Console.info("Server started at " + Config.ServerConfig.Ip + ":" + Config.ServerConfig.Port);
         this.server.use(livereload);
         this.server.use(express.static(Config.Directories.Build));
-        this.server.listen(Config.ServerPort);
+        this.server.listen(Config.ServerConfig.Port);
         this.server.all('/*', function (req, res) {
             res.sendFile('index.html', { root: Config.Directories.Build });
         });
-        this.liveReload.listen(Config.LiveReloadPort);
+        this.liveReload.listen(Config.ServerConfig.LiveReloadPort);
     }
     return StartServer;
 })();
@@ -305,23 +312,23 @@ var ShellCommands = (function () {
     function ShellCommands() {
     }
     ShellCommands.PipeLiveReload = function () {
-        return shell("curl http://" + Config.ServerIp + ":" + Config.LiveReloadPort + "/changed?files=<%= file.path %>", { quiet: true });
+        return shell("curl http://" + Config.ServerConfig.Ip + ":" + Config.ServerConfig.LiveReloadPort + "/changed?files=<%= file.path %>", { quiet: true });
     };
     return ShellCommands;
 })();
-var TypescriptProject = (function () {
-    function TypescriptProject(configFile) {
+var TypeScriptProject = (function () {
+    function TypeScriptProject(configFile) {
         this.configFile = configFile;
         this.project = ts.createProject(configFile);
     }
-    Object.defineProperty(TypescriptProject.prototype, "Project", {
+    Object.defineProperty(TypeScriptProject.prototype, "Project", {
         get: function () {
             return this.project;
         },
         enumerable: true,
         configurable: true
     });
-    TypescriptProject.prototype.build = function (sourceMap) {
+    TypeScriptProject.prototype.build = function (sourceMap) {
         var src = [Paths.AllFilesInSource('.ts*'), ("!" + Paths.OneDirectoryInSource('libs'))];
         var task = gulp.src(src);
         if (sourceMap)
@@ -336,13 +343,13 @@ var TypescriptProject = (function () {
             }));
         return task.pipe(gulp.dest(this.project.config.compilerOptions.outDir));
     };
-    TypescriptProject.prototype.BuildDevelopment = function () {
+    TypeScriptProject.prototype.BuildDevelopment = function () {
         return this.build(true);
     };
-    TypescriptProject.prototype.BuildProduction = function () {
+    TypeScriptProject.prototype.BuildProduction = function () {
         return this.build(false);
     };
-    return TypescriptProject;
+    return TypeScriptProject;
 })();
 var SassBuilder = (function () {
     function SassBuilder() {
@@ -382,11 +389,19 @@ var FilesWatcher = (function () {
         this.watcher(Paths.AllFilesInSource('.html'), ['_html']);
         this.watcher(Paths.AllFilesInSourceApp('.scss'), ['_sass']);
         this.watcher(Paths.AllDirectoriesInSource('assets'), ['_assets']);
-        this.watcher([Paths.OneFileInSource(Config.WebConfig), Paths.OneFileInSource('config.js')], ['_configs']);
+        this.watcher(this.generateConfigurationFilesList(), ['_configs']);
         Console.info("Started watching files in '" + rootDir + "' folder.");
     }
     FilesWatcher.prototype.watcher = function (dir, gulpTask) {
         return gulp.watch(dir, gulpTask).on('change', this.onFileChanged);
+    };
+    FilesWatcher.prototype.generateConfigurationFilesList = function () {
+        var files = [];
+        files.push(Paths.OneFileInSource('config.js'));
+        if (Config.WebConfig != null && Config.WebConfig.length > 0) {
+            files.push(Paths.OneFileInSource(Config.WebConfig));
+        }
+        return files;
     };
     FilesWatcher.prototype.deleteFile = function (pathName) {
         var pathNames = pathName.split(path.sep);
@@ -408,7 +423,9 @@ var GulpTasks = (function () {
     function GulpTasks() {
         var _this = this;
         this.configs = function () {
-            _this.copyFiles(Paths.OneFileInSource(Config.WebConfig), Paths.BuildDirectory);
+            if (Config.WebConfig != null && Config.WebConfig.length > 0) {
+                _this.copyFiles(Paths.OneFileInSource(Config.WebConfig), Paths.BuildDirectory);
+            }
             _this.copyFiles(Paths.OneFileInSource("config.js"), Paths.BuildDirectory, replace('wwwroot/', ''));
         };
         this.bundle = function (production) {
@@ -459,9 +476,9 @@ var GulpTasks = (function () {
                 task = task.pipe(ShellCommands.PipeLiveReload());
             return task;
         };
-        this.buildTypescript = function (production) {
-            var configFile = (production) ? Config.TypescriptConfig.Production : Config.TypescriptConfig.Development;
-            var tsProject = new TypescriptProject(configFile);
+        this.buildTypeScript = function (production) {
+            var configFile = (production) ? Config.TypeScriptConfig.Production : Config.TypeScriptConfig.Development;
+            var tsProject = new TypeScriptProject(configFile);
             var task;
             if (production)
                 task = tsProject.BuildProduction();
@@ -493,8 +510,8 @@ var GulpTasks = (function () {
         };
         this.registerGulpTask('default', this.startWatcherAndServer);
         this.registerGulpTask('_html', this.buildHtml);
-        this.registerGulpTask('_ts', this.buildTypescript.bind(this, false));
-        this.registerGulpTask('_ts:prod', this.buildTypescript.bind(this, true));
+        this.registerGulpTask('_ts', this.buildTypeScript.bind(this, false));
+        this.registerGulpTask('_ts:prod', this.buildTypeScript.bind(this, true));
         this.registerGulpTask('_sass', this.buildSass.bind(this, false));
         this.registerGulpTask('_sass:prod', this.buildSass.bind(this, true));
         this.registerGulpTask('_assets', this.copyFiles.bind(this, Paths.AllDirectoriesInSource('assets'), Paths.BuildDirectory, null));
