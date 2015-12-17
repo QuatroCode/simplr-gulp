@@ -85,6 +85,7 @@ var Configuration;
             };
             this.status = Status.Init;
             this.tryToReadConfigurationFile();
+            this.checkTypeScriptConfigurationFiles();
         }
         Config.prototype.tryToReadConfigurationFile = function (cfgFileName) {
             if (cfgFileName === void 0) { cfgFileName = 'gulpconfig'; }
@@ -113,6 +114,24 @@ var Configuration;
                 this.config = this.defaultConfig;
                 this.writeToConfigFile(cfgFileName + ".json", this.config);
                 Console.warn("gulpconfig.json was not found or is not valid. Creating default configuration...");
+            }
+        };
+        Config.prototype.checkTypeScriptConfigurationFiles = function () {
+            try {
+                if (!fs.statSync("./" + this.config.TypeScriptConfig.Development).isFile())
+                    throw new Error();
+            }
+            catch (e) {
+                Console.error("File '" + this.config.TypeScriptConfig.Development + "' not found!");
+                gulp.stop();
+            }
+            try {
+                if (!fs.statSync("./" + this.config.TypeScriptConfig.Production).isFile())
+                    throw new Error();
+            }
+            catch (e) {
+                Console.error("File '" + this.config.TypeScriptConfig.Production + "' not found!");
+                gulp.stop();
             }
         };
         Config.prototype.writeToConfigFile = function (fileName, config) {

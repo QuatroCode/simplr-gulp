@@ -128,6 +128,7 @@ module Configuration {
 
         constructor() {
             this.tryToReadConfigurationFile();
+            this.checkTypeScriptConfigurationFiles();
         }
 
         private tryToReadConfigurationFile(cfgFileName: string = 'gulpconfig') {
@@ -155,6 +156,21 @@ module Configuration {
                 this.config = this.defaultConfig;
                 this.writeToConfigFile(`${cfgFileName}.json`, this.config);
                 Console.warn("gulpconfig.json was not found or is not valid. Creating default configuration...");
+            }
+        }
+
+        private checkTypeScriptConfigurationFiles() {
+            try {
+                if (!fs.statSync(`./${this.config.TypeScriptConfig.Development}`).isFile()) throw new Error();
+            } catch (e) {
+                Console.error(`File '${this.config.TypeScriptConfig.Development}' not found!`);
+                gulp.stop();
+            }
+            try {
+                if (!fs.statSync(`./${this.config.TypeScriptConfig.Production}`).isFile()) throw new Error();
+            } catch (e) {
+                Console.error(`File '${this.config.TypeScriptConfig.Production}' not found!`);
+                gulp.stop();
             }
         }
 
