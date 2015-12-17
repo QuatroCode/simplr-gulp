@@ -93,6 +93,22 @@ module Configuration {
 
     export class Config {
 
+        private defaultTypeScriptConfig = {
+            compilerOptions: {
+                module: "commonjs",
+                target: "es5",
+                noImplicitAny: true,
+                preserveConstEnums: true,
+                removeComments: false,
+                sourceMap: true,
+                inlineSources: true
+            },
+            exclude: [
+                "node_modules",
+                "src/libs"
+            ]
+        };
+
         private defaultConfig: IConfig = {
             Directories: {
                 Source: "src",
@@ -148,14 +164,14 @@ module Configuration {
 
                 if (!valid) {
                     Console.warn("Creating new file with default configuration...");
-                    this.writeToConfigFile(`${cfgFileName}-v${config.CfgVersion}.json`, config);
+                    this.writeToFile(`${cfgFileName}-v${config.CfgVersion}.json`, config);
                     this.config = this.defaultConfig;
-                    this.writeToConfigFile(`${cfgFileName}.json`, this.config);
+                    this.writeToFile(`${cfgFileName}.json`, this.config);
                 }
             } catch (e) {
                 this.config = this.defaultConfig;
-                this.writeToConfigFile(`${cfgFileName}.json`, this.config);
-                Console.warn("gulpconfig.json was not found or is not valid. Creating default configuration...");
+                this.writeToFile(`${cfgFileName}.json`, this.config);
+                Console.warn("gulpconfig.json was not found or is not valid. Creating default configuration file...");
             }
         }
 
@@ -163,19 +179,28 @@ module Configuration {
             try {
                 if (!fs.statSync(`./${this.config.TypeScriptConfig.Development}`).isFile()) throw new Error();
             } catch (e) {
-                Console.error(`File '${this.config.TypeScriptConfig.Development}' not found!`);
-                gulp.stop();
+                let tsConfig = {
+                    compilerOptions: this.defaultTypeScriptConfig.compilerOptions,
+                    exclude: this.defaultTypeScriptConfig.exclude
+                };
+                tsConfig.exclude.push(this.config.Directories.Build);
+                this.writeToFile(this.config.TypeScriptConfig.Development, tsConfig);
+                Console.warn(`'${this.config.TypeScriptConfig.Development}' was not found. Creating default TypeScript configuration file...`);
             }
             try {
                 if (!fs.statSync(`./${this.config.TypeScriptConfig.Production}`).isFile()) throw new Error();
             } catch (e) {
-                Console.error(`File '${this.config.TypeScriptConfig.Production}' not found!`);
-                gulp.stop();
+                let tsConfig = this.defaultTypeScriptConfig;
+                tsConfig.compilerOptions.inlineSources = false;
+                tsConfig.compilerOptions.removeComments = true;
+                tsConfig.compilerOptions.sourceMap = false;
+                this.writeToFile(this.config.TypeScriptConfig.Production, tsConfig);
+                Console.warn(`'${this.config.TypeScriptConfig.Production}' was not found. Creating default TypeScript configuration file...`);
             }
         }
 
-        private writeToConfigFile(fileName: string, config: IConfig) {
-            fs.writeFile(fileName, JSON.stringify(config, null, 4));
+        private writeToFile(fileName: string, content: Object) {
+            fs.writeFile(fileName, JSON.stringify(content, null, 4));
         }
 
         get Directories() {
@@ -353,8 +378,7 @@ class TypeScriptProject {
     }
 
     private build(sourceMap: boolean) {
-        let src = [Paths.AllFilesInSource('.ts*'), `!${Paths.OneDirectoryInSource('libs')}`];
-        let task = gulp.src(src);
+        let task = gulp.src(Paths.AllFilesInSource('.ts*'));
         if (sourceMap) task = task.pipe(sourcemaps.init());
         task = task.pipe(ts(this.project)).js;
         if (sourceMap)
@@ -362,9 +386,9 @@ class TypeScriptProject {
         else
             task = task.pipe(uglify({
                 mangle: true,
-                compress: true,
+                compress: true
             }));
-        return task.pipe(gulp.dest(this.project.config.compilerOptions.outDir));
+        return task.pipe(gulp.dest(Config.Directories.Build));
     }
 
     public BuildDevelopment() {
@@ -490,7 +514,7 @@ class GulpTasks {
         if (Config.WebConfig != null && Config.WebConfig.length > 0) {
             this.copyFiles(Paths.OneFileInSource(Config.WebConfig), Paths.BuildDirectory);
         }
-        this.copyFiles(Paths.OneFileInSource("config.js"), Paths.BuildDirectory, replace('wwwroot/', ''));
+        this.copyFiles(Paths.OneFileInSource("config.js"), Paths.BuildDirectory, replace(`${Config.Directories.Build}/`, ''));
     }
 
     private bundle = (production: boolean) => {

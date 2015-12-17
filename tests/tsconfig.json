@@ -1,20 +1,16 @@
 {
-  "compilerOptions": {
-    "module": "commonjs",
-    "target": "es5",
-    "noImplicitAny": true,
-    "preserveConstEnums": true,
-    "removeComments": true,
-    "outDir": "wwwroot",
-    "rootDir": "src",
-    "sourceMap": true,
-    "inlineSources": true,
-    "jsx": "react",
-    "listFiles": true
-  },
-  "exclude": [
-    "node_modules",
-    "wwwroot",
-    "src/libs"
-  ]
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es5",
+        "noImplicitAny": true,
+        "preserveConstEnums": true,
+        "removeComments": false,
+        "sourceMap": true,
+        "inlineSources": true
+    },
+    "exclude": [
+        "node_modules",
+        "src/libs",
+        "wwwroot"
+    ]
 }
