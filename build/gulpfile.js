@@ -120,14 +120,14 @@ var Configuration;
                 }
                 if (!valid) {
                     Console.warn("Creating new file with default configuration...");
-                    this.writeToFileFile(cfgFileName + "-v" + config.CfgVersion + ".json", config);
+                    this.writeToFile(cfgFileName + "-v" + config.CfgVersion + ".json", config);
                     this.config = this.defaultConfig;
-                    this.writeToFileFile(cfgFileName + ".json", this.config);
+                    this.writeToFile(cfgFileName + ".json", this.config);
                 }
             }
             catch (e) {
                 this.config = this.defaultConfig;
-                this.writeToFileFile(cfgFileName + ".json", this.config);
+                this.writeToFile(cfgFileName + ".json", this.config);
                 Console.warn("gulpconfig.json was not found or is not valid. Creating default configuration file...");
             }
         };
@@ -142,7 +142,7 @@ var Configuration;
                     exclude: this.defaultTypeScriptConfig.exclude
                 };
                 tsConfig.exclude.push(this.config.Directories.Build);
-                this.writeToFileFile(this.config.TypeScriptConfig.Development, tsConfig);
+                this.writeToFile(this.config.TypeScriptConfig.Development, tsConfig);
                 Console.warn("'" + this.config.TypeScriptConfig.Development + "' was not found. Creating default TypeScript configuration file...");
             }
             try {
@@ -154,11 +154,11 @@ var Configuration;
                 tsConfig.compilerOptions.inlineSources = false;
                 tsConfig.compilerOptions.removeComments = true;
                 tsConfig.compilerOptions.sourceMap = false;
-                this.writeToFileFile(this.config.TypeScriptConfig.Production, tsConfig);
+                this.writeToFile(this.config.TypeScriptConfig.Production, tsConfig);
                 Console.warn("'" + this.config.TypeScriptConfig.Production + "' was not found. Creating default TypeScript configuration file...");
             }
         };
-        Config.prototype.writeToFileFile = function (fileName, content) {
+        Config.prototype.writeToFile = function (fileName, content) {
             fs.writeFile(fileName, JSON.stringify(content, null, 4));
         };
         Object.defineProperty(Config.prototype, "Directories", {
