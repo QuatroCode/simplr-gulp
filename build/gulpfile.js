@@ -54,6 +54,21 @@ var Configuration;
     var Status = Configuration.Status;
     var Config = (function () {
         function Config() {
+            this.defaultTypeScriptConfig = {
+                compilerOptions: {
+                    module: "commonjs",
+                    target: "es5",
+                    noImplicitAny: true,
+                    preserveConstEnums: true,
+                    removeComments: false,
+                    sourceMap: true,
+                    inlineSources: true
+                },
+                exclude: [
+                    "node_modules",
+                    "src/libs"
+                ]
+            };
             this.defaultConfig = {
                 Directories: {
                     Source: "src",
@@ -105,15 +120,15 @@ var Configuration;
                 }
                 if (!valid) {
                     Console.warn("Creating new file with default configuration...");
-                    this.writeToConfigFile(cfgFileName + "-v" + config.CfgVersion + ".json", config);
+                    this.writeToFileFile(cfgFileName + "-v" + config.CfgVersion + ".json", config);
                     this.config = this.defaultConfig;
-                    this.writeToConfigFile(cfgFileName + ".json", this.config);
+                    this.writeToFileFile(cfgFileName + ".json", this.config);
                 }
             }
             catch (e) {
                 this.config = this.defaultConfig;
-                this.writeToConfigFile(cfgFileName + ".json", this.config);
-                Console.warn("gulpconfig.json was not found or is not valid. Creating default configuration...");
+                this.writeToFileFile(cfgFileName + ".json", this.config);
+                Console.warn("gulpconfig.json was not found or is not valid. Creating default configuration file...");
             }
         };
         Config.prototype.checkTypeScriptConfigurationFiles = function () {
@@ -122,20 +137,29 @@ var Configuration;
                     throw new Error();
             }
             catch (e) {
-                Console.error("File '" + this.config.TypeScriptConfig.Development + "' not found!");
-                gulp.stop();
+                var tsConfig = {
+                    compilerOptions: this.defaultTypeScriptConfig.compilerOptions,
+                    exclude: this.defaultTypeScriptConfig.exclude
+                };
+                tsConfig.exclude.push(this.config.Directories.Build);
+                this.writeToFileFile(this.config.TypeScriptConfig.Development, tsConfig);
+                Console.warn("'" + this.config.TypeScriptConfig.Development + "' was not found. Creating default TypeScript configuration file...");
             }
             try {
                 if (!fs.statSync("./" + this.config.TypeScriptConfig.Production).isFile())
                     throw new Error();
             }
             catch (e) {
-                Console.error("File '" + this.config.TypeScriptConfig.Production + "' not found!");
-                gulp.stop();
+                var tsConfig = this.defaultTypeScriptConfig;
+                tsConfig.compilerOptions.inlineSources = false;
+                tsConfig.compilerOptions.removeComments = true;
+                tsConfig.compilerOptions.sourceMap = false;
+                this.writeToFileFile(this.config.TypeScriptConfig.Production, tsConfig);
+                Console.warn("'" + this.config.TypeScriptConfig.Production + "' was not found. Creating default TypeScript configuration file...");
             }
         };
-        Config.prototype.writeToConfigFile = function (fileName, config) {
-            fs.writeFile(fileName, JSON.stringify(config, null, 4));
+        Config.prototype.writeToFileFile = function (fileName, content) {
+            fs.writeFile(fileName, JSON.stringify(content, null, 4));
         };
         Object.defineProperty(Config.prototype, "Directories", {
             get: function () {
@@ -329,8 +353,7 @@ var TypeScriptProject = (function () {
         configurable: true
     });
     TypeScriptProject.prototype.build = function (sourceMap) {
-        var src = [Paths.AllFilesInSource('.ts*'), ("!" + Paths.OneDirectoryInSource('libs'))];
-        var task = gulp.src(src);
+        var task = gulp.src(Paths.AllFilesInSource('.ts*'));
         if (sourceMap)
             task = task.pipe(sourcemaps.init());
         task = task.pipe(ts(this.project)).js;
@@ -339,9 +362,9 @@ var TypeScriptProject = (function () {
         else
             task = task.pipe(uglify({
                 mangle: true,
-                compress: true,
+                compress: true
             }));
-        return task.pipe(gulp.dest(this.project.config.compilerOptions.outDir));
+        return task.pipe(gulp.dest(Config.Directories.Build));
     };
     TypeScriptProject.prototype.BuildDevelopment = function () {
         return this.build(true);
@@ -426,7 +449,7 @@ var GulpTasks = (function () {
             if (Config.WebConfig != null && Config.WebConfig.length > 0) {
                 _this.copyFiles(Paths.OneFileInSource(Config.WebConfig), Paths.BuildDirectory);
             }
-            _this.copyFiles(Paths.OneFileInSource("config.js"), Paths.BuildDirectory, replace('wwwroot/', ''));
+            _this.copyFiles(Paths.OneFileInSource("config.js"), Paths.BuildDirectory, replace(Config.Directories.Build + "/", ''));
         };
         this.bundle = function (production) {
             var jspmInclude = Config.BundleConfig.Include;
