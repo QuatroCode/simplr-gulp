@@ -445,6 +445,9 @@ var FilesWatcher = (function () {
 var GulpTasks = (function () {
     function GulpTasks() {
         var _this = this;
+        this.jspmInstall = function () {
+            return jspm.install(true, { lock: true });
+        };
         this.configs = function () {
             if (Config.WebConfig != null && Config.WebConfig.length > 0) {
                 _this.copyFiles(Paths.OneFileInSource(Config.WebConfig), Paths.BuildDirectory);
@@ -544,6 +547,7 @@ var GulpTasks = (function () {
         this.registerGulpTask(':build', this.buildCode);
         this.registerGulpTask(':build:prod', this.buildCodeForProduction);
         this.registerGulpTask(':clean', this.clean);
+        this.registerGulpTask(':jspm:install', this.jspmInstall);
     }
     GulpTasks.prototype.registerGulpTask = function (name, callBack) {
         gulp.task(name, callBack);
