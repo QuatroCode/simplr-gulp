@@ -86,3 +86,6 @@ You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp), [`tsd`](
 
 ## Hyperlinks
 * [simplr-gulp wiki](https://github.com/QuatroCode/simplr-gulp/wiki)
+* [gulp](https://github.com/gulpjs/gulp)
+* [tsd](https://github.com/DefinitelyTyped/tsd)
+* [jspm](https://github.com/jspm/jspm-cli)
