@@ -90,13 +90,13 @@ var Configuration;
                     Include: [],
                     Exclude: ['[wwwroot/js/app/**/*]']
                 },
-                ExtensionsMap: {
-                    "ts": "js",
-                    "tsx": "js",
-                    "scss": "css"
-                },
-                WebConfig: "web.config",
-                CfgVersion: 2.01
+                WebConfig: null,
+                CfgVersion: 2.02
+            };
+            this.defaultExtensionsMap = {
+                "ts": "js",
+                "tsx": "js",
+                "scss": "css"
             };
             this.status = Status.Init;
             this.tryToReadConfigurationFile();
@@ -161,6 +161,13 @@ var Configuration;
         Config.prototype.writeToFile = function (fileName, content) {
             fs.writeFile(fileName, JSON.stringify(content, null, 4));
         };
+        Object.defineProperty(Config.prototype, "ExtensionsMap", {
+            get: function () {
+                return this.defaultExtensionsMap;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Config.prototype, "Directories", {
             get: function () {
                 return this.config.Directories;
@@ -209,13 +216,6 @@ var Configuration;
         Object.defineProperty(Config.prototype, "CfgVersion", {
             get: function () {
                 return this.config.CfgVersion;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Config.prototype, "ExtensionsMap", {
-            get: function () {
-                return this.config.ExtensionsMap;
             },
             enumerable: true,
             configurable: true

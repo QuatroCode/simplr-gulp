@@ -88,7 +88,6 @@ module Configuration {
         ServerConfig: ServerConfiguration;
         WebConfig: string;
         CfgVersion: number;
-        ExtensionsMap: { [ext: string]: string };
     }
 
     export class Config {
@@ -130,14 +129,15 @@ module Configuration {
                 Include: [],
                 Exclude: ['[wwwroot/js/app/**/*]']
             },
-            ExtensionsMap: {
-                "ts": "js",
-                "tsx": "js",
-                "scss": "css"
-            },
-            WebConfig: "web.config",
-            CfgVersion: 2.01
+            WebConfig: null,
+            CfgVersion: 2.02
         }
+
+        private defaultExtensionsMap: { [ext: string]: string } = {
+            "ts": "js",
+            "tsx": "js",
+            "scss": "css"
+        };
 
         private config: IConfig;
         private status: Status = Status.Init;
@@ -203,6 +203,10 @@ module Configuration {
             fs.writeFile(fileName, JSON.stringify(content, null, 4));
         }
 
+        get ExtensionsMap() {
+            return this.defaultExtensionsMap;
+        }
+
         get Directories() {
             return this.config.Directories;
         }
@@ -233,10 +237,6 @@ module Configuration {
 
         get CfgVersion() {
             return this.config.CfgVersion;
-        }
-
-        get ExtensionsMap() {
-            return this.config.ExtensionsMap;
         }
     }
 

@@ -23,11 +23,6 @@
             "[wwwroot/js/app/**/*]"
         ]
     },
-    "ExtensionsMap": {
-        "ts": "js",
-        "tsx": "js",
-        "scss": "css"
-    },
     "WebConfig": null,
-    "CfgVersion": 2.01
+    "CfgVersion": 2.02
 }
