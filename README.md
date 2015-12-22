@@ -68,15 +68,11 @@ You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp), [`tsd`](
             "[wwwroot/js/app/**/*]"
         ]
     },
-    "ExtensionsMap": {
-        "ts": "js",
-        "tsx": "js",
-        "scss": "css"
-    },
-    "WebConfig": "web.config",
-    "CfgVersion": 2.01
+    "WebConfig": null,
+    "CfgVersion": 2.02
 }
 ```
+> [More info about configuration](https://github.com/QuatroCode/simplr-gulp/wiki/Configuration)
 
 ## Development
 #### If you want to update gulpfile.ts yourself
@@ -86,3 +82,7 @@ You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp), [`tsd`](
 3. `tsd reinstall`
 4. `npm run watch` (or `npm run build` for one time compilation)
 5. Make changes
+
+
+## Hyperlinks
+* [simplr-gulp wiki](https://github.com/QuatroCode/simplr-gulp/wiki)
