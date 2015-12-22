@@ -63,7 +63,7 @@ module Configuration {
         App: string;
     }
 
-    export interface TypescriptConfig {
+    export interface TypeScriptConfig {
         Development: string;
         Production: string;
     }
@@ -75,19 +75,38 @@ module Configuration {
         Exclude: Array<string>;
     }
 
+    export interface ServerConfiguration {
+        Ip: string;
+        Port: number;
+        LiveReloadPort: number;
+    }
+
     export interface IConfig {
         Directories: Directories;
-        TypescriptConfig: TypescriptConfig;
+        TypeScriptConfig: TypeScriptConfig;
         BundleConfig: Bundle;
-        ServerPort: number;
-        LiveReloadPort: number;
-        ServerIp: string;
+        ServerConfig: ServerConfiguration;
         WebConfig: string;
         CfgVersion: number;
-        Extensions: { [ext: string]: string };
     }
 
     export class Config {
+
+        private defaultTypeScriptConfig = {
+            compilerOptions: {
+                module: "commonjs",
+                target: "es5",
+                noImplicitAny: true,
+                preserveConstEnums: true,
+                removeComments: false,
+                sourceMap: true,
+                inlineSources: true
+            },
+            exclude: [
+                "node_modules",
+                "src/libs"
+            ]
+        };
 
         private defaultConfig: IConfig = {
             Directories: {
@@ -95,9 +114,14 @@ module Configuration {
                 Build: "wwwroot",
                 App: "app"
             },
-            TypescriptConfig: {
+            TypeScriptConfig: {
                 Development: "tsconfig.json",
                 Production: "tsconfig.production.json"
+            },
+            ServerConfig: {
+                Ip: "127.0.0.1",
+                Port: 4000,
+                LiveReloadPort: 4400
             },
             BundleConfig: {
                 AppFile: "app.js",
@@ -105,23 +129,22 @@ module Configuration {
                 Include: [],
                 Exclude: ['[wwwroot/js/app/**/*]']
             },
-            Extensions: {
-                "ts": "js",
-                "tsx": "js",
-                "scss": "css"
-            },
-            WebConfig: "web.config",
-            ServerPort: 4000,
-            LiveReloadPort: 4400,
-            ServerIp: '127.0.0.1',
-            CfgVersion: 1.01
+            WebConfig: null,
+            CfgVersion: 2.02
         }
+
+        private defaultExtensionsMap: { [ext: string]: string } = {
+            "ts": "js",
+            "tsx": "js",
+            "scss": "css"
+        };
 
         private config: IConfig;
         private status: Status = Status.Init;
 
         constructor() {
             this.tryToReadConfigurationFile();
+            this.checkTypeScriptConfigurationFiles();
         }
 
         private tryToReadConfigurationFile(cfgFileName: string = 'gulpconfig') {
@@ -141,39 +164,59 @@ module Configuration {
 
                 if (!valid) {
                     Console.warn("Creating new file with default configuration...");
-                    this.writeToConfigFile(`${cfgFileName}-v${config.CfgVersion}.json`, config);
+                    this.writeToFile(`${cfgFileName}-v${config.CfgVersion}.json`, config);
                     this.config = this.defaultConfig;
-                    this.writeToConfigFile(`${cfgFileName}.json`, this.config);
+                    this.writeToFile(`${cfgFileName}.json`, this.config);
                 }
             } catch (e) {
                 this.config = this.defaultConfig;
-                this.writeToConfigFile(`${cfgFileName}.json`, this.config);
-                Console.warn("gulpconfig.json was not found or is not valid. Creating default configuration...");
+                this.writeToFile(`${cfgFileName}.json`, this.config);
+                Console.warn("gulpconfig.json was not found or is not valid. Creating default configuration file...");
             }
         }
 
-        private writeToConfigFile(fileName: string, config: IConfig) {
-            fs.writeFile(fileName, JSON.stringify(config, null, 4));
+        private checkTypeScriptConfigurationFiles() {
+            try {
+                if (!fs.statSync(`./${this.config.TypeScriptConfig.Development}`).isFile()) throw new Error();
+            } catch (e) {
+                let tsConfig = {
+                    compilerOptions: this.defaultTypeScriptConfig.compilerOptions,
+                    exclude: this.defaultTypeScriptConfig.exclude
+                };
+                tsConfig.exclude.push(this.config.Directories.Build);
+                this.writeToFile(this.config.TypeScriptConfig.Development, tsConfig);
+                Console.warn(`'${this.config.TypeScriptConfig.Development}' was not found. Creating default TypeScript configuration file...`);
+            }
+            try {
+                if (!fs.statSync(`./${this.config.TypeScriptConfig.Production}`).isFile()) throw new Error();
+            } catch (e) {
+                let tsConfig = this.defaultTypeScriptConfig;
+                tsConfig.compilerOptions.inlineSources = false;
+                tsConfig.compilerOptions.removeComments = true;
+                tsConfig.compilerOptions.sourceMap = false;
+                this.writeToFile(this.config.TypeScriptConfig.Production, tsConfig);
+                Console.warn(`'${this.config.TypeScriptConfig.Production}' was not found. Creating default TypeScript configuration file...`);
+            }
+        }
+
+        private writeToFile(fileName: string, content: Object) {
+            fs.writeFile(fileName, JSON.stringify(content, null, 4));
+        }
+
+        get ExtensionsMap() {
+            return this.defaultExtensionsMap;
         }
 
         get Directories() {
             return this.config.Directories;
         }
 
-        get TypescriptConfig() {
-            return this.config.TypescriptConfig;
+        get TypeScriptConfig() {
+            return this.config.TypeScriptConfig;
         }
 
-        get ServerPort() {
-            return this.config.ServerPort;
-        }
-
-        get LiveReloadPort() {
-            return this.config.LiveReloadPort;
-        }
-
-        get ServerIp() {
-            return this.config.ServerIp;
+        get ServerConfig() {
+            return this.config.ServerConfig;
         }
 
         get Status() {
@@ -194,10 +237,6 @@ module Configuration {
 
         get CfgVersion() {
             return this.config.CfgVersion;
-        }
-
-        get Extensions() {
-            return this.config.Extensions;
         }
     }
 
@@ -285,11 +324,11 @@ class PathBuilder {
 
     public ReplaceExtensionFromList(pathName: string) {
 
-        let extensions = Config.Extensions;
+        let extensionsMap = Config.ExtensionsMap;
 
         let current = path.extname(pathName).substring(1);
-        if (extensions[current] != null) {
-            let replaceTo = extensions[current];
+        if (extensionsMap[current] != null) {
+            let replaceTo = extensionsMap[current];
             return replaceExt(pathName, `.${replaceTo}`);
         } else {
             return pathName;
@@ -303,27 +342,27 @@ class StartServer {
     private liveReload = tinylr();
 
     constructor() {
-        let livereload = connectLiveReload({ port: Config.LiveReloadPort }) as express.Handler;
-        Console.info(`Server started at ${Config.ServerIp}:${Config.ServerPort}`);
+        let livereload = connectLiveReload({ port: Config.ServerConfig.LiveReloadPort }) as express.Handler;
+        Console.info(`Server started at ${Config.ServerConfig.Ip}:${Config.ServerConfig.Port}`);
         this.server.use(livereload);
         this.server.use(express.static(Config.Directories.Build));
-        this.server.listen(Config.ServerPort);
+        this.server.listen(Config.ServerConfig.Port);
         this.server.all('/*', function (req, res) {
             res.sendFile('index.html', { root: Config.Directories.Build });
         });
-        this.liveReload.listen(Config.LiveReloadPort);
+        this.liveReload.listen(Config.ServerConfig.LiveReloadPort);
     }
 }
 
 class ShellCommands {
 
     static PipeLiveReload() {
-        return shell(`curl http://${Config.ServerIp}:${Config.LiveReloadPort}/changed?files=<%= file.path %>`, { quiet: true });
+        return shell(`curl http://${Config.ServerConfig.Ip}:${Config.ServerConfig.LiveReloadPort}/changed?files=<%= file.path %>`, { quiet: true });
     }
 
 }
 
-class TypescriptProject {
+class TypeScriptProject {
 
     private project: ts.Project;
 
@@ -339,8 +378,7 @@ class TypescriptProject {
     }
 
     private build(sourceMap: boolean) {
-        let src = [Paths.AllFilesInSource('.ts*'), `!${Paths.OneDirectoryInSource('libs')}`];
-        let task = gulp.src(src);
+        let task = gulp.src(Paths.AllFilesInSource('.ts*'));
         if (sourceMap) task = task.pipe(sourcemaps.init());
         task = task.pipe(ts(this.project)).js;
         if (sourceMap)
@@ -348,9 +386,9 @@ class TypescriptProject {
         else
             task = task.pipe(uglify({
                 mangle: true,
-                compress: true,
+                compress: true
             }));
-        return task.pipe(gulp.dest(this.project.config.compilerOptions.outDir));
+        return task.pipe(gulp.dest(Config.Directories.Build));
     }
 
     public BuildDevelopment() {
@@ -398,8 +436,17 @@ class FilesWatcher {
         this.watcher(Paths.AllFilesInSource('.html'), ['_html']);
         this.watcher(Paths.AllFilesInSourceApp('.scss'), ['_sass']);
         this.watcher(Paths.AllDirectoriesInSource('assets'), ['_assets']);
-        this.watcher([Paths.OneFileInSource(Config.WebConfig), Paths.OneFileInSource('config.js')], ['_configs']);
+        this.watcher(this.generateConfigurationFilesList(), ['_configs']);
         Console.info(`Started watching files in '${rootDir}' folder.`);
+    }
+
+    private generateConfigurationFilesList() {
+        let files: Array<string> = [];
+        files.push(Paths.OneFileInSource('config.js'));
+        if (Config.WebConfig != null && Config.WebConfig.length > 0) {
+            files.push(Paths.OneFileInSource(Config.WebConfig));
+        }
+        return files;
     }
 
     private onFileChanged = (event: gulp.WatchEvent) => {
@@ -450,8 +497,8 @@ class GulpTasks {
     constructor() {
         this.registerGulpTask('default', this.startWatcherAndServer);
         this.registerGulpTask('_html', this.buildHtml);
-        this.registerGulpTask('_ts', this.buildTypescript.bind(this, false));
-        this.registerGulpTask('_ts:prod', this.buildTypescript.bind(this, true));
+        this.registerGulpTask('_ts', this.buildTypeScript.bind(this, false));
+        this.registerGulpTask('_ts:prod', this.buildTypeScript.bind(this, true));
         this.registerGulpTask('_sass', this.buildSass.bind(this, false));
         this.registerGulpTask('_sass:prod', this.buildSass.bind(this, true));
         this.registerGulpTask('_assets', this.copyFiles.bind(this, Paths.AllDirectoriesInSource('assets'), Paths.BuildDirectory, null));
@@ -464,9 +511,10 @@ class GulpTasks {
     }
 
     private configs = () => {
-
-        this.copyFiles(Paths.OneFileInSource(Config.WebConfig), Paths.BuildDirectory);
-        this.copyFiles(Paths.OneFileInSource("config.js"), Paths.BuildDirectory, replace('wwwroot/', ''));
+        if (Config.WebConfig != null && Config.WebConfig.length > 0) {
+            this.copyFiles(Paths.OneFileInSource(Config.WebConfig), Paths.BuildDirectory);
+        }
+        this.copyFiles(Paths.OneFileInSource("config.js"), Paths.BuildDirectory, replace(`${Config.Directories.Build}/`, ''));
     }
 
     private bundle = (production: boolean) => {
@@ -531,9 +579,9 @@ class GulpTasks {
     }
 
 
-    private buildTypescript = (production: boolean) => {
-        let configFile = (production) ? Config.TypescriptConfig.Production : Config.TypescriptConfig.Development;
-        let tsProject = new TypescriptProject(configFile);
+    private buildTypeScript = (production: boolean) => {
+        let configFile = (production) ? Config.TypeScriptConfig.Production : Config.TypeScriptConfig.Development;
+        let tsProject = new TypeScriptProject(configFile);
         let task: NodeJS.ReadWriteStream;
         if (production)
             task = tsProject.BuildProduction();

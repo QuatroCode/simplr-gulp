@@ -4,9 +4,7 @@ System.config({
   transpiler: "typescript",
   paths: {
     "github:*": "libs/github/*",
-    "npm:*": "libs/npm/*",
-    "quatrodev:*": "libs/quatrodev/*",
-    "quatrodev-insider:*": "libs/quatrodev-insider/*"
+    "npm:*": "libs/npm/*"
   },
   buildCSS: false,
 

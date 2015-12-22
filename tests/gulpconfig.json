@@ -4,29 +4,25 @@
         "Build": "wwwroot",
         "App": "app"
     },
-    "TypescriptConfig": {
+    "TypeScriptConfig": {
         "Development": "tsconfig.json",
         "Production": "tsconfig.production.json"
+    },
+    "ServerConfig": {
+        "Ip": "127.0.0.1",
+        "Port": 4000,
+        "LiveReloadPort": 4400
     },
     "BundleConfig": {
         "AppFile": "app.js",
         "BuildFile": "build.js",
         "Include": [
-            "css"
+          "css"
         ],
         "Exclude": [
             "[wwwroot/js/app/**/*]"
         ]
     },
-    "Extensions": {
-        "ts": "js",
-        "tsx": "js",
-        "scss": "css",
-        "less": "css"
-    },
-    "WebConfig": "web.config",
-    "ServerPort": 4000,
-    "LiveReloadPort": 4400,
-    "ServerIp": "127.0.0.1",
-    "CfgVersion": 1.01
+    "WebConfig": null,
+    "CfgVersion": 2.02
 }

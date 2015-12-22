@@ -11,8 +11,6 @@ All directories, server and live-reload settings are configured in `gulpconfig.j
 
 After first run, `gulpconfig.json` file will be generated for you to edit for your own use.
 
-**NB!** For now, you have to manually add `tsconfig.json` file. More info can be found [here](https://github.com/QuatroCode/simplr-gulp/issues/5).
-
 ### Available commands:
 **Main tasks**
 * `:build` - compiles files (`*.ts`, `*.scss`, `index.html`, `configs`, etc.)
@@ -53,33 +51,28 @@ You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp), [`tsd`](
         "Build": "wwwroot",
         "App": "app"
     },
-    "TypescriptConfig": {
+    "TypeScriptConfig": {
         "Development": "tsconfig.json",
         "Production": "tsconfig.production.json"
+    },
+    "ServerConfig": {
+        "Ip": "127.0.0.1",
+        "Port": 4000,
+        "LiveReloadPort": 4400
     },
     "BundleConfig": {
         "AppFile": "app.js",
         "BuildFile": "build.js",
-        "Include": [
-            "css"
-        ],
+        "Include": [],
         "Exclude": [
             "[wwwroot/js/app/**/*]"
         ]
     },
-    "Extensions": {
-        "ts": "js",
-        "tsx": "js",
-        "scss": "css",
-        "less": "css"
-    },
-    "WebConfig": "web.config",
-    "ServerPort": 4000,
-    "LiveReloadPort": 4400,
-    "ServerIp": "127.0.0.1",
-    "CfgVersion": 1.01
+    "WebConfig": null,
+    "CfgVersion": 2.02
 }
 ```
+> [More info about configuration](https://github.com/QuatroCode/simplr-gulp/wiki/Configuration)
 
 ## Development
 #### If you want to update gulpfile.ts yourself
@@ -89,3 +82,10 @@ You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp), [`tsd`](
 3. `tsd reinstall`
 4. `npm run watch` (or `npm run build` for one time compilation)
 5. Make changes
+
+
+## Hyperlinks
+* [simplr-gulp wiki](https://github.com/QuatroCode/simplr-gulp/wiki)
+* [gulp](https://github.com/gulpjs/gulp)
+* [tsd](https://github.com/DefinitelyTyped/tsd)
+* [jspm](https://github.com/jspm/jspm-cli)
