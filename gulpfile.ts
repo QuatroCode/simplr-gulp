@@ -508,12 +508,6 @@ class GulpTasks {
         this.registerGulpTask(':build', this.buildCode);
         this.registerGulpTask(':build:prod', this.buildCodeForProduction);
         this.registerGulpTask(':clean', this.clean);
-        this.registerGulpTask(':jspm:install', this.jspmInstall);
-    }
-
-
-    private jspmInstall = () => {
-        return jspm.install(true, { lock: true });
     }
 
     private configs = () => {
