@@ -1,0 +1,24 @@
+{
+  "name": "simplr-gulp",
+  "dependencies": {
+    "gulp": "github:quatrotypings/npm-gulp/4.0.0-alpha.2",
+    "tsconfig-glob": "github:QuatroTypings/npm-tsconfig-glob/0.4.3"
+  },
+  "globalDependencies": {
+    "chokidar": "registry:dt/chokidar#1.4.3+20160316155526",
+    "colors": "registry:dt/colors#0.6.0-1+20160501135139",
+    "express": "registry:dt/express#4.0.0+20160317120654",
+    "express-serve-static-core": "registry:dt/express-serve-static-core#0.0.0+20160602151406",
+    "glob": "registry:dt/glob#5.0.10+20160317120654",
+    "glob-stream": "registry:dt/glob-stream#3.1.12+20160316155526",
+    "gulp-sourcemaps": "registry:dt/gulp-sourcemaps#0.0.0+20160316155526",
+    "gulp-typescript": "registry:dt/gulp-typescript#0.0.0+20160317120654",
+    "mime": "registry:dt/mime#0.0.0+20160316155526",
+    "minimatch": "registry:dt/minimatch#2.0.8+20160317120654",
+    "node": "registry:dt/node#6.0.0+20160608110640",
+    "serve-static": "registry:dt/serve-static#0.0.0+20160606155157",
+    "undertaker": "registry:dt/undertaker#0.12.0+20160316155526",
+    "vinyl": "registry:dt/vinyl#1.1.0+20160316155526",
+    "vinyl-fs": "registry:dt/vinyl-fs#0.0.0+20160317120654"
+  }
+}
