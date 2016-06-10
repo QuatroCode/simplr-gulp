@@ -2,7 +2,8 @@
   "name": "simplr-gulp",
   "dependencies": {
     "gulp": "github:quatrotypings/npm-gulp/4.0.0-alpha.2",
-    "tsconfig-glob": "github:QuatroTypings/npm-tsconfig-glob/0.4.3"
+    "tsconfig-glob": "github:QuatroTypings/npm-tsconfig-glob/0.4.3",
+    "tsconfig-lint": "github:QuatroTypings/npm-tsconfig-lint/0.11.0"
   },
   "globalDependencies": {
     "chokidar": "registry:dt/chokidar#1.4.3+20160316155526",
