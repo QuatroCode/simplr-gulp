@@ -13,3 +13,7 @@ function GetTimeNow() {
     return hours + ":" + minutes + ":" + seconds;
 }
 exports.GetTimeNow = GetTimeNow;
+function RemoveFullPath(directory) {
+    return directory.split(__dirname + "\\")[1];
+}
+exports.RemoveFullPath = RemoveFullPath;

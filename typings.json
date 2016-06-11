@@ -1,7 +1,7 @@
 {
   "name": "simplr-gulp",
   "dependencies": {
-    "gulp": "github:quatrotypings/npm-gulp/4.0.0-alpha.2",
+    "gulp": "github:QuatroTypings/npm-gulp/4.0.0-alpha.2",
     "tsconfig-glob": "github:QuatroTypings/npm-tsconfig-glob/0.4.3",
     "tsconfig-lint": "github:QuatroTypings/npm-tsconfig-lint/0.11.0"
   },

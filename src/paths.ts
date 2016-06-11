@@ -2,73 +2,78 @@ import * as path from 'path';
 import Configuration from './configuration';
 
 
-class PathBuilder {
+abstract class BuilderBase {
+    protected abstract builder(startPath: string, param: string): string;
 
-    get SourceDirectory() {
-        return Configuration.GulpConfig.Directories.Source;
+    InSource(param: string = undefined) {
+        let startPath = Paths.Directories.Source;
+        return this.builder(startPath, param);
     }
 
-    get BuildDirectory() {
-        return Configuration.GulpConfig.Directories.Build;
+    InSourceApp(param: string = undefined) {
+        let startPath = Paths.Directories.SourceApp;
+        return this.builder(startPath, param);
     }
 
-    get SourceAppDirectory() {
-        return path.join(Configuration.GulpConfig.Directories.Source, Configuration.GulpConfig.Directories.App);
+    InBuild(param: string = undefined) {
+        let startPath = Paths.Directories.Build;
+        return this.builder(startPath, param);
     }
 
-    get BuildAppDirectory() {
-        return path.join(Configuration.GulpConfig.Directories.Build, Configuration.GulpConfig.Directories.App);
+    InBuildApp(param: string = undefined) {
+        let startPath = Paths.Directories.BuildApp;
+        return this.builder(startPath, param);
     }
-
-    public AllDirectoriesInSourceApp(dirName: string) {
-        return path.join(this.SourceAppDirectory, '**', dirName, '**', '*');
-    }
-
-    public AllDirectoriesInSource(dirName: string) {
-        return path.join(this.SourceDirectory, '**', dirName, '**', '*');
-    }
-
-    public OneDirectoryInSource(dirName: string) {
-        return path.join(this.SourceDirectory, dirName, '**', '*');
-    }
-
-    public OneDirectoryInSourceApp(dirName: string) {
-        return path.join(this.SourceAppDirectory, dirName, '**', '*');
-    }
-
-    public AllFilesInSourceApp(type: string) {
-        return path.join(this.SourceAppDirectory, '**', '*' + type);
-    }
-
-    public AllFilesInSource(type: string) {
-        type = (type === '*') ? type : `*${type}`;
-        return path.join(this.SourceDirectory, '**', type);
-    }
-
-    public AllFilesInBuild(type: string) {
-        type = (type === '*') ? type : `*${type}`;
-        return path.join(this.BuildDirectory, '**', type);
-    }
-
-    public OneFileInBuild(fileName: string) {
-        return path.join(this.BuildDirectory, fileName);
-    }
-
-    public OneFileInBuildApp(fileName: string) {
-        return path.join(this.BuildAppDirectory, fileName);
-    }
-
-    public OneFileInSource(fileName: string) {
-        return path.join(this.SourceDirectory, fileName);
-    }
-
-    public OneFileInSourceApp(fileName: string) {
-        return path.join(this.SourceAppDirectory, fileName);
-    }
-
-    public RemoveFullPath(directory: string) {
-        return directory.split(`${__dirname}\\`)[1];
-    }
-
-
 }
+
+
+class DirectoriesBuilder {
+    private gulpConfig = Configuration.GulpConfig;
+    Source = this.gulpConfig.Directories.Source;
+    SourceApp = path.join(this.Source, this.gulpConfig.Directories.App);
+    Build = this.gulpConfig.Directories.Build;
+    BuildApp = path.join(this.Build, this.gulpConfig.Directories.App);
+}
+
+class AllFilesBuilder extends BuilderBase {
+    protected builder(startPath: string, name: string) {
+        if (name != undefined) {
+            return path.join(startPath, '**', '*' + name);
+        } else {
+            return path.join(startPath, '**', '*');
+        }
+    }
+}
+
+class OneFileBuilder extends BuilderBase {
+    protected builder(startPath: string, name: string) {
+        return path.join(startPath, name);
+    }
+}
+
+
+class AllDirectoriesBuilder extends BuilderBase {
+    protected builder(startPath: string, name: string) {
+        return path.join(startPath, "**", name, "**", "*");
+    }
+}
+
+class OneDirectoryBuilder extends BuilderBase {
+    protected builder(startPath: string, name: string) {
+        return path.join(startPath, name, "**", "*");
+    }
+}
+
+
+namespace Paths {
+    export var Directories = new DirectoriesBuilder();
+    export namespace Builders {
+        export var AllFiles = new AllFilesBuilder();
+        export var OneFile = new OneFileBuilder();
+        export var AllDirectories = new AllDirectoriesBuilder();
+        export var OneDirectory = new OneDirectoryBuilder();
+    }
+}
+
+
+export default Paths;

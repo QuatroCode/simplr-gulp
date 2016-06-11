@@ -1,73 +1,100 @@
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var path = require('path');
 var configuration_1 = require('./configuration');
-var PathBuilder = (function () {
-    function PathBuilder() {
+var BuilderBase = (function () {
+    function BuilderBase() {
     }
-    Object.defineProperty(PathBuilder.prototype, "SourceDirectory", {
-        get: function () {
-            return configuration_1.default.GulpConfig.Directories.Source;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(PathBuilder.prototype, "BuildDirectory", {
-        get: function () {
-            return configuration_1.default.GulpConfig.Directories.Build;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(PathBuilder.prototype, "SourceAppDirectory", {
-        get: function () {
-            return path.join(configuration_1.default.GulpConfig.Directories.Source, configuration_1.default.GulpConfig.Directories.App);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(PathBuilder.prototype, "BuildAppDirectory", {
-        get: function () {
-            return path.join(configuration_1.default.GulpConfig.Directories.Build, configuration_1.default.GulpConfig.Directories.App);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    PathBuilder.prototype.AllDirectoriesInSourceApp = function (dirName) {
-        return path.join(this.SourceAppDirectory, '**', dirName, '**', '*');
+    BuilderBase.prototype.InSource = function (param) {
+        if (param === void 0) { param = undefined; }
+        var startPath = Paths.Directories.Source;
+        return this.builder(startPath, param);
     };
-    PathBuilder.prototype.AllDirectoriesInSource = function (dirName) {
-        return path.join(this.SourceDirectory, '**', dirName, '**', '*');
+    BuilderBase.prototype.InSourceApp = function (param) {
+        if (param === void 0) { param = undefined; }
+        var startPath = Paths.Directories.SourceApp;
+        return this.builder(startPath, param);
     };
-    PathBuilder.prototype.OneDirectoryInSource = function (dirName) {
-        return path.join(this.SourceDirectory, dirName, '**', '*');
+    BuilderBase.prototype.InBuild = function (param) {
+        if (param === void 0) { param = undefined; }
+        var startPath = Paths.Directories.Build;
+        return this.builder(startPath, param);
     };
-    PathBuilder.prototype.OneDirectoryInSourceApp = function (dirName) {
-        return path.join(this.SourceAppDirectory, dirName, '**', '*');
+    BuilderBase.prototype.InBuildApp = function (param) {
+        if (param === void 0) { param = undefined; }
+        var startPath = Paths.Directories.BuildApp;
+        return this.builder(startPath, param);
     };
-    PathBuilder.prototype.AllFilesInSourceApp = function (type) {
-        return path.join(this.SourceAppDirectory, '**', '*' + type);
-    };
-    PathBuilder.prototype.AllFilesInSource = function (type) {
-        type = (type === '*') ? type : "*" + type;
-        return path.join(this.SourceDirectory, '**', type);
-    };
-    PathBuilder.prototype.AllFilesInBuild = function (type) {
-        type = (type === '*') ? type : "*" + type;
-        return path.join(this.BuildDirectory, '**', type);
-    };
-    PathBuilder.prototype.OneFileInBuild = function (fileName) {
-        return path.join(this.BuildDirectory, fileName);
-    };
-    PathBuilder.prototype.OneFileInBuildApp = function (fileName) {
-        return path.join(this.BuildAppDirectory, fileName);
-    };
-    PathBuilder.prototype.OneFileInSource = function (fileName) {
-        return path.join(this.SourceDirectory, fileName);
-    };
-    PathBuilder.prototype.OneFileInSourceApp = function (fileName) {
-        return path.join(this.SourceAppDirectory, fileName);
-    };
-    PathBuilder.prototype.RemoveFullPath = function (directory) {
-        return directory.split(__dirname + "\\")[1];
-    };
-    return PathBuilder;
+    return BuilderBase;
 }());
+var DirectoriesBuilder = (function () {
+    function DirectoriesBuilder() {
+        this.gulpConfig = configuration_1.default.GulpConfig;
+        this.Source = this.gulpConfig.Directories.Source;
+        this.SourceApp = path.join(this.Source, this.gulpConfig.Directories.App);
+        this.Build = this.gulpConfig.Directories.Build;
+        this.BuildApp = path.join(this.Build, this.gulpConfig.Directories.App);
+    }
+    return DirectoriesBuilder;
+}());
+var AllFilesBuilder = (function (_super) {
+    __extends(AllFilesBuilder, _super);
+    function AllFilesBuilder() {
+        _super.apply(this, arguments);
+    }
+    AllFilesBuilder.prototype.builder = function (startPath, name) {
+        if (name != undefined) {
+            return path.join(startPath, '**', '*' + name);
+        }
+        else {
+            return path.join(startPath, '**', '*');
+        }
+    };
+    return AllFilesBuilder;
+}(BuilderBase));
+var OneFileBuilder = (function (_super) {
+    __extends(OneFileBuilder, _super);
+    function OneFileBuilder() {
+        _super.apply(this, arguments);
+    }
+    OneFileBuilder.prototype.builder = function (startPath, name) {
+        return path.join(startPath, name);
+    };
+    return OneFileBuilder;
+}(BuilderBase));
+var AllDirectoriesBuilder = (function (_super) {
+    __extends(AllDirectoriesBuilder, _super);
+    function AllDirectoriesBuilder() {
+        _super.apply(this, arguments);
+    }
+    AllDirectoriesBuilder.prototype.builder = function (startPath, name) {
+        return path.join(startPath, "**", name, "**", "*");
+    };
+    return AllDirectoriesBuilder;
+}(BuilderBase));
+var OneDirectoryBuilder = (function (_super) {
+    __extends(OneDirectoryBuilder, _super);
+    function OneDirectoryBuilder() {
+        _super.apply(this, arguments);
+    }
+    OneDirectoryBuilder.prototype.builder = function (startPath, name) {
+        return path.join(startPath, name, "**", "*");
+    };
+    return OneDirectoryBuilder;
+}(BuilderBase));
+var Paths;
+(function (Paths) {
+    Paths.Directories = new DirectoriesBuilder();
+    var Builders;
+    (function (Builders) {
+        Builders.AllFiles = new AllFilesBuilder();
+        Builders.OneFile = new OneFileBuilder();
+        Builders.AllDirectories = new AllDirectoriesBuilder();
+        Builders.OneDirectory = new OneDirectoryBuilder();
+    })(Builders = Paths.Builders || (Paths.Builders = {}));
+})(Paths || (Paths = {}));
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = Paths;

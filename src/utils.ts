@@ -31,3 +31,11 @@ export function GetTimeNow(): string {
         seconds = Pad(date.getSeconds(), 2);
     return `${hours}:${minutes}:${seconds}`;
 }
+
+/**
+ * Remove full directory path name
+ * @return Path
+ */
+export function RemoveFullPath(directory: string) {
+    return directory.split(`${__dirname}\\`)[1];
+}
