@@ -4,7 +4,7 @@ import rollupWatch from 'rollup-watch';
 
 export default {
   entry: './src/main.ts',
-  dest: 'src/gulpfile.js', 
+  dest: 'dist/gulpfile.js', 
   format: 'cjs',
   plugins: [
     typescript(),

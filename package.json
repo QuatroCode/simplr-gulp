@@ -5,12 +5,12 @@
   "author": "QuatroDev",
   "scripts": {
     "build": "rollup -c",
-    "watch": "echo Coming soon... && echo rollup -w -c",
+    "watch": "rollup -w -c",
     "build:sample": "rollup -c -o example/gulpfile.js",
-    "watch:sample": "echo Coming soon... && echo rollup -w -c -o example/gulpfile.js"
+    "watch:sample": "rollup -w -c -o example/gulpfile.js"
   },
   "devDependencies": {
-    "rollup": "^0.29.0",
+    "rollup": "^0.33.0",
     "rollup-watch": "^2.1.1",
     "typescript": "^1.8.10",
     "typings": "^1.0.4"
