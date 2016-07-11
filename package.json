@@ -10,7 +10,7 @@
     "watch:sample": "rollup -w -c -o example/gulpfile.js"
   },
   "devDependencies": {
-    "rollup": "^0.33.0",
+    "rollup": "^0.34.1",
     "rollup-watch": "^2.1.1",
     "typescript": "^1.8.10",
     "typings": "^1.0.4"
