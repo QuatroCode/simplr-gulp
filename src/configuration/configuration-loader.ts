@@ -1,26 +1,28 @@
-import Console from './logger';
 import * as fs from 'fs';
-import { WriteToFileAsJson } from './utils';
-import { ConfigurationContracts } from './contracts';
-import { DEFAULT_EXTENSIONS_MAP, DEFAULT_GULP_CONFIG, DEFAULT_TYPESCRIPT_CONFIG } from './defaults';
+import Console from '../utils/logger';
+import { WriteToFileAsJson } from '../utils/helpers';
+import { GulpConfig } from './configuration-contracts';
+import { DEFAULT_GULP_CONFIG, DEFAULT_TYPESCRIPT_CONFIG } from './configuration-defaults';
 
 
 
-export class Configuration {
+class ConfigurationLoader {
 
-    private config: ConfigurationContracts.GulpConfig;
+    private config: GulpConfig;
+
+    public Init() { }
 
     constructor() {
         this.tryToReadConfigurationFile();
         this.checkTypeScriptConfigurationFiles();
-    }
+    };
 
     private tryToReadConfigurationFile(cfgFileName: string = 'gulpconfig') {
         try {
-            let config = require(`./${cfgFileName}.json`) as ConfigurationContracts.GulpConfig;
+            let config = require(`./${cfgFileName}.json`) as GulpConfig;
 
             let valid = true;
-            if (parseInt(config.CfgVersion.toString()) != parseInt(DEFAULT_GULP_CONFIG.CfgVersion.toString())) {
+            if (parseInt(config.CfgVersion.toString()) !== parseInt(DEFAULT_GULP_CONFIG.CfgVersion.toString())) {
                 Console.warn(`'${cfgFileName}.json' file major version is not valid (v${config.CfgVersion} != v${DEFAULT_GULP_CONFIG.CfgVersion})!`);
                 valid = false;
             } else if (config.CfgVersion < DEFAULT_GULP_CONFIG.CfgVersion) {
@@ -71,11 +73,6 @@ export class Configuration {
         return this.config;
     }
 
-    get ExtensionsMap() {
-        return DEFAULT_EXTENSIONS_MAP;
-    }
-
 }
 
-let Config = new Configuration();
-export default Config;
+export default new ConfigurationLoader();

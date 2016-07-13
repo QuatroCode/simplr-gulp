@@ -1,21 +1,12 @@
-import Logger from './logger';
 import * as gulp from 'gulp';
-import Configuration from './configuration';
+import Configuration from './configuration/configuration-loader';
+
 import Server from './server';
-import Watcher from './watcher';
+import Watcher from './watcher/watchers';
+import DefaultTasks from './tasks/default/default-tasks';
 
+// Load configuration
+Configuration.Init();
 
-gulp.task("default", (done) => {
-
-    let watcher = new Watcher();
-    
-});
-
-
-gulp.task("_server", (done) => {
-    let server = new Server();
-    server.Listener.on("close", () => {
-        done();
-    });
-});
-
+// Load tasks
+new DefaultTasks();

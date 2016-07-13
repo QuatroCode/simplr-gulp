@@ -1,26 +1,25 @@
 import * as express from 'express';
-import Console from './logger';
-import Configuration from './configuration';
 import * as http from 'http';
 import { RequestHandler } from 'express-serve-static-core';
+import { Logger, GulpConfig } from './globals';
 
 
-export default class ServerStarter {
+class ServerStarter {
     public server = express();
 
     Listener: http.Server;
 
     constructor() {
-        let {ServerConfig, Directories} = Configuration.GulpConfig;
-        Console.info(`Server started at ${ServerConfig.Ip}:${ServerConfig.Port}`);
-     
+        let {ServerConfig, Directories} = GulpConfig;
+        Logger.info(`Server started at ${ServerConfig.Ip}:${ServerConfig.Port}`);
+
         this.server.use(express.static(Directories.Build));
         this.Listener = this.server.listen(ServerConfig.Port);
         this.addListeners();
     }
 
     private onRequest: RequestHandler = (req, res) => {
-        let { Build } = Configuration.GulpConfig.Directories;
+        let { Build } = GulpConfig.Directories;
         res.sendFile('index.html', { root: Build });
     }
 
@@ -31,15 +30,17 @@ export default class ServerStarter {
     }
 
     private onClose = () => {
-        Console.info(`Server closed.`);
+        Logger.info(`Server closed.`);
     }
 
     private onError = (err: NodeJS.ErrnoException) => {
         if (err.code === 'EADDRINUSE') {
-            Console.error(`Port ${Configuration.GulpConfig.ServerConfig.Port} already in use.`);
+            Logger.error(`Port ${GulpConfig.ServerConfig.Port} already in use.`);
             this.Listener.close();
         } else {
-            Console.error("Exeption not handled. Please create issues with error code: \n", err);
+            Logger.error("Exeption not handled. Please create issues with error code: \n", err);
         }
     }
 }
+
+export default ServerStarter;

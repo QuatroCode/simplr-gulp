@@ -21,5 +21,8 @@
     "undertaker": "registry:dt/undertaker#0.12.0+20160316155526",
     "vinyl": "registry:dt/vinyl#1.1.0+20160316155526",
     "vinyl-fs": "registry:dt/vinyl-fs#0.0.0+20160317120654"
+  },
+  "globalDevDependencies": {
+    "typescript": "registry:dt/typescript#0.4.0+20160317120654"
   }
 }

@@ -1,5 +1,4 @@
-import { ConfigurationContracts } from './contracts';
-
+import { GulpConfig } from './configuration-contracts';
 
 export const DEFAULT_TYPESCRIPT_CONFIG = {
     compilerOptions: {
@@ -17,7 +16,7 @@ export const DEFAULT_TYPESCRIPT_CONFIG = {
     ]
 };
 
-export const DEFAULT_GULP_CONFIG: ConfigurationContracts.GulpConfig = {
+export const DEFAULT_GULP_CONFIG: GulpConfig = {
     Directories: {
         Source: "src",
         Build: "wwwroot",
@@ -42,12 +41,8 @@ export const DEFAULT_GULP_CONFIG: ConfigurationContracts.GulpConfig = {
     CfgVersion: 2.02
 };
 
-
 export const DEFAULT_EXTENSIONS_MAP = {
     "ts": "js",
     "tsx": "js",
-    "scss": "css",
-    ".ts": ".js",
-    ".tsx": ".js",
-    ".scss": ".css"
-};
+    "scss": "css"
+}; 

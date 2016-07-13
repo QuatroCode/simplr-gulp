@@ -1,19 +1,24 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-
 /**
  * Write in file in JSON format
  * 
+ * @export
+ * @param {string} fileName
+ * @param {Object} content
  */
 export function WriteToFileAsJson(fileName: string, content: Object): void {
     fs.writeFile(fileName, JSON.stringify(content, null, 4));
 }
 
-
-
 /**
  * Pad number with zeros
+ * 
+ * @export
+ * @param {number} num
+ * @param {number} size
+ * @returns {string} 
  */
 export function Pad(num: number, size: number): string {
     var s = "000000000" + num.toString();
@@ -22,7 +27,9 @@ export function Pad(num: number, size: number): string {
 
 /**
  * Generate and return time at the moment
- * @return HH:ii:ss
+ * 
+ * @export
+ * @returns {string} HH:ii:ss
  */
 export function GetTimeNow(): string {
     let date = new Date(),
@@ -34,8 +41,20 @@ export function GetTimeNow(): string {
 
 /**
  * Remove full directory path name
- * @return Path
+ * 
+ * @export
+ * @param {string} directory
+ * @returns {string} Path
  */
-export function RemoveFullPath(directory: string) {
+export function RemoveFullPath(directory: string): string {
     return directory.split(`${__dirname}\\`)[1];
+}
+
+
+export function Ensure(...element: Array<any>) {
+    console.log(JSON.stringify(element));
+}
+
+export function GetClassName(constructor: Function) {
+    return constructor.toString().match(/\w+/g)[1];
 }

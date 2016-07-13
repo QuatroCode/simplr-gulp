@@ -1,5 +1,5 @@
 import * as Colors from 'colors/safe';
-import { GetTimeNow } from './utils';
+import { GetTimeNow } from './helpers';
 
 enum LogType {
     Default,
