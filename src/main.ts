@@ -1,12 +1,9 @@
 import * as gulp from 'gulp';
 import Configuration from './configuration/configuration-loader';
-
-import Server from './server';
-import Watcher from './watcher/watchers';
-import DefaultTasks from './tasks/default/default-tasks';
+import DefaultTasksHandler from './tasks/default/default-tasks-handler';
 
 // Load configuration
 Configuration.Init();
 
 // Load tasks
-new DefaultTasks();
+new DefaultTasksHandler();

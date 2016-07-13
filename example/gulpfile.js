@@ -452,11 +452,11 @@ var WatchStylesTask = (function () {
     return WatchStylesTask;
 }());
 
-var Watcher = (function (_super) {
-    __extends(Watchers, _super);
-    function Watchers() {
+var WatcherTasksHandler = (function (_super) {
+    __extends(WatcherTasksHandler, _super);
+    function WatcherTasksHandler() {
         _super.call(this, function (config) {
-            config.TasksPrefix = "Watchers";
+            config.TasksPrefix = "Watch";
             config.Tasks = [WatchAssetsTask, WatchConfigsTask, WatchHtmlTask, WatchScriptsTask, WatchStylesTask];
             return config;
         });
@@ -464,14 +464,14 @@ var Watcher = (function (_super) {
         this.registerWatchers();
         logger.info("Started watching files in '" + Configuration.GulpConfig.Directories.Source + "' folder.");
     }
-    Watchers.prototype.registerWatchers = function () {
+    WatcherTasksHandler.prototype.registerWatchers = function () {
         var _this = this;
         Object.keys(this.constructedTasks).forEach(function (name) {
             var task = _this.constructedTasks[name];
             _this.watchers[task.Name] = gulp.watch(task.Globs, gulp.parallel(_this.generateName(task.Name)));
         });
     };
-    return Watchers;
+    return WatcherTasksHandler;
 }(TasksHandler));
 
 var DefaultTask = (function (_super) {
@@ -482,7 +482,7 @@ var DefaultTask = (function (_super) {
     }
     DefaultTask.prototype.TaskFunction = function (done) {
         console.log("Default task");
-        new Watcher();
+        new WatcherTasksHandler();
         done();
     };
     return DefaultTask;
@@ -553,16 +553,16 @@ var BuildStylesgTask = (function (_super) {
     return BuildStylesgTask;
 }(TaskBase));
 
-var Tasks$1 = (function (_super) {
-    __extends(Tasks, _super);
-    function Tasks() {
+var BuildTasksHandler = (function (_super) {
+    __extends(BuildTasksHandler, _super);
+    function BuildTasksHandler() {
         _super.call(this, function (config) {
             config.TasksPrefix = "Build";
             config.Tasks = [BuildAssetsTask, BuildConfigTask, BuildHtmlTask, BuildScriptsTask, BuildStylesgTask];
             return config;
         });
     }
-    return Tasks;
+    return BuildTasksHandler;
 }(TasksHandler));
 
 var WatchTask = (function (_super) {
@@ -573,7 +573,7 @@ var WatchTask = (function (_super) {
     }
     WatchTask.prototype.TaskFunction = function (done) {
         console.log("Watch task");
-        new Watcher();
+        new WatcherTasksHandler();
         done();
     };
     return WatchTask;
@@ -584,7 +584,7 @@ var Tasks = (function (_super) {
     function Tasks() {
         _super.call(this, function (config) {
             config.Tasks = [DefaultTask, WatchTask];
-            config.TasksHandlers = [Tasks$1];
+            config.TasksHandlers = [BuildTasksHandler];
             return config;
         });
     }

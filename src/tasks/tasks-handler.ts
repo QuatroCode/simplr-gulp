@@ -47,7 +47,6 @@ abstract class TasksHandler<T extends Task> {
             tasks.forEach(task => {
                 let constructedTask = new task();
                 let fullName = this.generateName(constructedTask.Name);
-
                 if (constructedTasks[fullName] != null) {
                     Logger.warn(`(${this._moduleName}) Task "${fullName}" already exist.`);
                 } else {

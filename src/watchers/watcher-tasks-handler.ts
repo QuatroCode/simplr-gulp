@@ -12,14 +12,14 @@ import WatchAssetsTask from './tasks/watch-assets/watch-assets-task';
 import WatchConfigsTask from './tasks/watch-configs/watch-configs-task';
 import WatchHtmlTask from './tasks/watch-html/watch-html-task';
 import WatchScriptsTask from './tasks/watch-scripts/watch-scripts-task';
-import WatchStylesTask from './tasks/watch-scripts/watch-scripts-task';
+import WatchStylesTask from './tasks/watch-styles/watch-styles-task';
 
 
-export default class Watchers extends TasksHandler<WatchTask> {
+export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
 
     constructor() {
         super((config) => {
-            config.TasksPrefix = "Watchers";
+            config.TasksPrefix = "Watch";
             config.Tasks = [WatchAssetsTask, WatchConfigsTask, WatchHtmlTask, WatchScriptsTask, WatchStylesTask];
             return config;
         });

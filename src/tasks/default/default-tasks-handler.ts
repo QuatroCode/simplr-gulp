@@ -3,7 +3,7 @@ import { Task } from '../tasks-contracts';
 
 //Tasks
 import DefaultTask from './default-task';
-import BuildTasks from '../build/build-tasks';
+import BuildTasksHandler from '../build/build-tasks-handler';
 import WatchTask from '../watch/watch-task';
 
 export default class Tasks extends TasksHandler<Task> {
@@ -11,7 +11,7 @@ export default class Tasks extends TasksHandler<Task> {
     constructor() {
         super(config => {
             config.Tasks = [DefaultTask, WatchTask];
-            config.TasksHandlers = [BuildTasks];
+            config.TasksHandlers = [BuildTasksHandler];
             return config;
         });
     }

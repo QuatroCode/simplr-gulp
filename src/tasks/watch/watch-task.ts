@@ -1,6 +1,6 @@
 import TaskBase from '../task-base';
 import Paths from '../../paths/paths';
-import Watcher from '../../watchers/watchers';
+import WatcherTasksHandler from '../../watchers/watcher-tasks-handler';
 
 export default class WatchTask extends TaskBase {
 
@@ -8,7 +8,7 @@ export default class WatchTask extends TaskBase {
 
     TaskFunction(done: Function) {
         console.log("Watch task");
-        new Watcher();
+        new WatcherTasksHandler();
         done();
     }
 

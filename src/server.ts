@@ -1,7 +1,8 @@
 import * as express from 'express';
 import * as http from 'http';
 import { RequestHandler } from 'express-serve-static-core';
-import { Logger, GulpConfig } from './globals';
+import Logger from './utils/logger';
+import Configuration from './configuration/configuration-loader';
 
 
 class ServerStarter {
@@ -10,7 +11,7 @@ class ServerStarter {
     Listener: http.Server;
 
     constructor() {
-        let {ServerConfig, Directories} = GulpConfig;
+        let {ServerConfig, Directories} = Configuration.GulpConfig;
         Logger.info(`Server started at ${ServerConfig.Ip}:${ServerConfig.Port}`);
 
         this.server.use(express.static(Directories.Build));
@@ -19,7 +20,7 @@ class ServerStarter {
     }
 
     private onRequest: RequestHandler = (req, res) => {
-        let { Build } = GulpConfig.Directories;
+        let { Build } = Configuration.GulpConfig.Directories;
         res.sendFile('index.html', { root: Build });
     }
 
@@ -35,7 +36,7 @@ class ServerStarter {
 
     private onError = (err: NodeJS.ErrnoException) => {
         if (err.code === 'EADDRINUSE') {
-            Logger.error(`Port ${GulpConfig.ServerConfig.Port} already in use.`);
+            Logger.error(`Port ${Configuration.GulpConfig.ServerConfig.Port} already in use.`);
             this.Listener.close();
         } else {
             Logger.error("Exeption not handled. Please create issues with error code: \n", err);
