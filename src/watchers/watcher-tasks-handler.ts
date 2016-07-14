@@ -1,6 +1,6 @@
 import * as gulp from 'gulp';
 import * as fs from 'fs';
-import Configuration from '../configuration/configuration-loader';
+import Configuration from '../configuration/configuration';
 import Logger from '../utils/logger';
 
 import { WatchTask } from '../tasks/tasks-contracts';

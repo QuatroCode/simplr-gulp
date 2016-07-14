@@ -9,7 +9,11 @@
     "rootDir": "src",
     "outDir": "dist",
     "pretty": true,
-    "noImplicitUseStrict": true
+    "noImplicitUseStrict": true,
+    "strictNullChecks": true,
+    "noImplicitThis": true,
+    "noUnusedParameters": false,
+    "noUnusedLocals": true
   },
   "exclude": [
     "node_modules",

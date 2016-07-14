@@ -26,7 +26,7 @@ export const DEFAULT_GULP_CONFIG: GulpConfig = {
         Development: "tsconfig.json",
         Production: "tsconfig.production.json"
     },
-    ServerConfig: {
+    ServerConfig: { 
         Ip: "127.0.0.1",
         Port: 4000,
         LiveReloadPort: 4400

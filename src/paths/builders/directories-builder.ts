@@ -1,5 +1,5 @@
 import * as path from 'path';
-import Configuration from '../../configuration/configuration-loader';
+import Configuration from '../../configuration/configuration';
 
 export default class DirectoriesBuilder {
     private gulpConfig = Configuration.GulpConfig;

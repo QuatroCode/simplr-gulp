@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import * as path from 'path';
 
 /**
  * Write JSON object to file
@@ -63,5 +62,14 @@ export function Ensure(...element: Array<any>) {
  * @returns
  */
 export function GetClassName(constructor: Function) {
-    return constructor.toString().match(/\w+/g)[1];
+    if (constructor != null) {
+        let functionString = constructor.toString();
+        if (functionString.length > 0) {
+            let match = functionString.match(/\w+/g);
+            if (match != null && match[1] != null) {
+                return match[1];
+            }
+        }
+    }
+    return "";
 }

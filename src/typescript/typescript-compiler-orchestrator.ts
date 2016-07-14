@@ -1,5 +1,4 @@
-import TypescriptCompiler from './typescript-compiler';
-import Configuration from '../configuration/configuration-loader';
+import Configuration from '../configuration/configuration';
 
 class TypescriptCompilerOrchestrator {
 
@@ -11,9 +10,8 @@ class TypescriptCompilerOrchestrator {
         return Configuration.GulpConfig.TypeScriptConfig;
     }
 
-    private loadConfiguration() {
-        
-    }
+    // private loadConfiguration() {
+    // }
 
 
 

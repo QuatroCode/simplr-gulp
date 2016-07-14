@@ -27,6 +27,6 @@ export interface GulpConfig {
     TypeScriptConfig: TypeScriptConfig;
     BundleConfig: Bundle;
     ServerConfig: ServerConfiguration;
-    WebConfig: string;
+    WebConfig: string | null;
     CfgVersion: number;
-}
+ }

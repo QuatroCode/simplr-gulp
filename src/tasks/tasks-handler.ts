@@ -1,5 +1,4 @@
 import * as gulp from 'gulp';
-import TaskBase from './task-base';
 import { Task, TaskConstructor, TasksHandlerContructor } from './tasks-contracts';
 import Logger from '../utils/logger';
 import { GetClassName } from '../utils/helpers';
@@ -28,9 +27,9 @@ abstract class TasksHandler<T extends Task> {
 
     protected constructedTasks: { [name: string]: T };
 
-    private _className = GetClassName(this.constructor);
+    private readonly _className = GetClassName(this.constructor);
 
-    private _moduleName = `TasksHandler.${this._className}`;
+    private readonly _moduleName = `TasksHandler.${this._className}`;
 
     private get initConfiguration(): Configuration<T> {
         return {

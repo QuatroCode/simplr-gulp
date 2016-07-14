@@ -4,10 +4,10 @@ import * as ts from 'gulp-typescript';
 
 export default class TypescriptCompiler {
 
-    private project: ts.Project;
-    private tsConfiguration: ts.TsConfig = null;
+    // private project: ts.Project;
+    private tsConfiguration: ts.TsConfig | null = null;
 
-    constructor(private configFile: string) {
+    constructor(configFile: string) {
         this.buildConfiguration(configFile);
     }
 

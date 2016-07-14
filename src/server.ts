@@ -2,7 +2,7 @@ import * as express from 'express';
 import * as http from 'http';
 import { RequestHandler } from 'express-serve-static-core';
 import Logger from './utils/logger';
-import Configuration from './configuration/configuration-loader';
+import Configuration from './configuration/configuration';
 
 
 class ServerStarter {
