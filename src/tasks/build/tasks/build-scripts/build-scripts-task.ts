@@ -4,7 +4,7 @@ export default class BuildScriptsTask extends TaskBase {
 
     Name = "Build.Scripts";
 
-    TaskFunction(done: Function) {
+    TaskFunction(production: boolean, done: Function) {
         console.log("Build.Scripts");
         done();
     }

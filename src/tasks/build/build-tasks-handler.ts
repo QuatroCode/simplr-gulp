@@ -14,6 +14,7 @@ export default class BuildTasksHandler extends TasksHandler<Task> {
         super(config => {
             config.TasksPrefix = "Build";
             config.Tasks = [BuildAssetsTask, BuildConfigsTask, BuildHtmlTask, BuildScriptsTask, BuildStylesTask];
+            config.WithProduction = true;
             return config;
         });
 

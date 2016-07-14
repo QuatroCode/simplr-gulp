@@ -6,7 +6,7 @@ export default class WatchTask extends TaskBase {
 
     Name = "Watch";
 
-    TaskFunction(done: Function) {
+    TaskFunction(production: boolean, done: Function) {
         console.log("Watch task");
         new WatcherTasksHandler();
         done();

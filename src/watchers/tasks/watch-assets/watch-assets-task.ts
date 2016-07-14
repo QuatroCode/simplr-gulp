@@ -7,7 +7,7 @@ export default class WatchAssetsTask implements WatchTask {
 
     Globs = Paths.Builders.AllDirectories.InSource("assets");
     
-    TaskFunction(done: Function) {
+    TaskFunction(production: boolean, done: Function) {
 
         console.log("Assets watch task");
         done();

@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 /**
- * Write in file in JSON format
+ * Write JSON object to file
  * 
  * @export
  * @param {string} fileName
@@ -55,6 +55,13 @@ export function Ensure(...element: Array<any>) {
     console.log(JSON.stringify(element));
 }
 
+/**
+ * Get class name from constructor
+ * 
+ * @export
+ * @param {Function} constructor
+ * @returns
+ */
 export function GetClassName(constructor: Function) {
     return constructor.toString().match(/\w+/g)[1];
 }

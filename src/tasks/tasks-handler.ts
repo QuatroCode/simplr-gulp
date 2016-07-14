@@ -11,6 +11,7 @@ interface Configuration<T> {
     TasksPrefix: string;
     Tasks: Array<TaskConstructor<T>>;
     TasksHandlers: Array<TasksHandlerContructor<any>>;
+    WithProduction: boolean;
 }
 
 
@@ -37,7 +38,8 @@ abstract class TasksHandler<T extends Task> {
             TasksSufix: "",
             Tasks: [],
             TasksHandlers: [],
-            TasksAsync: true
+            TasksAsync: true,
+            WithProduction: false
         };
     }
 
@@ -51,7 +53,10 @@ abstract class TasksHandler<T extends Task> {
                     Logger.warn(`(${this._moduleName}) Task "${fullName}" already exist.`);
                 } else {
                     constructedTasks[fullName] = constructedTask;
-                    gulp.task(fullName, constructedTask.TaskFunction);
+                    gulp.task(fullName, constructedTask.TaskFunction.bind(this, false));
+                    if (this.configuration.WithProduction) {
+                        gulp.task(`${fullName}:Production`, constructedTask.TaskFunction.bind(this, true));
+                    }
                 }
             });
         } else {
@@ -71,7 +76,12 @@ abstract class TasksHandler<T extends Task> {
     private registerMainTask() {
         if (this.configuration.TasksPrefix != null && this.configuration.TasksPrefix.length > 0) {
             let method = (this.configuration.TasksAsync) ? gulp.parallel : gulp.series;
-            gulp.task(this.configuration.TasksPrefix, method(Object.keys(this.constructedTasks)));
+            let tasksList = Object.keys(this.constructedTasks);
+            gulp.task(this.configuration.TasksPrefix, method(tasksList));
+            if (this.configuration.WithProduction) {
+                let tasksListProuction = tasksList.map(x => { return `${x}:Production`; } );
+                gulp.task(this.configuration.TasksPrefix + ':Production', method(tasksListProuction));
+            }
         }
     }
 

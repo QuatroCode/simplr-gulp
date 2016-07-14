@@ -7,7 +7,7 @@ export default class WatchHtmlTask implements WatchTask {
 
     Globs = Paths.Builders.AllFiles.InSource(".{htm,html}");
 
-    TaskFunction(done: Function) {
+    TaskFunction(production: boolean, done: Function) {
         console.log("Html watch task");
         done();
     }

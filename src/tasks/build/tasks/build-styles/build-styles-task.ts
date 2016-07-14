@@ -4,7 +4,7 @@ export default class BuildStylesgTask extends TaskBase {
 
     Name = "Build.Styles";
 
-    TaskFunction(done: Function) {
+    TaskFunction(production: boolean, done: Function) {
         console.log("Build.Styles");
         done();
     }

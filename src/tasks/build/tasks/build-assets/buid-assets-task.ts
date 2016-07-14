@@ -4,7 +4,7 @@ export default class BuildAssetsTask extends TaskBase {
 
     Name = "Build.Assets";
 
-    TaskFunction(done: Function) {
+    TaskFunction(production: boolean, done: Function) {
         console.log("Build.Assets");
         done();
     }

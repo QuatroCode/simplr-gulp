@@ -235,7 +235,8 @@ var TasksHandler = (function () {
                 TasksSufix: "",
                 Tasks: [],
                 TasksHandlers: [],
-                TasksAsync: true
+                TasksAsync: true,
+                WithProduction: false
             };
         },
         enumerable: true,
@@ -253,7 +254,10 @@ var TasksHandler = (function () {
                 }
                 else {
                     constructedTasks[fullName] = constructedTask;
-                    gulp.task(fullName, constructedTask.TaskFunction);
+                    gulp.task(fullName, constructedTask.TaskFunction.bind(_this, false));
+                    if (_this.configuration.WithProduction) {
+                        gulp.task(fullName + ":Production", constructedTask.TaskFunction.bind(_this, true));
+                    }
                 }
             });
         }
@@ -272,7 +276,12 @@ var TasksHandler = (function () {
     TasksHandler.prototype.registerMainTask = function () {
         if (this.configuration.TasksPrefix != null && this.configuration.TasksPrefix.length > 0) {
             var method = (this.configuration.TasksAsync) ? gulp.parallel : gulp.series;
-            gulp.task(this.configuration.TasksPrefix, method(Object.keys(this.constructedTasks)));
+            var tasksList = Object.keys(this.constructedTasks);
+            gulp.task(this.configuration.TasksPrefix, method(tasksList));
+            if (this.configuration.WithProduction) {
+                var tasksListProuction = tasksList.map(function (x) { return x + ":Production"; });
+                gulp.task(this.configuration.TasksPrefix + ':Production', method(tasksListProuction));
+            }
         }
     };
     TasksHandler.prototype.generateName = function (taskName) {
@@ -400,7 +409,7 @@ var WatchAssetsTask = (function () {
         this.Name = "Assets";
         this.Globs = Paths$1.Builders.AllDirectories.InSource("assets");
     }
-    WatchAssetsTask.prototype.TaskFunction = function (done) {
+    WatchAssetsTask.prototype.TaskFunction = function (production, done) {
         console.log("Assets watch task");
         done();
     };
@@ -412,7 +421,7 @@ var WatchConfigsTask = (function () {
         this.Name = "Configs";
         this.Globs = Paths$1.Builders.OneDirectory.InSource("configs");
     }
-    WatchConfigsTask.prototype.TaskFunction = function () {
+    WatchConfigsTask.prototype.TaskFunction = function (production) {
         console.log("Configs watch task");
     };
     return WatchConfigsTask;
@@ -423,7 +432,7 @@ var WatchHtmlTask = (function () {
         this.Name = "Html";
         this.Globs = Paths$1.Builders.AllFiles.InSource(".{htm,html}");
     }
-    WatchHtmlTask.prototype.TaskFunction = function (done) {
+    WatchHtmlTask.prototype.TaskFunction = function (production, done) {
         console.log("Html watch task");
         done();
     };
@@ -435,7 +444,7 @@ var WatchScriptsTask = (function () {
         this.Name = "Scripts";
         this.Globs = Paths$1.Builders.AllFiles.InSource(".{ts,tsx}");
     }
-    WatchScriptsTask.prototype.TaskFunction = function () {
+    WatchScriptsTask.prototype.TaskFunction = function (production) {
         console.log("Scripts watch task");
     };
     return WatchScriptsTask;
@@ -446,7 +455,7 @@ var WatchStylesTask = (function () {
         this.Name = "Styles";
         this.Globs = Paths$1.Builders.AllFiles.InSource(".scss");
     }
-    WatchStylesTask.prototype.TaskFunction = function () {
+    WatchStylesTask.prototype.TaskFunction = function (production) {
         console.log("Styles watch task");
     };
     return WatchStylesTask;
@@ -480,7 +489,7 @@ var DefaultTask = (function (_super) {
         _super.apply(this, arguments);
         this.Name = "default";
     }
-    DefaultTask.prototype.TaskFunction = function (done) {
+    DefaultTask.prototype.TaskFunction = function (production, done) {
         console.log("Default task");
         new WatcherTasksHandler();
         done();
@@ -494,7 +503,7 @@ var BuildAssetsTask = (function (_super) {
         _super.apply(this, arguments);
         this.Name = "Build.Assets";
     }
-    BuildAssetsTask.prototype.TaskFunction = function (done) {
+    BuildAssetsTask.prototype.TaskFunction = function (production, done) {
         console.log("Build.Assets");
         done();
     };
@@ -507,7 +516,8 @@ var BuildConfigTask = (function (_super) {
         _super.apply(this, arguments);
         this.Name = "Build.Configs";
     }
-    BuildConfigTask.prototype.TaskFunction = function (done) {
+    BuildConfigTask.prototype.TaskFunction = function (production, done) {
+        console.log("BUILD CONFIGS:", production);
         console.log("Build.Configs");
         done();
     };
@@ -520,7 +530,7 @@ var BuildHtmlTask = (function (_super) {
         _super.apply(this, arguments);
         this.Name = "Build.Html";
     }
-    BuildHtmlTask.prototype.TaskFunction = function (done) {
+    BuildHtmlTask.prototype.TaskFunction = function (production, done) {
         console.log("Build.Html");
         done();
     };
@@ -533,7 +543,7 @@ var BuildScriptsTask = (function (_super) {
         _super.apply(this, arguments);
         this.Name = "Build.Scripts";
     }
-    BuildScriptsTask.prototype.TaskFunction = function (done) {
+    BuildScriptsTask.prototype.TaskFunction = function (production, done) {
         console.log("Build.Scripts");
         done();
     };
@@ -546,7 +556,7 @@ var BuildStylesgTask = (function (_super) {
         _super.apply(this, arguments);
         this.Name = "Build.Styles";
     }
-    BuildStylesgTask.prototype.TaskFunction = function (done) {
+    BuildStylesgTask.prototype.TaskFunction = function (production, done) {
         console.log("Build.Styles");
         done();
     };
@@ -559,6 +569,7 @@ var BuildTasksHandler = (function (_super) {
         _super.call(this, function (config) {
             config.TasksPrefix = "Build";
             config.Tasks = [BuildAssetsTask, BuildConfigTask, BuildHtmlTask, BuildScriptsTask, BuildStylesgTask];
+            config.WithProduction = true;
             return config;
         });
     }
@@ -571,7 +582,7 @@ var WatchTask = (function (_super) {
         _super.apply(this, arguments);
         this.Name = "Watch";
     }
-    WatchTask.prototype.TaskFunction = function (done) {
+    WatchTask.prototype.TaskFunction = function (production, done) {
         console.log("Watch task");
         new WatcherTasksHandler();
         done();

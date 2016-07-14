@@ -7,7 +7,7 @@ export default class WatchScriptsTask implements WatchTask {
 
     Globs = Paths.Builders.AllFiles.InSource(".{ts,tsx}");
 
-    TaskFunction() {
+    TaskFunction(production: boolean) {
         console.log("Scripts watch task");
     }
 

@@ -2,7 +2,7 @@ import { TaskFunction, Globs } from 'gulp/contracts';
 
 export interface Task {
     Name: string;
-    TaskFunction: TaskFunction;
+    TaskFunction: (production: boolean, done?: Function) =>  void | NodeJS.Process | any;
 }
 
 export interface WatchTask extends Task {

@@ -7,7 +7,7 @@ export default class WatchConfigsTask implements WatchTask {
 
     Globs = Paths.Builders.OneDirectory.InSource("configs");
 
-    TaskFunction() {
+    TaskFunction(production: boolean) {
         console.log("Configs watch task");
     }
 
