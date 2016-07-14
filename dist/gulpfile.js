@@ -1,9 +1,8 @@
 'use strict';
 
-var gulp = require('gulp');
-var express = require('express');
-var Colors = require('colors/safe');
 var fs = require('fs');
+var Colors = require('colors/safe');
+var gulp = require('gulp');
 var path = require('path');
 
 function __extends(d, b) {
@@ -22,6 +21,18 @@ function Pad(num, size) {
 function GetTimeNow() {
     var date = new Date(), hours = Pad(date.getHours(), 2), minutes = Pad(date.getMinutes(), 2), seconds = Pad(date.getSeconds(), 2);
     return hours + ":" + minutes + ":" + seconds;
+}
+function GetClassName(constructor) {
+    if (constructor != null) {
+        var functionString = constructor.toString();
+        if (functionString.length > 0) {
+            var match = functionString.match(/\w+/g);
+            if (match != null && match[1] != null) {
+                return match[1];
+            }
+        }
+    }
+    return "";
 }
 
 var LogType;
@@ -142,26 +153,20 @@ var DEFAULT_GULP_CONFIG = {
     WebConfig: null,
     CfgVersion: 2.02
 };
-var DEFAULT_EXTENSIONS_MAP = {
-    "ts": "js",
-    "tsx": "js",
-    "scss": "css",
-    ".ts": ".js",
-    ".tsx": ".js",
-    ".scss": ".css"
-};
 
-var Configuration = (function () {
-    function Configuration() {
+var ConfigurationLoader = (function () {
+    function ConfigurationLoader() {
         this.tryToReadConfigurationFile();
         this.checkTypeScriptConfigurationFiles();
     }
-    Configuration.prototype.tryToReadConfigurationFile = function (cfgFileName) {
+    ConfigurationLoader.prototype.Init = function () { };
+    ;
+    ConfigurationLoader.prototype.tryToReadConfigurationFile = function (cfgFileName) {
         if (cfgFileName === void 0) { cfgFileName = 'gulpconfig'; }
         try {
             var config = require("./" + cfgFileName + ".json");
             var valid = true;
-            if (parseInt(config.CfgVersion.toString()) != parseInt(DEFAULT_GULP_CONFIG.CfgVersion.toString())) {
+            if (parseInt(config.CfgVersion.toString()) !== parseInt(DEFAULT_GULP_CONFIG.CfgVersion.toString())) {
                 logger.warn("'" + cfgFileName + ".json' file major version is not valid (v" + config.CfgVersion + " != v" + DEFAULT_GULP_CONFIG.CfgVersion + ")!");
                 valid = false;
             }
@@ -185,7 +190,7 @@ var Configuration = (function () {
             logger.warn("'gulpconfig.json' was not found or is not valid. Creating default configuration file.");
         }
     };
-    Configuration.prototype.checkTypeScriptConfigurationFiles = function () {
+    ConfigurationLoader.prototype.checkTypeScriptConfigurationFiles = function () {
         try {
             if (!fs.statSync("./" + this.config.TypeScriptConfig.Development).isFile())
                 throw new Error();
@@ -212,86 +217,106 @@ var Configuration = (function () {
             logger.warn("'" + this.config.TypeScriptConfig.Production + "' was not found. Creating default TypeScript configuration file.");
         }
     };
-    Object.defineProperty(Configuration.prototype, "GulpConfig", {
+    Object.defineProperty(ConfigurationLoader.prototype, "GulpConfig", {
         get: function () {
             return this.config;
         },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(Configuration.prototype, "ExtensionsMap", {
+    return ConfigurationLoader;
+}());
+var Configuration = new ConfigurationLoader();
+
+var TasksHandler = (function () {
+    function TasksHandler(config) {
+        this._className = GetClassName(this.constructor);
+        this._moduleName = "TasksHandler." + this._className;
+        this.configuration = config(this.initConfiguration);
+        this.constructedTasks = this.registerTasks(this.configuration.Tasks);
+        this.loadTasksHandlers(this.configuration.TasksHandlers);
+        this.registerMainTask();
+    }
+    Object.defineProperty(TasksHandler.prototype, "initConfiguration", {
         get: function () {
-            return DEFAULT_EXTENSIONS_MAP;
+            return {
+                TasksPrefix: "",
+                TasksSufix: "",
+                Tasks: [],
+                TasksHandlers: [],
+                TasksAsync: true,
+                WithProduction: false
+            };
         },
         enumerable: true,
         configurable: true
     });
-    return Configuration;
-}());
-var Config = new Configuration();
-
-var ServerStarter = (function () {
-    function ServerStarter() {
+    TasksHandler.prototype.registerTasks = function (tasks) {
         var _this = this;
-        this.server = express();
-        this.onRequest = function (req, res) {
-            var Build = Config.GulpConfig.Directories.Build;
-            res.sendFile('index.html', { root: Build });
-        };
-        this.onClose = function () {
-            logger.info("Server closed.");
-        };
-        this.onError = function (err) {
-            if (err.code === 'EADDRINUSE') {
-                logger.error("Port " + Config.GulpConfig.ServerConfig.Port + " already in use.");
-                _this.Listener.close();
-            }
-            else {
-                logger.error("Exeption not handled. Please create issues with error code: \n", err);
-            }
-        };
-        var _a = Config.GulpConfig, ServerConfig = _a.ServerConfig, Directories = _a.Directories;
-        logger.info("Server started at " + ServerConfig.Ip + ":" + ServerConfig.Port);
-        this.server.use(express.static(Directories.Build));
-        this.Listener = this.server.listen(ServerConfig.Port);
-        this.addListeners();
-    }
-    ServerStarter.prototype.addListeners = function () {
-        this.Listener.once("close", this.onClose);
-        this.Listener.once('error', this.onError);
-        this.server.all('/*', this.onRequest);
+        var constructedTasks = {};
+        if (tasks != null && tasks.length > 0) {
+            tasks.forEach(function (task) {
+                var constructedTask = new task();
+                var fullName = _this.generateName(constructedTask.Name);
+                if (constructedTasks[fullName] != null) {
+                    logger.warn("(" + _this._moduleName + ") Task \"" + fullName + "\" already exist.");
+                }
+                else {
+                    constructedTasks[fullName] = constructedTask;
+                    gulp.task(fullName, constructedTask.TaskFunction.bind(_this, false));
+                    if (_this.configuration.WithProduction) {
+                        gulp.task(fullName + ":Production", constructedTask.TaskFunction.bind(_this, true));
+                    }
+                }
+            });
+        }
+        else {
+            logger.warn("(" + this._moduleName + ") The tasks list is empty.");
+        }
+        return constructedTasks;
     };
-    return ServerStarter;
+    TasksHandler.prototype.loadTasksHandlers = function (tasksHandlers) {
+        if (tasksHandlers != null && tasksHandlers.length > 0) {
+            tasksHandlers.forEach(function (handler) {
+                new handler();
+            });
+        }
+    };
+    TasksHandler.prototype.registerMainTask = function () {
+        if (this.configuration.TasksPrefix != null && this.configuration.TasksPrefix.length > 0) {
+            var method = (this.configuration.TasksAsync) ? gulp.parallel : gulp.series;
+            var tasksList = Object.keys(this.constructedTasks);
+            gulp.task(this.configuration.TasksPrefix, method(tasksList));
+            if (this.configuration.WithProduction) {
+                var tasksListProuction = tasksList.map(function (x) { return x + ":Production"; });
+                gulp.task(this.configuration.TasksPrefix + ':Production', method(tasksListProuction));
+            }
+        }
+    };
+    TasksHandler.prototype.generateName = function (taskName) {
+        var name = taskName;
+        if (this.configuration.TasksPrefix != null && this.configuration.TasksPrefix.length > 0) {
+            if (name.slice(0, this.configuration.TasksPrefix.length + 1) !== this.configuration.TasksPrefix + ".") {
+                name = this.configuration.TasksPrefix + "." + name;
+            }
+        }
+        if (this.configuration.TasksSufix != null && this.configuration.TasksSufix.length > 0) {
+            name = name + "." + this.configuration.TasksSufix;
+        }
+        return name;
+    };
+    return TasksHandler;
 }());
 
-var BuilderBase = (function () {
-    function BuilderBase() {
+var TaskBase = (function () {
+    function TaskBase() {
     }
-    BuilderBase.prototype.InSource = function (param) {
-        if (param === void 0) { param = undefined; }
-        var startPath = Paths.Directories.Source;
-        return this.builder(startPath, param);
-    };
-    BuilderBase.prototype.InSourceApp = function (param) {
-        if (param === void 0) { param = undefined; }
-        var startPath = Paths.Directories.SourceApp;
-        return this.builder(startPath, param);
-    };
-    BuilderBase.prototype.InBuild = function (param) {
-        if (param === void 0) { param = undefined; }
-        var startPath = Paths.Directories.Build;
-        return this.builder(startPath, param);
-    };
-    BuilderBase.prototype.InBuildApp = function (param) {
-        if (param === void 0) { param = undefined; }
-        var startPath = Paths.Directories.BuildApp;
-        return this.builder(startPath, param);
-    };
-    return BuilderBase;
+    return TaskBase;
 }());
+
 var DirectoriesBuilder = (function () {
     function DirectoriesBuilder() {
-        this.gulpConfig = Config.GulpConfig;
+        this.gulpConfig = Configuration.GulpConfig;
         this.Source = this.gulpConfig.Directories.Source;
         this.SourceApp = path.join(this.Source, this.gulpConfig.Directories.App);
         this.Build = this.gulpConfig.Directories.Build;
@@ -299,13 +324,36 @@ var DirectoriesBuilder = (function () {
     }
     return DirectoriesBuilder;
 }());
+
+var BuilderBase = (function () {
+    function BuilderBase() {
+    }
+    BuilderBase.prototype.InSource = function (param) {
+        var startPath = Paths$1.Directories.Source;
+        return this.builder(startPath, param);
+    };
+    BuilderBase.prototype.InSourceApp = function (param) {
+        var startPath = Paths$1.Directories.SourceApp;
+        return this.builder(startPath, param);
+    };
+    BuilderBase.prototype.InBuild = function (param) {
+        var startPath = Paths$1.Directories.Build;
+        return this.builder(startPath, param);
+    };
+    BuilderBase.prototype.InBuildApp = function (param) {
+        var startPath = Paths$1.Directories.BuildApp;
+        return this.builder(startPath, param);
+    };
+    return BuilderBase;
+}());
+
 var AllFilesBuilder = (function (_super) {
     __extends(AllFilesBuilder, _super);
     function AllFilesBuilder() {
         _super.apply(this, arguments);
     }
     AllFilesBuilder.prototype.builder = function (startPath, name) {
-        if (name != undefined) {
+        if (name !== undefined) {
             return path.join(startPath, '**', '*' + name);
         }
         else {
@@ -314,6 +362,7 @@ var AllFilesBuilder = (function (_super) {
     };
     return AllFilesBuilder;
 }(BuilderBase));
+
 var OneFileBuilder = (function (_super) {
     __extends(OneFileBuilder, _super);
     function OneFileBuilder() {
@@ -324,6 +373,7 @@ var OneFileBuilder = (function (_super) {
     };
     return OneFileBuilder;
 }(BuilderBase));
+
 var AllDirectoriesBuilder = (function (_super) {
     __extends(AllDirectoriesBuilder, _super);
     function AllDirectoriesBuilder() {
@@ -334,6 +384,7 @@ var AllDirectoriesBuilder = (function (_super) {
     };
     return AllDirectoriesBuilder;
 }(BuilderBase));
+
 var OneDirectoryBuilder = (function (_super) {
     __extends(OneDirectoryBuilder, _super);
     function OneDirectoryBuilder() {
@@ -344,6 +395,7 @@ var OneDirectoryBuilder = (function (_super) {
     };
     return OneDirectoryBuilder;
 }(BuilderBase));
+
 var Paths;
 (function (Paths) {
     Paths.Directories = new DirectoriesBuilder();
@@ -357,57 +409,203 @@ var Paths;
 })(Paths || (Paths = {}));
 var Paths$1 = Paths;
 
-var Watcher = (function () {
-    function Watcher() {
-        this.watchers = {};
-        this.onConfigurationsChanged = function (done) {
-            logger.log("onConfigurationsChanged");
-            done();
-        };
-        this.onAssetsChanged = function (done) {
-            logger.log("onAssetsChanged");
-            done();
-        };
-        this.onStyleSheetsChanged = function (done) {
-            logger.log("onStyleSheetsChanged");
-            done();
-        };
-        this.onTypescriptChanged = function (done) {
-            logger.log("onTypescriptChanged");
-            done();
-        };
-        this.onHtmlChanged = function (done) {
-            logger.log("test");
-            done();
-        };
-        var Directories = Config.GulpConfig.Directories;
-        this.createWatchersTasks();
-        this.createWatchers();
-        logger.info("Started watching files in '" + Directories.Source + "' folder.");
+var WatchAssetsTask = (function () {
+    function WatchAssetsTask() {
+        this.Name = "Assets";
+        this.Globs = Paths$1.Builders.AllDirectories.InSource("assets");
     }
-    Watcher.prototype.createWatchersTasks = function () {
-        gulp.task("_Watcher.Html", this.onHtmlChanged);
-        gulp.task("_Watcher.Typescript", this.onTypescriptChanged);
-        gulp.task("_Watcher.StyleSheets", this.onStyleSheetsChanged);
-        gulp.task("_Watcher.Assets", this.onAssetsChanged);
-        gulp.task("_Watcher.Configurations", this.onConfigurationsChanged);
+    WatchAssetsTask.prototype.TaskFunction = function (production, done) {
+        console.log("Assets watch task");
+        done();
     };
-    Watcher.prototype.createWatchers = function () {
-        this.watchers.Html = gulp.watch(Paths$1.Builders.AllFiles.InSource(".html"), gulp.parallel("_Watcher.Html"));
-        this.watchers.Typescript = gulp.watch(Paths$1.Builders.AllFiles.InSource(".{ts,tsx}"), gulp.parallel("_Watcher.Typescript"));
-        this.watchers.StyleSheets = gulp.watch(Paths$1.Builders.AllFiles.InSource(".scss"), gulp.parallel("_Watcher.StyleSheets"));
-        this.watchers.Assets = gulp.watch(Paths$1.Builders.AllDirectories.InSource("assets"), gulp.parallel("_Watcher.Assets"));
-        this.watchers.Configurations = gulp.watch(Paths$1.Builders.OneDirectory.InSource("configs"), gulp.parallel("_Watcher.Configurations"));
-    };
-    return Watcher;
+    return WatchAssetsTask;
 }());
 
-gulp.task("default", function (done) {
-    var watcher = new Watcher();
-});
-gulp.task("_server", function (done) {
-    var server = new ServerStarter();
-    server.Listener.on("close", function () {
+var WatchConfigsTask = (function () {
+    function WatchConfigsTask() {
+        this.Name = "Configs";
+        this.Globs = Paths$1.Builders.OneDirectory.InSource("configs");
+    }
+    WatchConfigsTask.prototype.TaskFunction = function (production) {
+        console.log("Configs watch task");
+    };
+    return WatchConfigsTask;
+}());
+
+var WatchHtmlTask = (function () {
+    function WatchHtmlTask() {
+        this.Name = "Html";
+        this.Globs = Paths$1.Builders.AllFiles.InSource(".{htm,html}");
+    }
+    WatchHtmlTask.prototype.TaskFunction = function (production, done) {
+        console.log("Html watch task");
         done();
-    });
-});
+    };
+    return WatchHtmlTask;
+}());
+
+var WatchScriptsTask = (function () {
+    function WatchScriptsTask() {
+        this.Name = "Scripts";
+        this.Globs = Paths$1.Builders.AllFiles.InSource(".{ts,tsx}");
+    }
+    WatchScriptsTask.prototype.TaskFunction = function (production) {
+        console.log("Scripts watch task");
+    };
+    return WatchScriptsTask;
+}());
+
+var WatchStylesTask = (function () {
+    function WatchStylesTask() {
+        this.Name = "Styles";
+        this.Globs = Paths$1.Builders.AllFiles.InSource(".scss");
+    }
+    WatchStylesTask.prototype.TaskFunction = function (production) {
+        console.log("Styles watch task");
+    };
+    return WatchStylesTask;
+}());
+
+var WatcherTasksHandler = (function (_super) {
+    __extends(WatcherTasksHandler, _super);
+    function WatcherTasksHandler() {
+        _super.call(this, function (config) {
+            config.TasksPrefix = "Watch";
+            config.Tasks = [WatchAssetsTask, WatchConfigsTask, WatchHtmlTask, WatchScriptsTask, WatchStylesTask];
+            return config;
+        });
+        this.watchers = {};
+        this.registerWatchers();
+        logger.info("Started watching files in '" + Configuration.GulpConfig.Directories.Source + "' folder.");
+    }
+    WatcherTasksHandler.prototype.registerWatchers = function () {
+        var _this = this;
+        Object.keys(this.constructedTasks).forEach(function (name) {
+            var task = _this.constructedTasks[name];
+            _this.watchers[task.Name] = gulp.watch(task.Globs, gulp.parallel(_this.generateName(task.Name)));
+        });
+    };
+    return WatcherTasksHandler;
+}(TasksHandler));
+
+var DefaultTask = (function (_super) {
+    __extends(DefaultTask, _super);
+    function DefaultTask() {
+        _super.apply(this, arguments);
+        this.Name = "default";
+    }
+    DefaultTask.prototype.TaskFunction = function (production, done) {
+        console.log("Default task");
+        new WatcherTasksHandler();
+        done();
+    };
+    return DefaultTask;
+}(TaskBase));
+
+var BuildAssetsTask = (function (_super) {
+    __extends(BuildAssetsTask, _super);
+    function BuildAssetsTask() {
+        _super.apply(this, arguments);
+        this.Name = "Build.Assets";
+    }
+    BuildAssetsTask.prototype.TaskFunction = function (production, done) {
+        console.log("Build.Assets");
+        done();
+    };
+    return BuildAssetsTask;
+}(TaskBase));
+
+var BuildConfigTask = (function (_super) {
+    __extends(BuildConfigTask, _super);
+    function BuildConfigTask() {
+        _super.apply(this, arguments);
+        this.Name = "Build.Configs";
+    }
+    BuildConfigTask.prototype.TaskFunction = function (production, done) {
+        console.log("BUILD CONFIGS:", production);
+        console.log("Build.Configs");
+        done();
+    };
+    return BuildConfigTask;
+}(TaskBase));
+
+var BuildHtmlTask = (function (_super) {
+    __extends(BuildHtmlTask, _super);
+    function BuildHtmlTask() {
+        _super.apply(this, arguments);
+        this.Name = "Build.Html";
+    }
+    BuildHtmlTask.prototype.TaskFunction = function (production, done) {
+        console.log("Build.Html");
+        done();
+    };
+    return BuildHtmlTask;
+}(TaskBase));
+
+var BuildScriptsTask = (function (_super) {
+    __extends(BuildScriptsTask, _super);
+    function BuildScriptsTask() {
+        _super.apply(this, arguments);
+        this.Name = "Build.Scripts";
+    }
+    BuildScriptsTask.prototype.TaskFunction = function (production, done) {
+        console.log("Build.Scripts");
+        done();
+    };
+    return BuildScriptsTask;
+}(TaskBase));
+
+var BuildStylesgTask = (function (_super) {
+    __extends(BuildStylesgTask, _super);
+    function BuildStylesgTask() {
+        _super.apply(this, arguments);
+        this.Name = "Build.Styles";
+    }
+    BuildStylesgTask.prototype.TaskFunction = function (production, done) {
+        console.log("Build.Styles");
+        done();
+    };
+    return BuildStylesgTask;
+}(TaskBase));
+
+var BuildTasksHandler = (function (_super) {
+    __extends(BuildTasksHandler, _super);
+    function BuildTasksHandler() {
+        _super.call(this, function (config) {
+            config.TasksPrefix = "Build";
+            config.Tasks = [BuildAssetsTask, BuildConfigTask, BuildHtmlTask, BuildScriptsTask, BuildStylesgTask];
+            config.WithProduction = true;
+            return config;
+        });
+    }
+    return BuildTasksHandler;
+}(TasksHandler));
+
+var WatchTask = (function (_super) {
+    __extends(WatchTask, _super);
+    function WatchTask() {
+        _super.apply(this, arguments);
+        this.Name = "Watch";
+    }
+    WatchTask.prototype.TaskFunction = function (production, done) {
+        console.log("Watch task");
+        new WatcherTasksHandler();
+        done();
+    };
+    return WatchTask;
+}(TaskBase));
+
+var Tasks = (function (_super) {
+    __extends(Tasks, _super);
+    function Tasks() {
+        _super.call(this, function (config) {
+            config.Tasks = [DefaultTask, WatchTask];
+            config.TasksHandlers = [BuildTasksHandler];
+            return config;
+        });
+    }
+    return Tasks;
+}(TasksHandler));
+
+Configuration.Init();
+new Tasks();

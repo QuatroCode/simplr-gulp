@@ -23,7 +23,16 @@ function GetTimeNow() {
     return hours + ":" + minutes + ":" + seconds;
 }
 function GetClassName(constructor) {
-    return constructor.toString().match(/\w+/g)[1];
+    if (constructor != null) {
+        var functionString = constructor.toString();
+        if (functionString.length > 0) {
+            var match = functionString.match(/\w+/g);
+            if (match != null && match[1] != null) {
+                return match[1];
+            }
+        }
+    }
+    return "";
 }
 
 var LogType;
@@ -320,22 +329,18 @@ var BuilderBase = (function () {
     function BuilderBase() {
     }
     BuilderBase.prototype.InSource = function (param) {
-        if (param === void 0) { param = undefined; }
         var startPath = Paths$1.Directories.Source;
         return this.builder(startPath, param);
     };
     BuilderBase.prototype.InSourceApp = function (param) {
-        if (param === void 0) { param = undefined; }
         var startPath = Paths$1.Directories.SourceApp;
         return this.builder(startPath, param);
     };
     BuilderBase.prototype.InBuild = function (param) {
-        if (param === void 0) { param = undefined; }
         var startPath = Paths$1.Directories.Build;
         return this.builder(startPath, param);
     };
     BuilderBase.prototype.InBuildApp = function (param) {
-        if (param === void 0) { param = undefined; }
         var startPath = Paths$1.Directories.BuildApp;
         return this.builder(startPath, param);
     };

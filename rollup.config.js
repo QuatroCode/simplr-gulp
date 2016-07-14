@@ -1,5 +1,5 @@
 // rollup.config.js
-import typescript from 'rollup-plugin-typescript';
+import typescriptPlugin from 'rollup-plugin-typescript';
 import rollupWatch from 'rollup-watch';
 
 export default {
@@ -7,7 +7,9 @@ export default {
   dest: 'dist/gulpfile.js', 
   format: 'cjs',
   plugins: [
-    typescript(),
+    typescriptPlugin({
+      typescript: require("typescript")
+    }),
     rollupWatch()
   ]
 }

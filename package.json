@@ -4,10 +4,6 @@
   "private": true,
   "author": "QuatroDev",
   "scripts": {
-    "build": "rollup -c",
-    "watch": "rollup -w -c",
-    "build:sample": "rollup -c -o example/gulpfile.js",
-    "watch:sample": "rollup -w -c -o example/gulpfile.js"
   },
   "devDependencies": {
     "rollup": "^0.34.1",
