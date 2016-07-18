@@ -1,4 +1,4 @@
-import {  Globs } from 'gulp/contracts';
+import {  Globs } from 'gulp';
 
 export interface Task {
     Name: string;
