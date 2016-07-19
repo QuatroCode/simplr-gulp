@@ -4,12 +4,7 @@ var fs = require('fs');
 var Colors = require('colors/safe');
 var gulp = require('gulp');
 var path = require('path');
-
-function __extends(d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-}
+var ts = require('gulp-typescript');
 
 function WriteToFileAsJson(fileName, content) {
     fs.writeFile(fileName, JSON.stringify(content, null, 4));
@@ -19,14 +14,14 @@ function Pad(num, size) {
     return s.substr(s.length - size);
 }
 function GetTimeNow() {
-    var date = new Date(), hours = Pad(date.getHours(), 2), minutes = Pad(date.getMinutes(), 2), seconds = Pad(date.getSeconds(), 2);
-    return hours + ":" + minutes + ":" + seconds;
+    let date = new Date(), hours = Pad(date.getHours(), 2), minutes = Pad(date.getMinutes(), 2), seconds = Pad(date.getSeconds(), 2);
+    return `${hours}:${minutes}:${seconds}`;
 }
 function GetClassName(constructor) {
     if (constructor != null) {
-        var functionString = constructor.toString();
+        let functionString = constructor.toString();
         if (functionString.length > 0) {
-            var match = functionString.match(/\w+/g);
+            let match = functionString.match(/\w+/g);
             if (match != null && match[1] != null) {
                 return match[1];
             }
@@ -42,21 +37,17 @@ var LogType;
     LogType[LogType["Info"] = 2] = "Info";
     LogType[LogType["Warning"] = 3] = "Warning";
 })(LogType || (LogType = {}));
-var Console = (function () {
-    function Console() {
+class Console {
+    constructor() {
         this.styles = Colors.styles;
     }
-    Console.prototype.getTimeNowWithStyles = function () {
-        return "[" + this.styles.grey.open + GetTimeNow() + this.styles.grey.close + "]";
-    };
-    Console.prototype.showMessage = function (type) {
-        var message = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            message[_i - 1] = arguments[_i];
-        }
-        var typeString = " " + LogType[type].toLocaleUpperCase() + ":";
-        var log = console.log;
-        var color = this.styles.white.open;
+    getTimeNowWithStyles() {
+        return `[${this.styles.grey.open}${GetTimeNow()}${this.styles.grey.close}]`;
+    }
+    showMessage(type, ...message) {
+        let typeString = ` ${LogType[type].toLocaleUpperCase()}:`;
+        let log = console.log;
+        let color = this.styles.white.open;
         switch (type) {
             case LogType.Error:
                 {
@@ -80,41 +71,24 @@ var Console = (function () {
                 typeString = "";
             }
         }
-        log.apply(void 0, ["" + this.getTimeNowWithStyles() + this.styles.bold.open + color + typeString].concat(message, [this.styles.reset.open]));
-    };
-    Console.prototype.log = function () {
-        var message = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            message[_i - 0] = arguments[_i];
-        }
-        this.showMessage.apply(this, [LogType.Default].concat(message));
-    };
-    Console.prototype.error = function () {
-        var message = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            message[_i - 0] = arguments[_i];
-        }
-        this.showMessage.apply(this, [LogType.Error].concat(message));
-    };
-    Console.prototype.info = function () {
-        var message = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            message[_i - 0] = arguments[_i];
-        }
-        this.showMessage.apply(this, [LogType.Info].concat(message));
-    };
-    Console.prototype.warn = function () {
-        var message = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            message[_i - 0] = arguments[_i];
-        }
-        this.showMessage.apply(this, [LogType.Warning].concat(message));
-    };
-    return Console;
-}());
-var logger = new Console();
+        log(`${this.getTimeNowWithStyles()}${this.styles.bold.open}${color}${typeString}`, ...message, this.styles.reset.open);
+    }
+    log(...message) {
+        this.showMessage(LogType.Default, ...message);
+    }
+    error(...message) {
+        this.showMessage(LogType.Error, ...message);
+    }
+    info(...message) {
+        this.showMessage(LogType.Info, ...message);
+    }
+    warn(...message) {
+        this.showMessage(LogType.Warning, ...message);
+    }
+}
+let logger = new Console();
 
-var DEFAULT_TYPESCRIPT_CONFIG = {
+const DEFAULT_TYPESCRIPT_CONFIG = {
     compilerOptions: {
         module: "commonjs",
         target: "es5",
@@ -129,7 +103,7 @@ var DEFAULT_TYPESCRIPT_CONFIG = {
         "src/libs"
     ]
 };
-var DEFAULT_GULP_CONFIG = {
+const DEFAULT_GULP_CONFIG = {
     Directories: {
         Source: "src",
         Build: "wwwroot",
@@ -154,24 +128,23 @@ var DEFAULT_GULP_CONFIG = {
     CfgVersion: 2.02
 };
 
-var ConfigurationLoader = (function () {
-    function ConfigurationLoader() {
+class ConfigurationLoader {
+    constructor() {
         this.tryToReadConfigurationFile();
         this.checkTypeScriptConfigurationFiles();
     }
-    ConfigurationLoader.prototype.Init = function () { };
+    Init() { }
     ;
-    ConfigurationLoader.prototype.tryToReadConfigurationFile = function (cfgFileName) {
-        if (cfgFileName === void 0) { cfgFileName = 'gulpconfig'; }
+    tryToReadConfigurationFile(cfgFileName = 'gulpconfig') {
         try {
-            var config = require("./" + cfgFileName + ".json");
-            var valid = true;
+            let config = require(`./${cfgFileName}.json`);
+            let valid = true;
             if (parseInt(config.CfgVersion.toString()) !== parseInt(DEFAULT_GULP_CONFIG.CfgVersion.toString())) {
-                logger.warn("'" + cfgFileName + ".json' file major version is not valid (v" + config.CfgVersion + " != v" + DEFAULT_GULP_CONFIG.CfgVersion + ")!");
+                logger.warn(`'${cfgFileName}.json' file major version is not valid (v${config.CfgVersion} != v${DEFAULT_GULP_CONFIG.CfgVersion})!`);
                 valid = false;
             }
             else if (config.CfgVersion < DEFAULT_GULP_CONFIG.CfgVersion) {
-                logger.warn("'" + cfgFileName + ".json' file version is too old (v" + config.CfgVersion + " < v" + DEFAULT_GULP_CONFIG.CfgVersion + ")!");
+                logger.warn(`'${cfgFileName}.json' file version is too old (v${config.CfgVersion} < v${DEFAULT_GULP_CONFIG.CfgVersion})!`);
                 valid = false;
             }
             else {
@@ -179,222 +152,205 @@ var ConfigurationLoader = (function () {
             }
             if (!valid) {
                 logger.warn("Creating new file with default configuration.");
-                WriteToFileAsJson(cfgFileName + "-v" + config.CfgVersion + ".json", config);
+                WriteToFileAsJson(`${cfgFileName}-v${config.CfgVersion}.json`, config);
                 this.config = DEFAULT_GULP_CONFIG;
-                WriteToFileAsJson(cfgFileName + ".json", this.config);
+                WriteToFileAsJson(`${cfgFileName}.json`, this.config);
             }
         }
         catch (e) {
             this.config = DEFAULT_GULP_CONFIG;
-            WriteToFileAsJson(cfgFileName + ".json", this.config);
+            WriteToFileAsJson(`${cfgFileName}.json`, this.config);
             logger.warn("'gulpconfig.json' was not found or is not valid. Creating default configuration file.");
         }
-    };
-    ConfigurationLoader.prototype.checkTypeScriptConfigurationFiles = function () {
+    }
+    checkTypeScriptConfigurationFiles() {
         try {
-            if (!fs.statSync("./" + this.config.TypeScriptConfig.Development).isFile())
+            if (!fs.statSync(`./${this.config.TypeScriptConfig.Development}`).isFile())
                 throw new Error();
         }
         catch (e) {
-            var tsConfig = {
+            let tsConfig = {
                 compilerOptions: DEFAULT_TYPESCRIPT_CONFIG.compilerOptions,
                 exclude: DEFAULT_TYPESCRIPT_CONFIG.exclude
             };
             tsConfig.exclude.push(this.config.Directories.Build);
             WriteToFileAsJson(this.config.TypeScriptConfig.Development, tsConfig);
-            logger.warn("'" + this.config.TypeScriptConfig.Development + "' was not found. Creating default TypeScript configuration file.");
+            logger.warn(`'${this.config.TypeScriptConfig.Development}' was not found. Creating default TypeScript configuration file.`);
         }
         try {
-            if (!fs.statSync("./" + this.config.TypeScriptConfig.Production).isFile())
+            if (!fs.statSync(`./${this.config.TypeScriptConfig.Production}`).isFile())
                 throw new Error();
         }
         catch (e) {
-            var tsConfig = DEFAULT_TYPESCRIPT_CONFIG;
+            let tsConfig = DEFAULT_TYPESCRIPT_CONFIG;
             tsConfig.compilerOptions.inlineSources = false;
             tsConfig.compilerOptions.removeComments = true;
             tsConfig.compilerOptions.sourceMap = false;
             WriteToFileAsJson(this.config.TypeScriptConfig.Production, tsConfig);
-            logger.warn("'" + this.config.TypeScriptConfig.Production + "' was not found. Creating default TypeScript configuration file.");
+            logger.warn(`'${this.config.TypeScriptConfig.Production}' was not found. Creating default TypeScript configuration file.`);
         }
-    };
-    Object.defineProperty(ConfigurationLoader.prototype, "GulpConfig", {
-        get: function () {
-            return this.config;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    return ConfigurationLoader;
-}());
+    }
+    get GulpConfig() {
+        return this.config;
+    }
+}
 var Configuration = new ConfigurationLoader();
 
-var TasksHandler = (function () {
-    function TasksHandler(config) {
+class TasksHandler {
+    constructor(config) {
         this._className = GetClassName(this.constructor);
-        this._moduleName = "TasksHandler." + this._className;
+        this._moduleName = `TasksHandler.${this._className}`;
         this.configuration = config(this.initConfiguration);
         this.constructedTasks = this.registerTasks(this.configuration.Tasks);
         this.loadTasksHandlers(this.configuration.TasksHandlers);
         this.registerMainTask();
     }
-    Object.defineProperty(TasksHandler.prototype, "initConfiguration", {
-        get: function () {
-            return {
-                TasksPrefix: "",
-                TasksSufix: "",
-                Tasks: [],
-                TasksHandlers: [],
-                TasksAsync: true,
-                WithProduction: false
-            };
-        },
-        enumerable: true,
-        configurable: true
-    });
-    TasksHandler.prototype.registerTasks = function (tasks) {
-        var _this = this;
-        var constructedTasks = {};
+    get initConfiguration() {
+        return {
+            TasksPrefix: "",
+            TasksSufix: "",
+            Tasks: [],
+            TasksHandlers: [],
+            TasksAsync: true,
+            WithProduction: false
+        };
+    }
+    registerTasks(tasks) {
+        let constructedTasks = {};
         if (tasks != null && tasks.length > 0) {
-            tasks.forEach(function (task) {
-                var constructedTask = new task();
-                var fullName = _this.generateName(constructedTask.Name);
+            tasks.forEach(task => {
+                let constructedTask = new task();
+                let fullName = this.generateName(constructedTask.Name);
                 if (constructedTasks[fullName] != null) {
-                    logger.warn("(" + _this._moduleName + ") Task \"" + fullName + "\" already exist.");
+                    logger.warn(`(${this._moduleName}) Task "${fullName}" already exist.`);
                 }
                 else {
                     constructedTasks[fullName] = constructedTask;
-                    gulp.task(fullName, constructedTask.TaskFunction.bind(_this, false));
-                    if (_this.configuration.WithProduction) {
-                        gulp.task(fullName + ":Production", constructedTask.TaskFunction.bind(_this, true));
+                    gulp.task(fullName, constructedTask.TaskFunction.bind(this, false));
+                    if (this.configuration.WithProduction) {
+                        gulp.task(`${fullName}:Production`, constructedTask.TaskFunction.bind(this, true));
                     }
                 }
             });
         }
         else {
-            logger.warn("(" + this._moduleName + ") The tasks list is empty.");
+            logger.warn(`(${this._moduleName}) The tasks list is empty.`);
         }
         return constructedTasks;
-    };
-    TasksHandler.prototype.loadTasksHandlers = function (tasksHandlers) {
+    }
+    loadTasksHandlers(tasksHandlers) {
         if (tasksHandlers != null && tasksHandlers.length > 0) {
-            tasksHandlers.forEach(function (handler) {
+            tasksHandlers.forEach(handler => {
                 new handler();
             });
         }
-    };
-    TasksHandler.prototype.registerMainTask = function () {
+    }
+    registerMainTask() {
         if (this.configuration.TasksPrefix != null && this.configuration.TasksPrefix.length > 0) {
-            var method = (this.configuration.TasksAsync) ? gulp.parallel : gulp.series;
-            var tasksList = Object.keys(this.constructedTasks);
+            let method = (this.configuration.TasksAsync) ? gulp.parallel : gulp.series;
+            let tasksList = Object.keys(this.constructedTasks);
             gulp.task(this.configuration.TasksPrefix, method(tasksList));
             if (this.configuration.WithProduction) {
-                var tasksListProuction = tasksList.map(function (x) { return x + ":Production"; });
+                let tasksListProuction = tasksList.map(x => { return `${x}:Production`; });
                 gulp.task(this.configuration.TasksPrefix + ':Production', method(tasksListProuction));
             }
         }
-    };
-    TasksHandler.prototype.generateName = function (taskName) {
-        var name = taskName;
+    }
+    generateName(taskName) {
+        let name = taskName;
         if (this.configuration.TasksPrefix != null && this.configuration.TasksPrefix.length > 0) {
-            if (name.slice(0, this.configuration.TasksPrefix.length + 1) !== this.configuration.TasksPrefix + ".") {
-                name = this.configuration.TasksPrefix + "." + name;
+            if (name.slice(0, this.configuration.TasksPrefix.length + 1) !== `${this.configuration.TasksPrefix}.`) {
+                name = `${this.configuration.TasksPrefix}.${name}`;
             }
         }
         if (this.configuration.TasksSufix != null && this.configuration.TasksSufix.length > 0) {
-            name = name + "." + this.configuration.TasksSufix;
+            name = `${name}.${this.configuration.TasksSufix}`;
         }
         return name;
-    };
-    return TasksHandler;
-}());
-
-var TaskBase = (function () {
-    function TaskBase() {
     }
-    return TaskBase;
-}());
+}
 
-var DirectoriesBuilder = (function () {
-    function DirectoriesBuilder() {
+class TaskBase {
+}
+
+class WatchTaskBase extends TaskBase {
+    addTasksProductionSuffix(text) {
+        return text + ":Production";
+    }
+}
+
+class DirectoriesBuilder {
+    constructor() {
         this.gulpConfig = Configuration.GulpConfig;
         this.Source = this.gulpConfig.Directories.Source;
         this.SourceApp = path.join(this.Source, this.gulpConfig.Directories.App);
         this.Build = this.gulpConfig.Directories.Build;
         this.BuildApp = path.join(this.Build, this.gulpConfig.Directories.App);
     }
-    return DirectoriesBuilder;
-}());
+}
 
-var BuilderBase = (function () {
-    function BuilderBase() {
+class BuilderBase {
+    InSource(param) {
+        let startPath = Paths$1.Directories.Source;
+        return this.builder(startPath, param);
     }
-    BuilderBase.prototype.InSource = function (param) {
-        var startPath = Paths$1.Directories.Source;
+    InSourceApp(param) {
+        let startPath = Paths$1.Directories.SourceApp;
         return this.builder(startPath, param);
-    };
-    BuilderBase.prototype.InSourceApp = function (param) {
-        var startPath = Paths$1.Directories.SourceApp;
+    }
+    InBuild(param) {
+        let startPath = Paths$1.Directories.Build;
         return this.builder(startPath, param);
-    };
-    BuilderBase.prototype.InBuild = function (param) {
-        var startPath = Paths$1.Directories.Build;
+    }
+    InBuildApp(param) {
+        let startPath = Paths$1.Directories.BuildApp;
         return this.builder(startPath, param);
-    };
-    BuilderBase.prototype.InBuildApp = function (param) {
-        var startPath = Paths$1.Directories.BuildApp;
-        return this.builder(startPath, param);
-    };
-    return BuilderBase;
-}());
+    }
+}
 
-var AllFilesBuilder = (function (_super) {
-    __extends(AllFilesBuilder, _super);
-    function AllFilesBuilder() {
-        _super.apply(this, arguments);
-    }
-    AllFilesBuilder.prototype.builder = function (startPath, name) {
+class AllFilesBuilder extends BuilderBase {
+    builder(startPath, name) {
         if (name !== undefined) {
             return path.join(startPath, '**', '*' + name);
         }
         else {
             return path.join(startPath, '**', '*');
         }
-    };
-    return AllFilesBuilder;
-}(BuilderBase));
-
-var OneFileBuilder = (function (_super) {
-    __extends(OneFileBuilder, _super);
-    function OneFileBuilder() {
-        _super.apply(this, arguments);
     }
-    OneFileBuilder.prototype.builder = function (startPath, name) {
-        return path.join(startPath, name);
-    };
-    return OneFileBuilder;
-}(BuilderBase));
+}
 
-var AllDirectoriesBuilder = (function (_super) {
-    __extends(AllDirectoriesBuilder, _super);
-    function AllDirectoriesBuilder() {
-        _super.apply(this, arguments);
+class OneFileBuilder extends BuilderBase {
+    builder(startPath, name) {
+        if (name !== undefined) {
+            return path.join(startPath, name);
+        }
+        else {
+            return startPath;
+        }
     }
-    AllDirectoriesBuilder.prototype.builder = function (startPath, name) {
-        return path.join(startPath, "**", name, "**", "*");
-    };
-    return AllDirectoriesBuilder;
-}(BuilderBase));
+}
 
-var OneDirectoryBuilder = (function (_super) {
-    __extends(OneDirectoryBuilder, _super);
-    function OneDirectoryBuilder() {
-        _super.apply(this, arguments);
+class AllDirectoriesBuilder extends BuilderBase {
+    builder(startPath, name) {
+        if (name !== undefined) {
+            return path.join(startPath, "**", name, "**", "*");
+        }
+        else {
+            return path.join(startPath, "**", "*");
+        }
     }
-    OneDirectoryBuilder.prototype.builder = function (startPath, name) {
-        return path.join(startPath, name, "**", "*");
-    };
-    return OneDirectoryBuilder;
-}(BuilderBase));
+}
+
+class OneDirectoryBuilder extends BuilderBase {
+    builder(startPath, name) {
+        if (name != null) {
+            return path.join(startPath, name);
+        }
+        else {
+            return startPath;
+        }
+    }
+}
 
 var Paths;
 (function (Paths) {
@@ -409,203 +365,246 @@ var Paths;
 })(Paths || (Paths = {}));
 var Paths$1 = Paths;
 
-var WatchAssetsTask = (function () {
-    function WatchAssetsTask() {
+class WatchAssetsTask extends WatchTaskBase {
+    constructor(...args) {
+        super(...args);
         this.Name = "Assets";
         this.Globs = Paths$1.Builders.AllDirectories.InSource("assets");
     }
-    WatchAssetsTask.prototype.TaskFunction = function (production, done) {
+    TaskFunction(production, done) {
         console.log("Assets watch task");
         done();
-    };
-    return WatchAssetsTask;
-}());
+    }
+}
 
-var WatchConfigsTask = (function () {
-    function WatchConfigsTask() {
+class WatchConfigsTask extends WatchTaskBase {
+    constructor(...args) {
+        super(...args);
         this.Name = "Configs";
         this.Globs = Paths$1.Builders.OneDirectory.InSource("configs");
     }
-    WatchConfigsTask.prototype.TaskFunction = function (production) {
+    TaskFunction(production) {
         console.log("Configs watch task");
-    };
-    return WatchConfigsTask;
-}());
+    }
+}
 
-var WatchHtmlTask = (function () {
-    function WatchHtmlTask() {
+class WatchHtmlTask extends WatchTaskBase {
+    constructor(...args) {
+        super(...args);
         this.Name = "Html";
         this.Globs = Paths$1.Builders.AllFiles.InSource(".{htm,html}");
     }
-    WatchHtmlTask.prototype.TaskFunction = function (production, done) {
+    TaskFunction(production, done) {
         console.log("Html watch task");
         done();
-    };
-    return WatchHtmlTask;
-}());
+    }
+}
 
-var WatchScriptsTask = (function () {
-    function WatchScriptsTask() {
+class WatchScriptsTask extends WatchTaskBase {
+    constructor(...args) {
+        super(...args);
         this.Name = "Scripts";
         this.Globs = Paths$1.Builders.AllFiles.InSource(".{ts,tsx}");
     }
-    WatchScriptsTask.prototype.TaskFunction = function (production) {
-        console.log("Scripts watch task");
-    };
-    return WatchScriptsTask;
-}());
+    TaskFunction(production, done) {
+        let taskName = 'Build.Scripts';
+        if (production) {
+            taskName = this.addTasksProductionSuffix(taskName);
+        }
+        return gulp.parallel(taskName)(done);
+    }
+}
 
-var WatchStylesTask = (function () {
-    function WatchStylesTask() {
+class WatchStylesTask extends WatchTaskBase {
+    constructor(...args) {
+        super(...args);
         this.Name = "Styles";
         this.Globs = Paths$1.Builders.AllFiles.InSource(".scss");
     }
-    WatchStylesTask.prototype.TaskFunction = function (production) {
+    TaskFunction(production) {
         console.log("Styles watch task");
-    };
-    return WatchStylesTask;
-}());
+    }
+}
 
-var WatcherTasksHandler = (function (_super) {
-    __extends(WatcherTasksHandler, _super);
-    function WatcherTasksHandler() {
-        _super.call(this, function (config) {
+class WatcherTasksHandler extends TasksHandler {
+    constructor() {
+        super((config) => {
             config.TasksPrefix = "Watch";
             config.Tasks = [WatchAssetsTask, WatchConfigsTask, WatchHtmlTask, WatchScriptsTask, WatchStylesTask];
             return config;
         });
         this.watchers = {};
         this.registerWatchers();
-        logger.info("Started watching files in '" + Configuration.GulpConfig.Directories.Source + "' folder.");
+        logger.info(`Started watching files in '${Configuration.GulpConfig.Directories.Source}' folder.`);
     }
-    WatcherTasksHandler.prototype.registerWatchers = function () {
-        var _this = this;
-        Object.keys(this.constructedTasks).forEach(function (name) {
-            var task = _this.constructedTasks[name];
-            _this.watchers[task.Name] = gulp.watch(task.Globs, gulp.parallel(_this.generateName(task.Name)));
+    registerWatchers() {
+        Object.keys(this.constructedTasks).forEach(name => {
+            let task = this.constructedTasks[name];
+            this.watchers[task.Name] = gulp.watch(task.Globs, gulp.parallel(this.generateName(task.Name)));
         });
-    };
-    return WatcherTasksHandler;
-}(TasksHandler));
+    }
+}
 
-var DefaultTask = (function (_super) {
-    __extends(DefaultTask, _super);
-    function DefaultTask() {
-        _super.apply(this, arguments);
+class DefaultTask extends TaskBase {
+    constructor(...args) {
+        super(...args);
         this.Name = "default";
     }
-    DefaultTask.prototype.TaskFunction = function (production, done) {
-        console.log("Default task");
+    TaskFunction(production, done) {
         new WatcherTasksHandler();
         done();
-    };
-    return DefaultTask;
-}(TaskBase));
+    }
+}
 
-var BuildAssetsTask = (function (_super) {
-    __extends(BuildAssetsTask, _super);
-    function BuildAssetsTask() {
-        _super.apply(this, arguments);
+class BuildAssetsTask extends TaskBase {
+    constructor(...args) {
+        super(...args);
         this.Name = "Build.Assets";
     }
-    BuildAssetsTask.prototype.TaskFunction = function (production, done) {
+    TaskFunction(production, done) {
         console.log("Build.Assets");
         done();
-    };
-    return BuildAssetsTask;
-}(TaskBase));
+    }
+}
 
-var BuildConfigTask = (function (_super) {
-    __extends(BuildConfigTask, _super);
-    function BuildConfigTask() {
-        _super.apply(this, arguments);
+class BuildConfigTask extends TaskBase {
+    constructor(...args) {
+        super(...args);
         this.Name = "Build.Configs";
     }
-    BuildConfigTask.prototype.TaskFunction = function (production, done) {
+    TaskFunction(production, done) {
         console.log("BUILD CONFIGS:", production);
         console.log("Build.Configs");
         done();
-    };
-    return BuildConfigTask;
-}(TaskBase));
+    }
+}
 
-var BuildHtmlTask = (function (_super) {
-    __extends(BuildHtmlTask, _super);
-    function BuildHtmlTask() {
-        _super.apply(this, arguments);
+class BuildHtmlTask extends TaskBase {
+    constructor(...args) {
+        super(...args);
         this.Name = "Build.Html";
     }
-    BuildHtmlTask.prototype.TaskFunction = function (production, done) {
+    TaskFunction(production, done) {
         console.log("Build.Html");
         done();
-    };
-    return BuildHtmlTask;
-}(TaskBase));
+    }
+}
 
-var BuildScriptsTask = (function (_super) {
-    __extends(BuildScriptsTask, _super);
-    function BuildScriptsTask() {
-        _super.apply(this, arguments);
+class BuilderBase$1 {
+    constructor() {
+        this.builders = {
+            Production: undefined,
+            Development: undefined
+        };
+    }
+    Build(production, done) {
+        let compiler = this.getBuilder(production);
+        let maybePromise = this.build(production, compiler, done);
+        if (maybePromise !== undefined) {
+            maybePromise.then(() => {
+                done();
+            }, error => {
+                logger.error(error);
+                done();
+            });
+        }
+    }
+    getBuilder(production) {
+        if (production) {
+            if (this.builders.Production === undefined) {
+                this.builders.Production = this.initBuilder(production);
+            }
+            return this.builders.Production;
+        }
+        else {
+            if (this.builders.Development === undefined) {
+                this.builders.Development = this.initBuilder(production);
+            }
+            return this.builders.Development;
+        }
+    }
+}
+
+class TypescriptBuilderCompiler {
+    constructor(configFile) {
+        this.Project = ts.createProject(configFile);
+    }
+}
+
+class TypescriptBuilder extends BuilderBase$1 {
+    build(production, builder, done) {
+        let tsResult = gulp.src(Paths$1.Builders.AllFiles.InSource())
+            .pipe(ts(builder.Project));
+        tsResult.js.pipe(gulp.dest(Paths$1.Directories.Build)).on("end", done);
+    }
+    initBuilder(production) {
+        if (production) {
+            return new TypescriptBuilderCompiler(this.typescriptConfig.Production);
+        }
+        else {
+            return new TypescriptBuilderCompiler(this.typescriptConfig.Development);
+        }
+    }
+    get directories() {
+        return Configuration.GulpConfig.Directories;
+    }
+    get typescriptConfig() {
+        return Configuration.GulpConfig.TypeScriptConfig;
+    }
+}
+var TypescriptBuilder$1 = new TypescriptBuilder();
+
+class BuildScriptsTask {
+    constructor() {
         this.Name = "Build.Scripts";
     }
-    BuildScriptsTask.prototype.TaskFunction = function (production, done) {
-        console.log("Build.Scripts");
-        done();
-    };
-    return BuildScriptsTask;
-}(TaskBase));
+    TaskFunction(production, done) {
+        TypescriptBuilder$1.Build(production, done);
+    }
+}
 
-var BuildStylesgTask = (function (_super) {
-    __extends(BuildStylesgTask, _super);
-    function BuildStylesgTask() {
-        _super.apply(this, arguments);
+class BuildStylesgTask extends TaskBase {
+    constructor(...args) {
+        super(...args);
         this.Name = "Build.Styles";
     }
-    BuildStylesgTask.prototype.TaskFunction = function (production, done) {
+    TaskFunction(production, done) {
         console.log("Build.Styles");
         done();
-    };
-    return BuildStylesgTask;
-}(TaskBase));
+    }
+}
 
-var BuildTasksHandler = (function (_super) {
-    __extends(BuildTasksHandler, _super);
-    function BuildTasksHandler() {
-        _super.call(this, function (config) {
+class BuildTasksHandler extends TasksHandler {
+    constructor() {
+        super(config => {
             config.TasksPrefix = "Build";
             config.Tasks = [BuildAssetsTask, BuildConfigTask, BuildHtmlTask, BuildScriptsTask, BuildStylesgTask];
             config.WithProduction = true;
             return config;
         });
     }
-    return BuildTasksHandler;
-}(TasksHandler));
+}
 
-var WatchTask = (function (_super) {
-    __extends(WatchTask, _super);
-    function WatchTask() {
-        _super.apply(this, arguments);
+class WatchTask extends TaskBase {
+    constructor(...args) {
+        super(...args);
         this.Name = "Watch";
     }
-    WatchTask.prototype.TaskFunction = function (production, done) {
-        console.log("Watch task");
+    TaskFunction(production, done) {
         new WatcherTasksHandler();
         done();
-    };
-    return WatchTask;
-}(TaskBase));
+    }
+}
 
-var Tasks = (function (_super) {
-    __extends(Tasks, _super);
-    function Tasks() {
-        _super.call(this, function (config) {
+class Tasks extends TasksHandler {
+    constructor() {
+        super(config => {
             config.Tasks = [DefaultTask, WatchTask];
             config.TasksHandlers = [BuildTasksHandler];
             return config;
         });
     }
-    return Tasks;
-}(TasksHandler));
+}
 
 Configuration.Init();
 new Tasks();

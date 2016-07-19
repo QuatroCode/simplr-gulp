@@ -4,7 +4,7 @@ export default class BuildHtmlTask extends TaskBase {
 
     Name = "Build.Html";
 
-    TaskFunction(production: boolean, done: Function) {
+    TaskFunction(production: boolean, done: () => void) {
         console.log("Build.Html");
         done();
     }

@@ -1,14 +1,13 @@
-import { WatchTask } from '../../../tasks/tasks-contracts';
+import WatchTaskBase from '../../watcher-task-base';
 import Paths from '../../../paths/paths';
 
-export default class WatchAssetsTask implements WatchTask {
+export default class WatchAssetsTask extends WatchTaskBase {
 
     Name = "Assets";
 
     Globs = Paths.Builders.AllDirectories.InSource("assets");
-    
-    TaskFunction(production: boolean, done: Function) {
 
+    TaskFunction(production: boolean, done: () => void) {
         console.log("Assets watch task");
         done();
     }

@@ -1,7 +1,7 @@
-import { WatchTask } from '../../../tasks/tasks-contracts';
+import WatchTaskBase from '../../watcher-task-base';
 import Paths from '../../../paths/paths';
 
-export default class WatchConfigsTask implements WatchTask {
+export default class WatchConfigsTask extends WatchTaskBase {
 
     Name = "Configs";
 

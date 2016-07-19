@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import Configuration from '../configuration/configuration';
 import Logger from '../utils/logger';
 
-import { WatchTask } from '../tasks/tasks-contracts';
+import { WatchTask } from './watcher-task-base';
 
 import TasksHandler from '../tasks/tasks-handler';
 

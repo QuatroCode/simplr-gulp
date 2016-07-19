@@ -1,5 +1,5 @@
 import TasksHandler from '../tasks-handler';
-import { Task } from '../tasks-contracts';
+import { Task } from '../task-base';
 
 //Tasks
 import BuildAssetsTask from './tasks/build-assets/buid-assets-task';

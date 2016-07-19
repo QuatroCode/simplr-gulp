@@ -5,8 +5,7 @@ export default class DefaultTask extends TaskBase {
 
     Name = "default";
 
-    TaskFunction(production: boolean, done: Function) {
-        console.log("Default task");
+    TaskFunction(production: boolean, done: () => void) {
         new WatcherTasksHandler();
         done();
     }
