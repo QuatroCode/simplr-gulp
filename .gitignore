@@ -21,3 +21,5 @@ $RECYCLE.BIN/
 node_modules
 
 typings
+
+**/wwwroot/**/*
