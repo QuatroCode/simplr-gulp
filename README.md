@@ -14,18 +14,18 @@ After first run, `gulpconfig.json` file will be generated for you to edit for yo
 ### Available commands
 #### Gulp tasks
 * `Build` - compiles source files with development enviroment (starts all `Build.*` subtasks)
-    * `Build.Assets` - (Not implementd) copies all `assets` folders and their contents from source to build directory
-    * `Build.Configs` - (Not implementd) copies `web.config` (for Asp.Net 5 projects) and `configs` folder from source to build directory
-    * `Build.Html` - (Not implementd) copies all `*.html` files from source to build directory
+    * `Build.Assets` - *(Not implemented)* copies all `assets` folders and their contents from source to build directory
+    * `Build.Configs` - *(Not implemented)* copies `web.config` (for Asp.Net 5 projects) and `configs` folder from source to build directory
+    * `Build.Html` - *(Not implemented)* copies all `*.html` files from source to build directory
     * `Build.Scripts` - compiles TypeScript with sourcemap from source to build directory
-    * `Build.Styles` - (Not implementd) compiles `*.scss` files from source to build directory
+    * `Build.Styles` - *(Not implemented)* compiles `*.scss` files from source to build directory
 
 * `Build:Production` - compiles, minifies and uglifies source files with production enviroment (starts all `Build.*:Production` subtasks)
-    * `Build.Assets:Production` - (Not implementd) copies all `assets` folders and their contents from source to build directory
-    * `Build.Configs:Production` - (Not implementd) copies `web.config` (for Asp.Net 5 projects) and `configs` folder from source to build directory
-    * `Build.Html:Production` - (Not implementd) copies all `*.html` files from source to build directory
+    * `Build.Assets:Production` - *(Not implemented)* copies all `assets` folders and their contents from source to build directory
+    * `Build.Configs:Production` - *(Not implemented)* copies `web.config` (for Asp.Net 5 projects) and `configs` folder from source to build directory
+    * `Build.Html:Production` - *(Not implemented)* copies all `*.html` files from source to build directory
     * `Build.Scripts:Production` - compiles TypeScript from source to build directory
-    * `Build.Styles:Production` - (Not implementd) compiles and minifies `*.scss` files from source to build directory
+    * `Build.Styles:Production` - *(Not implemented)* compiles and minifies `*.scss` files from source to build directory
 
 
 * `Watch` - watch source files and start tasks.  (starts all `Watch.*` subtasks)
