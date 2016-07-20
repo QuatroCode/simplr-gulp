@@ -92,7 +92,7 @@ You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp-cli), [`ty
 > [More info about configuration](https://github.com/QuatroCode/simplr-gulp/wiki/Configuration)
 
 ## Development
-#### If you want to update gulpfile.ts yourself
+#### If you want to update `simplr-gulp` package yourself
 1. `git clone https://github.com/QuatroCode/simplr-gulp.git`
 2. `cd simplr-gulp`
 3. `npm install`
