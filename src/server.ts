@@ -39,7 +39,7 @@ class ServerStarter {
             Logger.error(`Port ${Configuration.GulpConfig.ServerConfig.Port} already in use.`);
             this.Listener.close();
         } else {
-            Logger.error("Exeption not handled. Please create issues with error code: \n", err);
+            Logger.error(`Exeption not handled. Please create issues with error code "${err.code}" here: https://github.com/QuatroCode/simplr-gulp/issues \n`, err);
         }
     }
 }
