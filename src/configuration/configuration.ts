@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import Console from '../utils/logger';
 import { WriteToFileAsJson } from '../utils/helpers';
 import { GulpConfig } from './configuration-contracts';
-import { DEFAULT_GULP_CONFIG, DEFAULT_TYPESCRIPT_CONFIG } from './configuration-defaults';
+import { DEFAULT_EXTENSIONS_MAP, DEFAULT_GULP_CONFIG, DEFAULT_TYPESCRIPT_CONFIG } from './configuration-defaults';
 
 
 
@@ -71,6 +71,10 @@ class ConfigurationLoader {
 
     get GulpConfig() {
         return this.config;
+    }
+
+    get DefaultExtensions() {
+        return DEFAULT_EXTENSIONS_MAP;
     }
 
 }

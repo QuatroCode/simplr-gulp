@@ -127,6 +127,11 @@ const DEFAULT_GULP_CONFIG = {
     WebConfig: null,
     CfgVersion: 2.02
 };
+const DEFAULT_EXTENSIONS_MAP = {
+    "ts": "js",
+    "tsx": "js",
+    "scss": "css"
+};
 
 class ConfigurationLoader {
     constructor() {
@@ -192,6 +197,9 @@ class ConfigurationLoader {
     }
     get GulpConfig() {
         return this.config;
+    }
+    get DefaultExtensions() {
+        return DEFAULT_EXTENSIONS_MAP;
     }
 }
 var Configuration = new ConfigurationLoader();
@@ -271,6 +279,12 @@ class TasksHandler {
 }
 
 class TaskBase {
+}
+
+class WatchTaskBase extends TaskBase {
+    addTasksProductionSuffix(text) {
+        return text + ":Production";
+    }
 }
 
 class DirectoriesBuilder {
@@ -359,8 +373,9 @@ var Paths;
 })(Paths || (Paths = {}));
 var Paths$1 = Paths;
 
-class WatchAssetsTask {
-    constructor() {
+class WatchAssetsTask extends WatchTaskBase {
+    constructor(...args) {
+        super(...args);
         this.Name = "Assets";
         this.Globs = Paths$1.Builders.AllDirectories.InSource("assets");
     }
@@ -370,8 +385,9 @@ class WatchAssetsTask {
     }
 }
 
-class WatchConfigsTask {
-    constructor() {
+class WatchConfigsTask extends WatchTaskBase {
+    constructor(...args) {
+        super(...args);
         this.Name = "Configs";
         this.Globs = Paths$1.Builders.OneDirectory.InSource("configs");
     }
@@ -380,8 +396,9 @@ class WatchConfigsTask {
     }
 }
 
-class WatchHtmlTask {
-    constructor() {
+class WatchHtmlTask extends WatchTaskBase {
+    constructor(...args) {
+        super(...args);
         this.Name = "Html";
         this.Globs = Paths$1.Builders.AllFiles.InSource(".{htm,html}");
     }
@@ -391,22 +408,24 @@ class WatchHtmlTask {
     }
 }
 
-class WatchScriptsTask {
-    constructor() {
+class WatchScriptsTask extends WatchTaskBase {
+    constructor(...args) {
+        super(...args);
         this.Name = "Scripts";
         this.Globs = Paths$1.Builders.AllFiles.InSource(".{ts,tsx}");
     }
     TaskFunction(production, done) {
         let taskName = 'Build.Scripts';
         if (production) {
-            taskName += ":Production";
+            taskName = this.addTasksProductionSuffix(taskName);
         }
         return gulp.parallel(taskName)(done);
     }
 }
 
-class WatchStylesTask {
-    constructor() {
+class WatchStylesTask extends WatchTaskBase {
+    constructor(...args) {
+        super(...args);
         this.Name = "Styles";
         this.Globs = Paths$1.Builders.AllFiles.InSource(".scss");
     }
@@ -423,6 +442,25 @@ class WatcherTasksHandler extends TasksHandler {
             return config;
         });
         this.watchers = {};
+        this.fileChangeHandler = (pathName, stats) => {
+        };
+        this.fileUnlinkHandler = (pathName) => {
+            let targetPathName = this.changeExtensionToBuilded(pathName);
+            targetPathName = this.changeRootPathToBuild(targetPathName);
+            fs.unlink(targetPathName, (err) => {
+                if (err != null) {
+                    if (err.code === "ENOENT") {
+                        logger.warn(`'${targetPathName}' has already been deleted.`);
+                    }
+                    else {
+                        logger.error(`Failed to delete file '${targetPathName}'\n`, err);
+                    }
+                }
+                else {
+                    logger.log(`'${targetPathName}' was deleted successfully.`);
+                }
+            });
+        };
         this.registerWatchers();
         logger.info(`Started watching files in '${Configuration.GulpConfig.Directories.Source}' folder.`);
     }
@@ -430,7 +468,30 @@ class WatcherTasksHandler extends TasksHandler {
         Object.keys(this.constructedTasks).forEach(name => {
             let task = this.constructedTasks[name];
             this.watchers[task.Name] = gulp.watch(task.Globs, gulp.parallel(this.generateName(task.Name)));
+            this.watchers[task.Name].on('unlink', this.fileUnlinkHandler);
+            this.watchers[task.Name].on('change', this.fileChangeHandler);
         });
+    }
+    changeExtensionToBuilded(pathName) {
+        let currentExtension = path.extname(pathName);
+        if (currentExtension.length > 1) {
+            let targetExtension = Configuration.DefaultExtensions[currentExtension.slice(1)];
+            if (targetExtension !== undefined) {
+                return pathName.slice(0, -targetExtension.length) + targetExtension;
+            }
+        }
+        return pathName;
+    }
+    changeRootPathToBuild(pathName) {
+        let pathList = pathName.split(path.sep);
+        if (pathList[0] === Configuration.GulpConfig.Directories.Source) {
+            pathList[0] = Configuration.GulpConfig.Directories.Build;
+            return path.join(...pathList);
+        }
+        else {
+            logger.warn(`WarcherTasksHandler.changeRootPathToBuild(): "${pathName}" path root is not under Source directory (${Configuration.GulpConfig.Directories.Source})`);
+            return pathName;
+        }
     }
 }
 

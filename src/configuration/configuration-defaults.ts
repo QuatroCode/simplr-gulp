@@ -26,7 +26,7 @@ export const DEFAULT_GULP_CONFIG: GulpConfig = {
         Development: "tsconfig.json",
         Production: "tsconfig.production.json"
     },
-    ServerConfig: { 
+    ServerConfig: {
         Ip: "127.0.0.1",
         Port: 4000,
         LiveReloadPort: 4400
@@ -41,7 +41,7 @@ export const DEFAULT_GULP_CONFIG: GulpConfig = {
     CfgVersion: 2.02
 };
 
-export const DEFAULT_EXTENSIONS_MAP = {
+export const DEFAULT_EXTENSIONS_MAP: { [ext: string]: string } = {
     "ts": "js",
     "tsx": "js",
     "scss": "css"
