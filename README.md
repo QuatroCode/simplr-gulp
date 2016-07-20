@@ -40,6 +40,7 @@ After first run, `gulpconfig.json` file will be generated for you to edit for yo
 #### TODO Gulp tasks
 * `Bundle` - bundles the app with `jspm bundle` with development enviroment
 * `Bundle:Production` - bundles the app with `jspm bundle` with production enviroment
+* `Server` - Start localhost server.
 
 * `Clean` - cleans build directory (`wwwroot` by default) without `wwwroot/libs` folder
     * `Clean.All` - cleans build directory (`wwwroot` by default)
