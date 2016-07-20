@@ -3,12 +3,10 @@ import Paths from '../../../paths/paths';
 
 export default class WatchConfigsTask extends WatchTaskBase {
 
+    TaskNamePrefix = "Build";
+
     Name = "Configs";
 
     Globs = Paths.Builders.OneDirectory.InSource("configs");
-
-    TaskFunction(production: boolean) {
-        console.log("Configs watch task");
-    }
 
 }

@@ -234,9 +234,9 @@ class TasksHandler {
                 }
                 else {
                     constructedTasks[fullName] = constructedTask;
-                    gulp.task(fullName, constructedTask.TaskFunction.bind(this, false));
+                    gulp.task(fullName, constructedTask.TaskFunction.bind(null, false));
                     if (this.configuration.WithProduction) {
-                        gulp.task(`${fullName}:Production`, constructedTask.TaskFunction.bind(this, true));
+                        gulp.task(`${fullName}:Production`, constructedTask.TaskFunction.bind(null, true));
                     }
                 }
             });
@@ -282,6 +282,16 @@ class TaskBase {
 }
 
 class WatchTaskBase extends TaskBase {
+    constructor(...args) {
+        super(...args);
+        this.TaskFunction = (production, done) => {
+            let taskName = `${this.TaskNamePrefix}.${this.Name}`;
+            if (production) {
+                taskName = this.addTasksProductionSuffix(taskName);
+            }
+            return gulp.parallel(taskName)(done);
+        };
+    }
     addTasksProductionSuffix(text) {
         return text + ":Production";
     }
@@ -376,50 +386,36 @@ var Paths$1 = Paths;
 class WatchAssetsTask extends WatchTaskBase {
     constructor(...args) {
         super(...args);
+        this.TaskNamePrefix = "Build";
         this.Name = "Assets";
         this.Globs = Paths$1.Builders.AllDirectories.InSource("assets");
-    }
-    TaskFunction(production, done) {
-        console.log("Assets watch task");
-        done();
     }
 }
 
 class WatchConfigsTask extends WatchTaskBase {
     constructor(...args) {
         super(...args);
+        this.TaskNamePrefix = "Build";
         this.Name = "Configs";
         this.Globs = Paths$1.Builders.OneDirectory.InSource("configs");
-    }
-    TaskFunction(production) {
-        console.log("Configs watch task");
     }
 }
 
 class WatchHtmlTask extends WatchTaskBase {
     constructor(...args) {
         super(...args);
+        this.TaskNamePrefix = "Build";
         this.Name = "Html";
         this.Globs = Paths$1.Builders.AllFiles.InSource(".{htm,html}");
-    }
-    TaskFunction(production, done) {
-        console.log("Html watch task");
-        done();
     }
 }
 
 class WatchScriptsTask extends WatchTaskBase {
     constructor(...args) {
         super(...args);
+        this.TaskNamePrefix = "Build";
         this.Name = "Scripts";
         this.Globs = Paths$1.Builders.AllFiles.InSource(".{ts,tsx}");
-    }
-    TaskFunction(production, done) {
-        let taskName = 'Build.Scripts';
-        if (production) {
-            taskName = this.addTasksProductionSuffix(taskName);
-        }
-        return gulp.parallel(taskName)(done);
     }
 }
 
@@ -427,10 +423,8 @@ class WatchStylesTask extends WatchTaskBase {
     constructor(...args) {
         super(...args);
         this.Name = "Styles";
+        this.TaskNamePrefix = "Build";
         this.Globs = Paths$1.Builders.AllFiles.InSource(".scss");
-    }
-    TaskFunction(production) {
-        console.log("Styles watch task");
     }
 }
 
@@ -499,10 +493,10 @@ class DefaultTask extends TaskBase {
     constructor(...args) {
         super(...args);
         this.Name = "default";
-    }
-    TaskFunction(production, done) {
-        new WatcherTasksHandler();
-        done();
+        this.TaskFunction = (production, done) => {
+            new WatcherTasksHandler();
+            done();
+        };
     }
 }
 
@@ -510,10 +504,11 @@ class BuildAssetsTask extends TaskBase {
     constructor(...args) {
         super(...args);
         this.Name = "Build.Assets";
-    }
-    TaskFunction(production, done) {
-        console.log("Build.Assets");
-        done();
+        this.TaskFunction = (production, done) => {
+            gulp.src(Paths$1.Builders.AllDirectories.InSource("assets"))
+                .pipe(gulp.dest(Paths$1.Directories.Build))
+                .on("end", done);
+        };
     }
 }
 
@@ -521,11 +516,11 @@ class BuildConfigTask extends TaskBase {
     constructor(...args) {
         super(...args);
         this.Name = "Build.Configs";
-    }
-    TaskFunction(production, done) {
-        console.log("BUILD CONFIGS:", production);
-        console.log("Build.Configs");
-        done();
+        this.TaskFunction = (production, done) => {
+            gulp.src(Paths$1.Builders.OneDirectory.InSource(path.join("configs", "**", "*")))
+                .pipe(gulp.dest(path.join(Paths$1.Directories.Build, "configs")))
+                .on("end", done);
+        };
     }
 }
 
@@ -533,10 +528,11 @@ class BuildHtmlTask extends TaskBase {
     constructor(...args) {
         super(...args);
         this.Name = "Build.Html";
-    }
-    TaskFunction(production, done) {
-        console.log("Build.Html");
-        done();
+        this.TaskFunction = (production, done) => {
+            gulp.src(Paths$1.Builders.AllFiles.InSource(".{htm,html}"))
+                .pipe(gulp.dest(Paths$1.Directories.Build))
+                .on("end", done);
+        };
     }
 }
 
@@ -607,9 +603,9 @@ var TypescriptBuilder$1 = new TypescriptBuilder();
 class BuildScriptsTask {
     constructor() {
         this.Name = "Build.Scripts";
-    }
-    TaskFunction(production, done) {
-        TypescriptBuilder$1.Build(production, done);
+        this.TaskFunction = (production, done) => {
+            TypescriptBuilder$1.Build(production, done);
+        };
     }
 }
 
@@ -617,10 +613,10 @@ class BuildStylesgTask extends TaskBase {
     constructor(...args) {
         super(...args);
         this.Name = "Build.Styles";
-    }
-    TaskFunction(production, done) {
-        console.log("Build.Styles");
-        done();
+        this.TaskFunction = (production, done) => {
+            console.log("Build.Styles");
+            done();
+        };
     }
 }
 
@@ -639,10 +635,10 @@ class WatchTask extends TaskBase {
     constructor(...args) {
         super(...args);
         this.Name = "Watch";
-    }
-    TaskFunction(production, done) {
-        new WatcherTasksHandler();
-        done();
+        this.TaskFunction = (production, done) => {
+            new WatcherTasksHandler();
+            done();
+        };
     }
 }
 

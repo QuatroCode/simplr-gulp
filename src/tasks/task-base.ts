@@ -2,7 +2,12 @@ import { Duplex } from 'stream';
 
 export interface Task {
     Name: string;
-    TaskFunction: (production: boolean, done?: Function) => void | Duplex | NodeJS.Process | any;
+    TaskFunction: TaskFunction;
+}
+
+
+interface TaskFunction {
+    (production: boolean, done?: Function): void | Duplex | NodeJS.Process | any;
 }
 
 /**
@@ -14,7 +19,7 @@ export interface Task {
  */
 abstract class TaskBase implements Task {
     public abstract Name: string;
-    public abstract TaskFunction(production: boolean, done?: Function): void | Duplex | NodeJS.Process | any;
+    public abstract TaskFunction: TaskFunction;
 }
 
 export default TaskBase;

@@ -5,7 +5,7 @@ export default class DefaultTask extends TaskBase {
 
     Name = "default";
 
-    TaskFunction(production: boolean, done: () => void) {
+    TaskFunction = (production: boolean, done: () => void) => {
         new WatcherTasksHandler();
         done();
     }

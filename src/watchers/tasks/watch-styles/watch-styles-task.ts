@@ -5,10 +5,8 @@ export default class WatchStylesTask extends WatchTaskBase {
 
     Name = "Styles";
     
-    Globs = Paths.Builders.AllFiles.InSource(".scss");
+    TaskNamePrefix = "Build";
 
-    TaskFunction(production: boolean) {
-        console.log("Styles watch task");
-    }
+    Globs = Paths.Builders.AllFiles.InSource(".scss");
 
 }

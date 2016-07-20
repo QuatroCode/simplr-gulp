@@ -4,7 +4,7 @@ export default class BuildScriptsTask {
 
     Name = "Build.Scripts";
 
-    TaskFunction(production: boolean, done: () => void) {
+    TaskFunction = (production: boolean, done: () => void) => {
         TypescriptBuilder.Build(production, done);
     }
 }

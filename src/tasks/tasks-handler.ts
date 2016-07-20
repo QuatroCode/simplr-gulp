@@ -1,5 +1,6 @@
 import * as gulp from 'gulp';
-import { Task, TaskConstructor, TasksHandlerContructor } from './tasks-contracts';
+import { TaskConstructor, TasksHandlerContructor } from './tasks-contracts';
+import { Task } from './task-base';
 import Logger from '../utils/logger';
 import { GetClassName } from '../utils/helpers';
 
@@ -52,9 +53,9 @@ abstract class TasksHandler<T extends Task> {
                     Logger.warn(`(${this._moduleName}) Task "${fullName}" already exist.`);
                 } else {
                     constructedTasks[fullName] = constructedTask;
-                    gulp.task(fullName, constructedTask.TaskFunction.bind(this, false));
+                    gulp.task(fullName, constructedTask.TaskFunction.bind(null, false));
                     if (this.configuration.WithProduction) {
-                        gulp.task(`${fullName}:Production`, constructedTask.TaskFunction.bind(this, true));
+                        gulp.task(`${fullName}:Production`, constructedTask.TaskFunction.bind(null, true));
                     }
                 }
             });
