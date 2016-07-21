@@ -13,6 +13,7 @@ var tslint = _interopDefault(require('gulp-tslint'));
 var Lint = require('tslint/lib/lint');
 var cleanCSS = require('gulp-clean-css');
 var sass = require('gulp-sass');
+var rimraf = require('rimraf');
 
 function WriteToFileAsJson(fileName, content) {
     fs.writeFile(fileName, JSON.stringify(content, null, 4));
@@ -762,11 +763,33 @@ class WatchTask extends TaskBase {
     }
 }
 
+class CleanAllTask extends TaskBase {
+    constructor(...args) {
+        super(...args);
+        this.Name = "Clean.All";
+        this.TaskFunction = (production, done) => {
+            rimraf("wwwroot/**/*", (error) => {
+                done();
+            });
+        };
+    }
+}
+
+class CleanTasksHandler extends TasksHandler {
+    constructor() {
+        super(config => {
+            config.Name = "Clean";
+            config.Tasks = [CleanAllTask];
+            return config;
+        });
+    }
+}
+
 class Tasks extends TasksHandler {
     constructor() {
         super(config => {
             config.Tasks = [DefaultTask, WatchTask];
-            config.TasksHandlers = [BuildTasksHandler];
+            config.TasksHandlers = [BuildTasksHandler, CleanTasksHandler];
             return config;
         });
     }

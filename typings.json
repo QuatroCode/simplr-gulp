@@ -3,6 +3,7 @@
   "dependencies": {
     "gulp": "registry:npm/gulp#4.0.0-alpha.2+20160618213436",
     "gulp-tslint": "https://raw.githubusercontent.com/panuhorsmalahti/gulp-tslint/master/index.d.ts",
+    "rimraf": "registry:npm/rimraf#2.5.0+20160211003958",
     "source-map": "registry:npm/source-map#0.4.0+20160211003958",
     "tsconfig-lint": "github:QuatroTypings/npm-tsconfig-lint/0.11.0"
   },
