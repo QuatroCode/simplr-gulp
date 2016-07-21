@@ -64,9 +64,10 @@ export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
     private changeExtensionToBuilded(pathName: string) {
         let currentExtension = path.extname(pathName);
         if (currentExtension.length > 1) {
-            let targetExtension = Configuration.DefaultExtensions[currentExtension.slice(1)];
+            let currentExtensionTarget = currentExtension.slice(1);
+            let targetExtension = Configuration.DefaultExtensions[currentExtensionTarget];
             if (targetExtension !== undefined) {
-                return pathName.slice(0, -targetExtension.length) + targetExtension;
+                return pathName.slice(0, -currentExtensionTarget.length) + targetExtension;
             }
         }
         return pathName;
