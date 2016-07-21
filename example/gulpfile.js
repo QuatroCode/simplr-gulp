@@ -5,6 +5,7 @@ var Colors = require('colors/safe');
 var gulp = require('gulp');
 var path = require('path');
 var ts = require('gulp-typescript');
+var uglify = require('gulp-uglify');
 
 function WriteToFileAsJson(fileName, content) {
     fs.writeFile(fileName, JSON.stringify(content, null, 4));
@@ -580,8 +581,11 @@ class TypescriptBuilderCompiler {
 class TypescriptBuilder extends BuilderBase$1 {
     build(production, builder, done) {
         let tsResult = gulp.src(Paths$1.Builders.AllFiles.InSource())
-            .pipe(ts(builder.Project));
-        tsResult.js.pipe(gulp.dest(Paths$1.Directories.Build)).on("end", done);
+            .pipe(ts(builder.Project)).js;
+        if (production) {
+            tsResult = tsResult.pipe(uglify({ mangle: true }));
+        }
+        tsResult.pipe(gulp.dest(Paths$1.Directories.Build)).on("end", done);
     }
     initBuilder(production) {
         if (production) {
