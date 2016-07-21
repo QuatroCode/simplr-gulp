@@ -1,5 +1,7 @@
 'use strict';
 
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
 var fs = require('fs');
 var Colors = require('colors/safe');
 var gulp = require('gulp');
@@ -7,6 +9,8 @@ var path = require('path');
 var ts = require('gulp-typescript');
 var uglify = require('gulp-uglify');
 var sourcemaps = require('gulp-sourcemaps');
+var tslint = _interopDefault(require('gulp-tslint'));
+var Lint = require('tslint/lib/lint');
 
 function WriteToFileAsJson(fileName, content) {
     fs.writeFile(fileName, JSON.stringify(content, null, 4));
@@ -573,6 +577,19 @@ class BuilderBase$1 {
     }
 }
 
+class ErrorHandler extends Lint.Formatters.AbstractFormatter {
+    format(failures) {
+        let lines = new Array();
+        failures.forEach(failure => {
+            let position = failure.getStartPosition().getLineAndCharacter();
+            let line = `${failure.getFileName()}[${position.line + 1}, ${position.character + 1}]: ${failure.getFailure()} (${failure.getRuleName()})`;
+            lines.push(line);
+            logger.warn(line);
+        });
+        return JSON.stringify(lines);
+    }
+}
+
 class TypescriptBuilderCompiler {
     constructor(configFile) {
         this.Project = ts.createProject(configFile);
@@ -581,8 +598,11 @@ class TypescriptBuilderCompiler {
 
 class TypescriptBuilder extends BuilderBase$1 {
     build(production, builder, done) {
-        let tsResult = gulp.src(Paths$1.Builders.AllFiles.InSource())
-            .pipe(ts(builder.Project)).js;
+        let tsResult = gulp.src(Paths$1.Builders.AllFiles.InSource(".{ts,tsx}"))
+            .pipe(tslint({
+            formatter: ErrorHandler
+        }));
+        tsResult = tsResult.pipe(ts(builder.Project)).js;
         if (production) {
             tsResult = tsResult.pipe(uglify({ mangle: true }));
         }
