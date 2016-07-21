@@ -6,6 +6,7 @@ var gulp = require('gulp');
 var path = require('path');
 var ts = require('gulp-typescript');
 var uglify = require('gulp-uglify');
+var sourcemaps = require('gulp-sourcemaps');
 
 function WriteToFileAsJson(fileName, content) {
     fs.writeFile(fileName, JSON.stringify(content, null, 4));
@@ -584,6 +585,9 @@ class TypescriptBuilder extends BuilderBase$1 {
             .pipe(ts(builder.Project)).js;
         if (production) {
             tsResult = tsResult.pipe(uglify({ mangle: true }));
+        }
+        else {
+            tsResult = tsResult.pipe(sourcemaps.init()).pipe(sourcemaps.write());
         }
         tsResult.pipe(gulp.dest(Paths$1.Directories.Build)).on("end", done);
     }

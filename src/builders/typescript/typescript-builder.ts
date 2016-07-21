@@ -4,6 +4,7 @@ import Paths from '../../paths/paths';
 import * as gulp from 'gulp';
 import * as ts from 'gulp-typescript';
 import * as uglify from 'gulp-uglify';
+import * as sourcemaps from 'gulp-sourcemaps';
 
 import TypescriptBuilderCompiler from './typescript-builder-compiler';
 
@@ -15,6 +16,8 @@ class TypescriptBuilder extends BuilderBase<TypescriptBuilderCompiler> {
 
         if (production) {
             tsResult = tsResult.pipe(uglify({ mangle: true }));
+        } else {
+            tsResult = tsResult.pipe(sourcemaps.init()).pipe(sourcemaps.write());
         }
 
         tsResult.pipe(gulp.dest(Paths.Directories.Build)).on("end", done);
