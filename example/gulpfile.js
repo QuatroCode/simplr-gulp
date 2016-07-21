@@ -11,6 +11,8 @@ var uglify = require('gulp-uglify');
 var sourcemaps = require('gulp-sourcemaps');
 var tslint = _interopDefault(require('gulp-tslint'));
 var Lint = require('tslint/lib/lint');
+var cleanCSS = require('gulp-clean-css');
+var sass = require('gulp-sass');
 
 function WriteToFileAsJson(fileName, content) {
     fs.writeFile(fileName, JSON.stringify(content, null, 4));
@@ -475,9 +477,10 @@ class WatcherTasksHandler extends TasksHandler {
     changeExtensionToBuilded(pathName) {
         let currentExtension = path.extname(pathName);
         if (currentExtension.length > 1) {
-            let targetExtension = Configuration.DefaultExtensions[currentExtension.slice(1)];
+            let currentExtensionTarget = currentExtension.slice(1);
+            let targetExtension = Configuration.DefaultExtensions[currentExtensionTarget];
             if (targetExtension !== undefined) {
-                return pathName.slice(0, -targetExtension.length) + targetExtension;
+                return pathName.slice(0, -currentExtensionTarget.length) + targetExtension;
             }
         }
         return pathName;
@@ -601,8 +604,8 @@ class TypescriptBuilder extends BuilderBase$1 {
         let tsResult = gulp.src(Paths$1.Builders.AllFiles.InSource(".{ts,tsx}"))
             .pipe(tslint({
             formatter: ErrorHandler
-        }));
-        tsResult = tsResult.pipe(ts(builder.Project)).js;
+        }))
+            .pipe(ts(builder.Project)).js;
         if (production) {
             tsResult = tsResult.pipe(uglify({ mangle: true }));
         }
@@ -637,13 +640,52 @@ class BuildScriptsTask {
     }
 }
 
+class StylesBuilder extends BuilderBase$1 {
+    build(production, builder, done) {
+        let sassResults = gulp.src(Paths$1.Builders.AllFiles.InSourceApp(".scss"));
+        if (!production) {
+            sassResults = sassResults.pipe(sourcemaps.init());
+        }
+        sassResults = sassResults
+            .pipe(sass()
+            .on('error', (error) => {
+            this.errorHandler(error);
+            done();
+        }));
+        if (!production) {
+            sassResults = sassResults.pipe(sourcemaps.write());
+        }
+        else {
+            sassResults = sassResults.pipe(cleanCSS());
+        }
+        sassResults.pipe(gulp.dest(Paths$1.Directories.BuildApp))
+            .on('end', done);
+    }
+    errorHandler(error) {
+        if (error != null) {
+            if (error.relativePath != null && error.line != null && error.column != null && error.messageOriginal != null) {
+                logger.error(`${error.relativePath}[${error.line}, ${error.column}]: ${error.messageOriginal}`);
+            }
+            else {
+                logger.error("Error in 'gulp-sass' plugin: \n", error);
+            }
+        }
+        else {
+            logger.error(`Unknown error in 'gulp-sass' plugin.`);
+        }
+    }
+    initBuilder(production) {
+        return null;
+    }
+}
+var StylesBuilder$1 = new StylesBuilder();
+
 class BuildStylesgTask extends TaskBase {
     constructor(...args) {
         super(...args);
         this.Name = "Build.Styles";
         this.TaskFunction = (production, done) => {
-            console.log("Build.Styles");
-            done();
+            StylesBuilder$1.Build(production, done);
         };
     }
 }

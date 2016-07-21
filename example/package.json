@@ -12,6 +12,8 @@
     "colors": "^1.1.2",
     "express": "^4.14.0",
     "gulp": "github:gulpjs/gulp#4.0",
+    "gulp-clean-css": "^2.0.11",
+    "gulp-sass": "^2.3.2",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-tslint": "^6.0.1",
     "gulp-typescript": "^2.13.6",
