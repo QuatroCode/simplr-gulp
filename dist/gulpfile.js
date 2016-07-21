@@ -218,12 +218,16 @@ class TasksHandler {
         this._moduleName = `TasksHandler.${this._className}`;
         this.configuration = config(this.initConfiguration);
         this.constructedTasks = this.registerTasks(this.configuration.Tasks);
-        this.loadTasksHandlers(this.configuration.TasksHandlers);
+        this.constructedTasksHander = this.loadTasksHandlers(this.configuration.TasksHandlers);
         this.registerMainTask();
     }
+    get TaskName() {
+        return this.configuration.Name;
+    }
+    ;
     get initConfiguration() {
         return {
-            TasksPrefix: "",
+            Name: "",
             TasksSufix: "",
             Tasks: [],
             TasksHandlers: [],
@@ -242,9 +246,9 @@ class TasksHandler {
                 }
                 else {
                     constructedTasks[fullName] = constructedTask;
-                    gulp.task(fullName, constructedTask.TaskFunction.bind(null, false));
+                    this.registerTaskFunction(fullName, false, constructedTask);
                     if (this.configuration.WithProduction) {
-                        gulp.task(`${fullName}:Production`, constructedTask.TaskFunction.bind(null, true));
+                        this.registerTaskFunction(`${fullName}:Production`, true, constructedTask);
                     }
                 }
             });
@@ -254,29 +258,53 @@ class TasksHandler {
         }
         return constructedTasks;
     }
+    registerTaskFunction(name, production, constructedTask) {
+        gulp.task(name, (done) => {
+            let taskRunner = constructedTask.TaskFunction(production, done);
+            if (taskRunner !== undefined) {
+                if (taskRunner instanceof Promise) {
+                    taskRunner.then(() => {
+                        done();
+                    });
+                }
+                else {
+                    return taskRunner;
+                }
+            }
+        });
+    }
     loadTasksHandlers(tasksHandlers) {
+        let constructedTasksHander = {};
         if (tasksHandlers != null && tasksHandlers.length > 0) {
             tasksHandlers.forEach(handler => {
-                new handler();
+                let taskHandler = new handler();
+                let fullName = taskHandler.TaskName;
+                if (constructedTasksHander[fullName] != null) {
+                    logger.warn(`(${this._moduleName}) Task handler "${fullName}" already exist.`);
+                }
+                else {
+                    constructedTasksHander[fullName] = taskHandler;
+                }
             });
         }
+        return constructedTasksHander;
     }
     registerMainTask() {
-        if (this.configuration.TasksPrefix != null && this.configuration.TasksPrefix.length > 0) {
+        if (this.configuration.Name != null && this.configuration.Name.length > 0) {
             let method = (this.configuration.TasksAsync) ? gulp.parallel : gulp.series;
-            let tasksList = Object.keys(this.constructedTasks);
-            gulp.task(this.configuration.TasksPrefix, method(tasksList));
+            let tasksList = Object.keys(this.constructedTasks).concat(Object.keys(this.constructedTasksHander));
+            gulp.task(this.configuration.Name, method(tasksList));
             if (this.configuration.WithProduction) {
                 let tasksListProuction = tasksList.map(x => { return `${x}:Production`; });
-                gulp.task(this.configuration.TasksPrefix + ':Production', method(tasksListProuction));
+                gulp.task(this.configuration.Name + ':Production', method(tasksListProuction));
             }
         }
     }
     generateName(taskName) {
         let name = taskName;
-        if (this.configuration.TasksPrefix != null && this.configuration.TasksPrefix.length > 0) {
-            if (name.slice(0, this.configuration.TasksPrefix.length + 1) !== `${this.configuration.TasksPrefix}.`) {
-                name = `${this.configuration.TasksPrefix}.${name}`;
+        if (this.configuration.Name != null && this.configuration.Name.length > 0) {
+            if (name.slice(0, this.configuration.Name.length + 1) !== `${this.configuration.Name}.`) {
+                name = `${this.configuration.Name}.${name}`;
             }
         }
         if (this.configuration.TasksSufix != null && this.configuration.TasksSufix.length > 0) {
@@ -439,7 +467,7 @@ class WatchStylesTask extends WatchTaskBase {
 class WatcherTasksHandler extends TasksHandler {
     constructor() {
         super((config) => {
-            config.TasksPrefix = "Watch";
+            config.Name = "Watch";
             config.Tasks = [WatchAssetsTask, WatchConfigsTask, WatchHtmlTask, WatchScriptsTask, WatchStylesTask];
             return config;
         });
@@ -521,15 +549,36 @@ class BuildAssetsTask extends TaskBase {
     }
 }
 
-class BuildConfigTask extends TaskBase {
+class BuildConfigsFilesTask extends TaskBase {
     constructor(...args) {
         super(...args);
-        this.Name = "Build.Configs";
-        this.TaskFunction = (production, done) => {
-            gulp.src(Paths$1.Builders.OneDirectory.InSource(path.join("configs", "**", "*")))
-                .pipe(gulp.dest(path.join(Paths$1.Directories.Build, "configs")))
-                .on("end", done);
+        this.Name = "Build.Configs.Files";
+        this.TaskFunction = (production) => {
+            return gulp.src(Paths$1.Builders.AllFiles.InSource(".config"))
+                .pipe(gulp.dest(Paths$1.Directories.Build));
         };
+    }
+}
+
+class BuildConfigsFoldersTask extends TaskBase {
+    constructor(...args) {
+        super(...args);
+        this.Name = "Build.Configs.Folders";
+        this.TaskFunction = (production) => {
+            return gulp.src(Paths$1.Builders.OneDirectory.InSource(path.join("configs", "**", "*")))
+                .pipe(gulp.dest(path.join(Paths$1.Directories.Build, "configs")));
+        };
+    }
+}
+
+class Tasks$1 extends TasksHandler {
+    constructor() {
+        super(config => {
+            config.Name = "Build.Configs";
+            config.Tasks = [BuildConfigsFilesTask, BuildConfigsFoldersTask];
+            config.WithProduction = true;
+            return config;
+        });
     }
 }
 
@@ -693,8 +742,9 @@ class BuildStylesgTask extends TaskBase {
 class BuildTasksHandler extends TasksHandler {
     constructor() {
         super(config => {
-            config.TasksPrefix = "Build";
-            config.Tasks = [BuildAssetsTask, BuildConfigTask, BuildHtmlTask, BuildScriptsTask, BuildStylesgTask];
+            config.Name = "Build";
+            config.Tasks = [BuildAssetsTask, BuildHtmlTask, BuildScriptsTask, BuildStylesgTask];
+            config.TasksHandlers = [Tasks$1];
             config.WithProduction = true;
             return config;
         });

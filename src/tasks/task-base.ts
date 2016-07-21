@@ -7,7 +7,7 @@ export interface Task {
 
 
 interface TaskFunction {
-    (production: boolean, done?: Function): void | Duplex | NodeJS.Process | any;
+    (production: boolean, done?: Function): void | Promise<any> | Duplex | NodeJS.Process;
 }
 
 /**

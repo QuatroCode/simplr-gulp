@@ -19,7 +19,7 @@ export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
 
     constructor() {
         super((config) => {
-            config.TasksPrefix = "Watch";
+            config.Name = "Watch";
             config.Tasks = [WatchAssetsTask, WatchConfigsTask, WatchHtmlTask, WatchScriptsTask, WatchStylesTask];
             return config;
         });
