@@ -10,7 +10,7 @@ export default class CleanTasksHandler extends TasksHandler<Task> {
         super(config => {
             config.Name = "Clean";
             config.Tasks = [CleanAllTask];
-
+            config.HandlerAsTask = false;
             return config;
         });
     }

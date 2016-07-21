@@ -12,6 +12,7 @@ interface Configuration<T> {
     Tasks: Array<TaskConstructor<T>>;
     TasksHandlers: Array<TasksHandlerContructor<any>>;
     WithProduction: boolean;
+    HandlerAsTask: boolean;
 }
 
 
@@ -21,7 +22,9 @@ abstract class TasksHandler<T extends Task> {
         this.configuration = config(this.initConfiguration);
         this.constructedTasks = this.registerTasks(this.configuration.Tasks);
         this.constructedTasksHander = this.loadTasksHandlers(this.configuration.TasksHandlers);
-        this.registerMainTask();
+        if (this.configuration.HandlerAsTask) {
+            this.registerMainTask();
+        }
     }
 
     private configuration: Configuration<T>;
@@ -44,7 +47,8 @@ abstract class TasksHandler<T extends Task> {
             Tasks: [],
             TasksHandlers: [],
             TasksAsync: true,
-            WithProduction: false
+            WithProduction: false,
+            HandlerAsTask: true
         };
     }
 

@@ -220,7 +220,9 @@ class TasksHandler {
         this.configuration = config(this.initConfiguration);
         this.constructedTasks = this.registerTasks(this.configuration.Tasks);
         this.constructedTasksHander = this.loadTasksHandlers(this.configuration.TasksHandlers);
-        this.registerMainTask();
+        if (this.configuration.HandlerAsTask) {
+            this.registerMainTask();
+        }
     }
     get TaskName() {
         return this.configuration.Name;
@@ -233,7 +235,8 @@ class TasksHandler {
             Tasks: [],
             TasksHandlers: [],
             TasksAsync: true,
-            WithProduction: false
+            WithProduction: false,
+            HandlerAsTask: true
         };
     }
     registerTasks(tasks) {
@@ -780,15 +783,29 @@ class CleanTasksHandler extends TasksHandler {
         super(config => {
             config.Name = "Clean";
             config.Tasks = [CleanAllTask];
+            config.HandlerAsTask = false;
             return config;
         });
+    }
+}
+
+class CleanAllTask$1 extends TaskBase {
+    constructor(...args) {
+        super(...args);
+        this.Name = "Clean";
+        this.TaskFunction = (production, done) => {
+            let ignoreLibsPath = [Paths$1.Directories.Build, "libs", "**"].join("/");
+            rimraf(Paths$1.Builders.AllFiles.InBuild(), { glob: { ignore: ignoreLibsPath } }, (error) => {
+                done();
+            });
+        };
     }
 }
 
 class Tasks extends TasksHandler {
     constructor() {
         super(config => {
-            config.Tasks = [DefaultTask, WatchTask];
+            config.Tasks = [DefaultTask, WatchTask, CleanAllTask$1];
             config.TasksHandlers = [BuildTasksHandler, CleanTasksHandler];
             return config;
         });
