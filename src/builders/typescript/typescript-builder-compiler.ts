@@ -4,7 +4,9 @@ export default class TypescriptBuilderCompiler {
     public Project: ts.Project;
 
     constructor(configFile: string) {
-        this.Project = ts.createProject(configFile);
+        this.Project = ts.createProject(configFile, {
+            typescript: require('typescript')
+        });
     }
 
 }

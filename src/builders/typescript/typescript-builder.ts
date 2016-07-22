@@ -8,8 +8,18 @@ import * as sourcemaps from 'gulp-sourcemaps';
 import tslint from 'gulp-tslint';
 import TsLintFormatter from './tslint/tslint-formatter';
 import TypescriptBuilderCompiler from './typescript-builder-compiler';
+import Logger from '../../utils/logger';
+
+
+class Reporter implements ts.Reporter {
+    error(error: any) {
+        Logger.withType("TS").error(`${error.relativeFilename}[${error.startPosition.line}, ${error.startPosition.character}]: ${error.diagnostic.messageText}`);
+    }
+}
 
 class TypescriptBuilder extends BuilderBase<TypescriptBuilderCompiler> {
+
+    private reporter = new Reporter();
 
     protected build(production: boolean, builder: TypescriptBuilderCompiler, done: () => void) {
 
@@ -17,7 +27,7 @@ class TypescriptBuilder extends BuilderBase<TypescriptBuilderCompiler> {
             .pipe(tslint({
                 formatter: TsLintFormatter
             }))
-            .pipe(ts(builder.Project)).js;
+            .pipe(ts(builder.Project, undefined, this.reporter)).js;
 
         if (production) {
             tsResult = tsResult.pipe(uglify({ mangle: true }));

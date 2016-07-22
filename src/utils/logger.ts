@@ -8,6 +8,15 @@ enum LogType {
     Warning
 }
 
+class LoggerType {
+    constructor(private type: string) {
+    }
+
+    get Type() {
+        return this.type;
+    }
+}
+
 class Console {
 
     private styles = Colors.styles;
@@ -16,8 +25,8 @@ class Console {
         return `[${this.styles.grey.open}${GetTimeNow()}${this.styles.grey.close}]`;
     }
 
-    private showMessage(type: LogType, ...messages: Array<any>) {
-        let typeString = ` ${LogType[type].toLocaleUpperCase()}:`;
+    private showMessage(type: LogType, loggerType: LoggerType | undefined, ...messages: Array<any>) {
+        let typeString = ` ${LogType[type].toLocaleUpperCase()}`;
         let log = console.log;
         let color = this.styles.white.open;
         switch (type) {
@@ -37,8 +46,13 @@ class Console {
                 typeString = "";
             }
         }
+
+        if (loggerType !== undefined) {
+            typeString = typeString + " " + loggerType.Type;
+        }
+
         this.discernWords(type, color, ...messages).then((resolvedMessages) => {
-            log(`${this.getTimeNowWithStyles()}${this.styles.bold.open}${color}${typeString}`, ...resolvedMessages, this.styles.reset.open);
+            log(`${this.getTimeNowWithStyles()}${this.styles.bold.open}${color}${typeString}:`, ...resolvedMessages, this.styles.reset.open);
         });
     }
 
@@ -70,20 +84,38 @@ class Console {
         });
     }
 
-    log(...message: Array<any>) {
-        this.showMessage(LogType.Default, ...message);
+    private getLoggerTypeFromMessages(messages: Array<any>) {
+        return (messages[0] instanceof LoggerType) ? messages.shift() : undefined;
     }
 
-    error(...message: Array<any>) {
-        this.showMessage(LogType.Error, ...message);
+    log(...messages: Array<any>) {
+        let loggerType = this.getLoggerTypeFromMessages(messages);
+        this.showMessage(LogType.Default, loggerType, ...messages);
     }
 
-    info(...message: Array<any>) {
-        this.showMessage(LogType.Info, ...message);
+    error(...messages: Array<any>) {
+        let loggerType = this.getLoggerTypeFromMessages(messages);
+        this.showMessage(LogType.Error, loggerType, ...messages);
     }
 
-    warn(...message: Array<any>) {
-        this.showMessage(LogType.Warning, ...message);
+    info(...messages: Array<any>) {
+        let loggerType = this.getLoggerTypeFromMessages(messages);
+        this.showMessage(LogType.Info, loggerType, ...messages);
+    }
+
+    warn(...messages: Array<any>) {
+        let loggerType = this.getLoggerTypeFromMessages(messages);
+        this.showMessage(LogType.Warning, loggerType, ...messages);
+    }
+
+    withType(type: string) {
+        let loggerType = new LoggerType(type);
+        return {
+            log: this.log.bind(this, loggerType),
+            error: this.error.bind(this, loggerType),
+            info: this.info.bind(this, loggerType),
+            warn: this.warn.bind(this, loggerType)
+        };
     }
 }
 

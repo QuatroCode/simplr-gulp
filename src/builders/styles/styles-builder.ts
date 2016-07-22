@@ -56,7 +56,7 @@ class StylesBuilder extends BuilderBase<null> {
     private errorHandler(error: ErrorDto) {
         if (error != null) {
             if (error.relativePath != null && error.line != null && error.column != null && error.messageOriginal != null) {
-                Logger.error(`${error.relativePath}[${error.line}, ${error.column}]: ${error.messageOriginal}`);
+                Logger.withType("SCSS").error(`${error.relativePath}[${error.line}, ${error.column}]: ${error.messageOriginal}`);
             } else {
                 Logger.error("Error in 'gulp-sass' plugin: \n", error);
             }

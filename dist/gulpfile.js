@@ -57,6 +57,14 @@ var LogType;
     LogType[LogType["Info"] = 2] = "Info";
     LogType[LogType["Warning"] = 3] = "Warning";
 })(LogType || (LogType = {}));
+class LoggerType {
+    constructor(type) {
+        this.type = type;
+    }
+    get Type() {
+        return this.type;
+    }
+}
 class Console {
     constructor() {
         this.styles = Colors.styles;
@@ -64,8 +72,8 @@ class Console {
     getTimeNowWithStyles() {
         return `[${this.styles.grey.open}${GetTimeNow()}${this.styles.grey.close}]`;
     }
-    showMessage(type, ...messages) {
-        let typeString = ` ${LogType[type].toLocaleUpperCase()}:`;
+    showMessage(type, loggerType, ...messages) {
+        let typeString = ` ${LogType[type].toLocaleUpperCase()}`;
         let log = console.log;
         let color = this.styles.white.open;
         switch (type) {
@@ -91,8 +99,11 @@ class Console {
                 typeString = "";
             }
         }
+        if (loggerType !== undefined) {
+            typeString = typeString + " " + loggerType.Type;
+        }
         this.discernWords(type, color, ...messages).then((resolvedMessages) => {
-            log(`${this.getTimeNowWithStyles()}${this.styles.bold.open}${color}${typeString}`, ...resolvedMessages, this.styles.reset.open);
+            log(`${this.getTimeNowWithStyles()}${this.styles.bold.open}${color}${typeString}:`, ...resolvedMessages, this.styles.reset.open);
         });
     }
     discernWords(type, color, ...messages) {
@@ -125,17 +136,33 @@ class Console {
             });
         });
     }
-    log(...message) {
-        this.showMessage(LogType.Default, ...message);
+    getLoggerTypeFromMessages(messages) {
+        return (messages[0] instanceof LoggerType) ? messages.shift() : undefined;
     }
-    error(...message) {
-        this.showMessage(LogType.Error, ...message);
+    log(...messages) {
+        let loggerType = this.getLoggerTypeFromMessages(messages);
+        this.showMessage(LogType.Default, loggerType, ...messages);
     }
-    info(...message) {
-        this.showMessage(LogType.Info, ...message);
+    error(...messages) {
+        let loggerType = this.getLoggerTypeFromMessages(messages);
+        this.showMessage(LogType.Error, loggerType, ...messages);
     }
-    warn(...message) {
-        this.showMessage(LogType.Warning, ...message);
+    info(...messages) {
+        let loggerType = this.getLoggerTypeFromMessages(messages);
+        this.showMessage(LogType.Info, loggerType, ...messages);
+    }
+    warn(...messages) {
+        let loggerType = this.getLoggerTypeFromMessages(messages);
+        this.showMessage(LogType.Warning, loggerType, ...messages);
+    }
+    withType(type) {
+        let loggerType = new LoggerType(type);
+        return {
+            log: this.log.bind(this, loggerType),
+            error: this.error.bind(this, loggerType),
+            info: this.info.bind(this, loggerType),
+            warn: this.warn.bind(this, loggerType)
+        };
     }
 }
 let logger = new Console();
@@ -734,17 +761,28 @@ class ErrorHandler extends Lint.Formatters.AbstractFormatter {
 
 class TypescriptBuilderCompiler {
     constructor(configFile) {
-        this.Project = ts.createProject(configFile);
+        this.Project = ts.createProject(configFile, {
+            typescript: require('typescript')
+        });
     }
 }
 
+class Reporter {
+    error(error) {
+        logger.withType("TS").error(`${error.relativeFilename}[${error.startPosition.line}, ${error.startPosition.character}]: ${error.diagnostic.messageText}`);
+    }
+}
 class TypescriptBuilder extends BuilderBase$1 {
+    constructor(...args) {
+        super(...args);
+        this.reporter = new Reporter();
+    }
     build(production, builder, done) {
         let tsResult = gulp.src(Paths$1.Builders.AllFiles.InSource(".{ts,tsx}"))
             .pipe(tslint({
             formatter: ErrorHandler
         }))
-            .pipe(ts(builder.Project)).js;
+            .pipe(ts(builder.Project, undefined, this.reporter)).js;
         if (production) {
             tsResult = tsResult.pipe(uglify({ mangle: true }));
         }
@@ -803,7 +841,7 @@ class StylesBuilder extends BuilderBase$1 {
     errorHandler(error) {
         if (error != null) {
             if (error.relativePath != null && error.line != null && error.column != null && error.messageOriginal != null) {
-                logger.error(`${error.relativePath}[${error.line}, ${error.column}]: ${error.messageOriginal}`);
+                logger.withType("SCSS").error(`${error.relativePath}[${error.line}, ${error.column}]: ${error.messageOriginal}`);
             }
             else {
                 logger.error("Error in 'gulp-sass' plugin: \n", error);
