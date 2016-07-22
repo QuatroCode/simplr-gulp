@@ -6,6 +6,8 @@ var fs = require('fs');
 var Colors = require('colors/safe');
 var gulp = require('gulp');
 var path = require('path');
+var express = require('express');
+var child_process = require('child_process');
 var ts = require('gulp-typescript');
 var uglify = require('gulp-uglify');
 var sourcemaps = require('gulp-sourcemaps');
@@ -14,6 +16,15 @@ var Lint = require('tslint/lib/lint');
 var cleanCSS = require('gulp-clean-css');
 var sass = require('gulp-sass');
 var rimraf = require('rimraf');
+
+function __awaiter(thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator.throw(value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments)).next());
+    });
+}
 
 function WriteToFileAsJson(fileName, content) {
     fs.writeFile(fileName, JSON.stringify(content, null, 4));
@@ -53,7 +64,7 @@ class Console {
     getTimeNowWithStyles() {
         return `[${this.styles.grey.open}${GetTimeNow()}${this.styles.grey.close}]`;
     }
-    showMessage(type, ...message) {
+    showMessage(type, ...messages) {
         let typeString = ` ${LogType[type].toLocaleUpperCase()}:`;
         let log = console.log;
         let color = this.styles.white.open;
@@ -80,7 +91,39 @@ class Console {
                 typeString = "";
             }
         }
-        log(`${this.getTimeNowWithStyles()}${this.styles.bold.open}${color}${typeString}`, ...message, this.styles.reset.open);
+        this.discernWords(type, color, ...messages).then((resolvedMessages) => {
+            log(`${this.getTimeNowWithStyles()}${this.styles.bold.open}${color}${typeString}`, ...resolvedMessages, this.styles.reset.open);
+        });
+    }
+    discernWords(type, color, ...messages) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise(resolve => {
+                if (type === LogType.Default || type === LogType.Info) {
+                    let resolveMessages = messages.map(message => {
+                        if (typeof message === 'string') {
+                            let msg = message;
+                            let openColor = true;
+                            while (msg.search("'") !== -1) {
+                                if (openColor) {
+                                    openColor = !openColor;
+                                    msg = msg.replace("'", this.styles.magenta.open);
+                                }
+                                else {
+                                    openColor = !openColor;
+                                    msg = msg.replace("'", color);
+                                }
+                            }
+                            return msg;
+                        }
+                        return message;
+                    });
+                    resolve(resolveMessages);
+                }
+                else {
+                    resolve(messages);
+                }
+            });
+        });
     }
     log(...message) {
         this.showMessage(LogType.Default, ...message);
@@ -530,12 +573,55 @@ class WatcherTasksHandler extends TasksHandler {
     }
 }
 
+class ServerStarter {
+    constructor() {
+        this.server = express();
+        this.onRequest = (req, res) => {
+            let { Build } = Configuration.GulpConfig.Directories;
+            res.sendFile('index.html', { root: Build });
+        };
+        this.onClose = () => {
+            logger.info(`Server closed.`);
+        };
+        this.onError = (err) => {
+            if (err.code === 'EADDRINUSE') {
+                logger.error(`Port ${Configuration.GulpConfig.ServerConfig.Port} already in use.`);
+                this.Listener.close();
+            }
+            else {
+                logger.error(`Exeption not handled. Please create issues with error code "${err.code}" here: https://github.com/QuatroCode/simplr-gulp/issues \n`, err);
+            }
+        };
+        let { ServerConfig, Directories } = Configuration.GulpConfig;
+        let serverUrl = `http://${ServerConfig.Ip}:${ServerConfig.Port}`;
+        logger.info(`Server started at '${serverUrl}'`);
+        this.openBrowser(serverUrl);
+        this.server.use(express.static(Directories.Build));
+        this.Listener = this.server.listen(ServerConfig.Port);
+        this.addListeners();
+    }
+    get isQuiet() {
+        return (process.argv.findIndex(x => x === "--quiet") !== -1 || process.argv.findIndex(x => x === "-Q") !== -1);
+    }
+    openBrowser(serverUrl) {
+        if (!this.isQuiet) {
+            child_process.spawn('explorer', [serverUrl]);
+        }
+    }
+    addListeners() {
+        this.Listener.once("close", this.onClose);
+        this.Listener.once('error', this.onError);
+        this.server.all('/*', this.onRequest);
+    }
+}
+
 class DefaultTask extends TaskBase {
     constructor(...args) {
         super(...args);
         this.Name = "default";
         this.TaskFunction = (production, done) => {
             new WatcherTasksHandler();
+            new ServerStarter();
             done();
         };
     }

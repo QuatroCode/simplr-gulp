@@ -1,8 +1,8 @@
 class Test {
  constructor() {
-  console.log("COOL");
+  document.getElementById("app-root").innerHTML = "Loaded";
+  console.log("Loaded");
  }
 }
-
 
 new Test();
