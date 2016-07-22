@@ -16,7 +16,7 @@ class Console {
         return `[${this.styles.grey.open}${GetTimeNow()}${this.styles.grey.close}]`;
     }
 
-    private showMessage(type: LogType, ...message: Array<any>) {
+    private showMessage(type: LogType, ...messages: Array<any>) {
         let typeString = ` ${LogType[type].toLocaleUpperCase()}:`;
         let log = console.log;
         let color = this.styles.white.open;
@@ -37,7 +37,37 @@ class Console {
                 typeString = "";
             }
         }
-        log(`${this.getTimeNowWithStyles()}${this.styles.bold.open}${color}${typeString}`, ...message, this.styles.reset.open);
+        this.discernWords(type, color, ...messages).then((resolvedMessages) => {
+            log(`${this.getTimeNowWithStyles()}${this.styles.bold.open}${color}${typeString}`, ...resolvedMessages, this.styles.reset.open);
+        });
+    }
+
+    private async discernWords(type: LogType, color: string, ...messages: Array<string | any>) {
+        return new Promise<Array<any>>(resolve => {
+            if (type === LogType.Default || type === LogType.Info) {
+
+                let resolveMessages = messages.map(message => {
+                    if (typeof message === 'string') {
+                        let msg: string = message;
+                        let openColor = true;
+                        while (msg.search("'") !== -1) {
+                            if (openColor) {
+                                openColor = !openColor;
+                                msg = msg.replace("'", this.styles.magenta.open);
+                            } else {
+                                openColor = !openColor;
+                                msg = msg.replace("'", color);
+                            }
+                        }
+                        return msg;
+                    }
+                    return message;
+                });
+                resolve(resolveMessages);
+            } else {
+                resolve(messages);
+            }
+        });
     }
 
     log(...message: Array<any>) {
