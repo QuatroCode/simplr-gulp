@@ -17,11 +17,11 @@ export default class ServerStarter {
     constructor() {
         let {ServerConfig, Directories} = Configuration.GulpConfig;
         let serverUrl = `http://${ServerConfig.Ip}:${ServerConfig.Port}`;
-        Logger.info(`Server started at '${serverUrl}'`);
         this.openBrowser(serverUrl);
         this.server.use(express.static(Directories.Build));
         this.Listener = this.server.listen(ServerConfig.Port);
         this.addListeners();
+        Logger.info(`Server started at '${serverUrl}'`);
     }
 
     private openBrowser(serverUrl: string) {

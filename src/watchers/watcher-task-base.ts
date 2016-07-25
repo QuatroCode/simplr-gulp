@@ -18,6 +18,8 @@ abstract class WatchTaskBase extends TaskBase implements WatchTask {
 
     abstract TaskNamePrefix: string;
 
+    Description = "Watch source files and start tasks";
+
     TaskFunction = (production: boolean, done: () => void) => {
         let taskName = `${this.TaskNamePrefix}.${this.Name}`;
         if (production) {

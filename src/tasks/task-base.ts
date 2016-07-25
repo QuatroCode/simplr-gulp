@@ -3,6 +3,7 @@ import { Duplex } from 'stream';
 export interface Task {
     Name: string;
     TaskFunction: TaskFunction;
+    Description: string;
 }
 
 
@@ -20,6 +21,7 @@ interface TaskFunction {
 abstract class TaskBase implements Task {
     public abstract Name: string;
     public abstract TaskFunction: TaskFunction;
+    public abstract Description: string;
 }
 
 export default TaskBase;

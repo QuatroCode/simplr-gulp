@@ -75,7 +75,7 @@ abstract class TasksHandler<T extends Task> {
     }
 
     private registerTaskFunction(name: string, production: boolean, constructedTask: T) {
-        gulp.task(name, (done: () => void) => {
+        let func: gulp.TaskFunction = (done: () => void) => {
             let taskRunner = constructedTask.TaskFunction(production, done);
             if (taskRunner !== undefined) {
                 if (taskRunner instanceof Promise) {
@@ -86,7 +86,14 @@ abstract class TasksHandler<T extends Task> {
                     return taskRunner;
                 }
             }
-        });
+        };
+
+        func.displayName = name;
+        if (constructedTask.Description != null && !production) {
+            func.description = "# " + constructedTask.Description;
+        }
+
+        gulp.task(func);
     }
 
     private loadTasksHandlers(tasksHandlers: Array<TasksHandlerContructor<TasksHandler<any>>>) {
@@ -111,8 +118,8 @@ abstract class TasksHandler<T extends Task> {
             let tasksList = Object.keys(this.constructedTasks).concat(Object.keys(this.constructedTasksHander));
             gulp.task(this.configuration.Name, method(tasksList));
             if (this.configuration.WithProduction) {
-                let tasksListProuction = tasksList.map(x => { return `${x}:Production`; });
-                gulp.task(this.configuration.Name + ':Production', method(tasksListProuction));
+                let tasksListProduction = tasksList.map(x => { return `${x}:Production`; });
+                gulp.task(this.configuration.Name + ':Production', method(tasksListProduction));
             }
         }
     }

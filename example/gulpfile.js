@@ -333,7 +333,7 @@ class TasksHandler {
         return constructedTasks;
     }
     registerTaskFunction(name, production, constructedTask) {
-        gulp.task(name, (done) => {
+        let func = (done) => {
             let taskRunner = constructedTask.TaskFunction(production, done);
             if (taskRunner !== undefined) {
                 if (taskRunner instanceof Promise) {
@@ -345,7 +345,12 @@ class TasksHandler {
                     return taskRunner;
                 }
             }
-        });
+        };
+        func.displayName = name;
+        if (constructedTask.Description != null && !production) {
+            func.description = "# " + constructedTask.Description;
+        }
+        gulp.task(func);
     }
     loadTasksHandlers(tasksHandlers) {
         let constructedTasksHander = {};
@@ -369,8 +374,8 @@ class TasksHandler {
             let tasksList = Object.keys(this.constructedTasks).concat(Object.keys(this.constructedTasksHander));
             gulp.task(this.configuration.Name, method(tasksList));
             if (this.configuration.WithProduction) {
-                let tasksListProuction = tasksList.map(x => { return `${x}:Production`; });
-                gulp.task(this.configuration.Name + ':Production', method(tasksListProuction));
+                let tasksListProduction = tasksList.map(x => { return `${x}:Production`; });
+                gulp.task(this.configuration.Name + ':Production', method(tasksListProduction));
             }
         }
     }
@@ -394,6 +399,7 @@ class TaskBase {
 class WatchTaskBase extends TaskBase {
     constructor(...args) {
         super(...args);
+        this.Description = "Watch source files and start tasks";
         this.TaskFunction = (production, done) => {
             let taskName = `${this.TaskNamePrefix}.${this.Name}`;
             if (production) {
@@ -621,11 +627,11 @@ class ServerStarter {
         };
         let { ServerConfig, Directories } = Configuration.GulpConfig;
         let serverUrl = `http://${ServerConfig.Ip}:${ServerConfig.Port}`;
-        logger.info(`Server started at '${serverUrl}'`);
         this.openBrowser(serverUrl);
         this.server.use(express.static(Directories.Build));
         this.Listener = this.server.listen(ServerConfig.Port);
         this.addListeners();
+        logger.info(`Server started at '${serverUrl}'`);
     }
     get isQuiet() {
         return (process.argv.findIndex(x => x === "--quiet") !== -1 || process.argv.findIndex(x => x === "-Q") !== -1);
@@ -646,11 +652,15 @@ class DefaultTask extends TaskBase {
     constructor(...args) {
         super(...args);
         this.Name = "default";
+        this.Description = "Build and start Watch with Server tasks.";
         this.TaskFunction = (production, done) => {
-            new WatcherTasksHandler();
-            new ServerStarter();
-            done();
+            gulp.parallel("Build")(() => { this.startWatcherWithServer(done); });
         };
+    }
+    startWatcherWithServer(done) {
+        new WatcherTasksHandler();
+        new ServerStarter();
+        done();
     }
 }
 
@@ -658,6 +668,7 @@ class BuildAssetsTask extends TaskBase {
     constructor(...args) {
         super(...args);
         this.Name = "Build.Assets";
+        this.Description = "Copies all assets folders and their contents from source to build directory";
         this.TaskFunction = (production, done) => {
             gulp.src(Paths$1.Builders.AllDirectories.InSource("assets"))
                 .pipe(gulp.dest(Paths$1.Directories.Build))
@@ -670,6 +681,7 @@ class BuildConfigsFilesTask extends TaskBase {
     constructor(...args) {
         super(...args);
         this.Name = "Build.Configs.Files";
+        this.Description = "Copies *.config files (web.config for Asp.Net 5 projects) from source to build directory";
         this.TaskFunction = (production) => {
             return gulp.src(Paths$1.Builders.AllFiles.InSource(".config"))
                 .pipe(gulp.dest(Paths$1.Directories.Build));
@@ -681,6 +693,7 @@ class BuildConfigsFoldersTask extends TaskBase {
     constructor(...args) {
         super(...args);
         this.Name = "Build.Configs.Folders";
+        this.Description = "Copies configs folder from source to build directory";
         this.TaskFunction = (production) => {
             return gulp.src(Paths$1.Builders.OneDirectory.InSource(path.join("configs", "**", "*")))
                 .pipe(gulp.dest(path.join(Paths$1.Directories.Build, "configs")));
@@ -703,6 +716,7 @@ class BuildHtmlTask extends TaskBase {
     constructor(...args) {
         super(...args);
         this.Name = "Build.Html";
+        this.Description = "Copies all *.html and *.htm files from source to build directory";
         this.TaskFunction = (production, done) => {
             gulp.src(Paths$1.Builders.AllFiles.InSource(".{htm,html}"))
                 .pipe(gulp.dest(Paths$1.Directories.Build))
@@ -808,9 +822,11 @@ class TypescriptBuilder extends BuilderBase$1 {
 }
 var TypescriptBuilder$1 = new TypescriptBuilder();
 
-class BuildScriptsTask {
-    constructor() {
+class BuildScriptsTask extends TaskBase {
+    constructor(...args) {
+        super(...args);
         this.Name = "Build.Scripts";
+        this.Description = "Compiles TypeScript from source to build directory";
         this.TaskFunction = (production, done) => {
             TypescriptBuilder$1.Build(production, done);
         };
@@ -861,6 +877,7 @@ class BuildStylesgTask extends TaskBase {
     constructor(...args) {
         super(...args);
         this.Name = "Build.Styles";
+        this.Description = "Compiles *.scss files from source to build directory";
         this.TaskFunction = (production, done) => {
             StylesBuilder$1.Build(production, done);
         };
@@ -883,6 +900,7 @@ class WatchTask extends TaskBase {
     constructor(...args) {
         super(...args);
         this.Name = "Watch";
+        this.Description = "Watch source files and start tasks";
         this.TaskFunction = (production, done) => {
             new WatcherTasksHandler();
             done();
@@ -894,6 +912,7 @@ class CleanAllTask extends TaskBase {
     constructor(...args) {
         super(...args);
         this.Name = "Clean.All";
+        this.Description = "Cleans build directory (wwwroot by default)";
         this.TaskFunction = (production, done) => {
             rimraf("wwwroot/**/*", (error) => {
                 done();
@@ -917,6 +936,7 @@ class CleanAllTask$1 extends TaskBase {
     constructor(...args) {
         super(...args);
         this.Name = "Clean";
+        this.Description = "Cleans build directory (wwwroot by default) without wwwroot/libs folder";
         this.TaskFunction = (production, done) => {
             let ignoreLibsPath = [Paths$1.Directories.Build, "libs", "**"].join("/");
             rimraf(Paths$1.Builders.AllFiles.InBuild(), { glob: { ignore: ignoreLibsPath } }, (error) => {
