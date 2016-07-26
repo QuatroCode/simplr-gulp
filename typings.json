@@ -5,12 +5,14 @@
     "gulp-tslint": "https://raw.githubusercontent.com/panuhorsmalahti/gulp-tslint/master/index.d.ts",
     "rimraf": "https://gist.githubusercontent.com/GiedriusGrabauskas/314f7c80bb2105ae00c4e868b1f58f54/raw/4079176122e5f78aa834461dd2b236ea0ae1e630/rimraf.d.ts",
     "source-map": "registry:npm/source-map#0.4.0+20160211003958",
+    "tiny-lr": "https://gist.githubusercontent.com/GiedriusGrabauskas/c937c59039945ed5a08ef6cf4e34ff66/raw/3f9a82c8d5dd643554c5b356199690f5a8d756f2/any.d.ts",
     "tsconfig-lint": "github:QuatroTypings/npm-tsconfig-lint/0.11.0"
   },
   "globalDependencies": {
     "chokidar": "registry:dt/chokidar#1.4.3+20160316155526",
     "clean-css": "registry:dt/clean-css#3.4.9+20160316155526",
     "colors": "https://gist.githubusercontent.com/GiedriusGrabauskas/268589c001176bbd09af51138b6255b0/raw/c78f8518a76e808a89d9ed402f2b62307221bb1b/colors.d.ts",
+    "connect-livereload": "registry:dt/connect-livereload#0.5.3+20160317120654",
     "express": "registry:dt/express#4.0.0+20160317120654",
     "express-serve-static-core": "registry:dt/express-serve-static-core#0.0.0+20160602151406",
     "glob": "registry:dt/glob#5.0.10+20160317120654",

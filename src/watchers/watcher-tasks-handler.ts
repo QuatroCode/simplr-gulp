@@ -4,6 +4,7 @@ import Configuration from '../configuration/configuration';
 import Logger from '../utils/logger';
 import * as path from 'path';
 import { WatchTask } from './watcher-task-base';
+import LiveReloadActionsCreators from '../actions/live-reload/live-reload-actions-creators';
 
 import TasksHandler from '../tasks/tasks-handler';
 
@@ -41,9 +42,12 @@ export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
     }
 
     private fileChangeHandler = (pathName: string, stats: fs.Stats) => {
-        //TODO: Make live reload
-        // console.log('File ' + path + ' was changed stats: ', stats);
+        let targetPathName = this.removeRootSourcePath(pathName);
+        targetPathName = this.changeExtensionToBuilded(targetPathName);
+        LiveReloadActionsCreators.ReloadFiles(targetPathName);
+        Logger.log(`'${pathName}' was changed.`); 
     }
+    
 
     private fileUnlinkHandler = (pathName: string) => {
         let targetPathName = this.changeExtensionToBuilded(pathName);
@@ -59,6 +63,16 @@ export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
                 Logger.log(`'${targetPathName}' was deleted successfully.`);
             }
         });
+    }
+
+    private removeRootSourcePath(pathName: string) {
+        let pathList = pathName.split(path.sep);
+        if (pathList[0] === Configuration.GulpConfig.Directories.Source) {
+            pathList[0] = "";
+            return path.join(...pathList);
+        } else {
+            return pathName;
+        }
     }
 
     private changeExtensionToBuilded(pathName: string) {
@@ -79,7 +93,7 @@ export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
             pathList[0] = Configuration.GulpConfig.Directories.Build;
             return path.join(...pathList);
         } else {
-            Logger.warn(`WarcherTasksHandler.changeRootPathToBuild(): "${pathName}" path root is not under Source directory (${Configuration.GulpConfig.Directories.Source})`);
+            Logger.warn(`WarcherTasksHandler.changeRootPathToBuild(): "${pathName}" path root is not under Source directory (${Configuration.GulpConfig.Directories.Source }) `);
             return pathName;
         }
     }

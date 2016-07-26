@@ -7,7 +7,10 @@ var Colors = require('colors/safe');
 var gulp = require('gulp');
 var path = require('path');
 var express = require('express');
+var http = require('http');
 var child_process = require('child_process');
+var connectLiveReload = require('connect-livereload');
+var tinyLr = require('tiny-lr');
 var ts = require('gulp-typescript');
 var uglify = require('gulp-uglify');
 var sourcemaps = require('gulp-sourcemaps');
@@ -102,8 +105,11 @@ class Console {
         if (loggerType !== undefined) {
             typeString = typeString + " " + loggerType.Type;
         }
+        if (log !== console.log) {
+            typeString = typeString + ":";
+        }
         this.discernWords(type, color, ...messages).then((resolvedMessages) => {
-            log(`${this.getTimeNowWithStyles()}${this.styles.bold.open}${color}${typeString}:`, ...resolvedMessages, this.styles.reset.open);
+            log(`${this.getTimeNowWithStyles()}${this.styles.bold.open}${color}${typeString}`, ...resolvedMessages, this.styles.reset.open);
         });
     }
     discernWords(type, color, ...messages) {
@@ -396,6 +402,93 @@ class TasksHandler {
 class TaskBase {
 }
 
+class ReloadFiles {
+    constructor(filesNames) {
+        this.filesNames = filesNames;
+    }
+    get FilesNames() {
+        return this.filesNames;
+    }
+}
+class ReloadPage {
+    constructor() {
+    }
+}
+
+class ActionsEmitter {
+    constructor() {
+        this.listeners = new Array();
+        this.uniqId = 0;
+    }
+    get UniqueId() {
+        return this.uniqId++;
+    }
+    On(action, callback) {
+        let id = this.UniqueId;
+        this.listeners[id] = { Action: action, Callback: callback };
+        return { remove: this.removeListener.bind(this, id) };
+    }
+    removeListener(id) {
+        delete this.listeners[id];
+        let tempListeners = this.listeners.filter(x => x !== undefined);
+        if (tempListeners.length === 0) {
+            this.listeners = tempListeners;
+            this.uniqId = 0;
+        }
+    }
+    Emit(action) {
+        this.listeners.forEach((listener) => {
+            if (action instanceof listener.Action) {
+                listener.Callback(action);
+            }
+            else if (listener.Action === "*") {
+                listener.Callback(action);
+            }
+        });
+    }
+}
+var ActionsEmitter$1 = new ActionsEmitter();
+
+class LiveReloadActionsCreators {
+    constructor() {
+        this.reloadFiles = [];
+        this.emitOnDebounced = () => {
+            if (this.reloadFiles !== undefined) {
+                ActionsEmitter$1.Emit(new ReloadFiles(this.reloadFiles));
+            }
+            else {
+                ActionsEmitter$1.Emit(new ReloadPage());
+            }
+            this.reloadFiles = [];
+            this.tryToClearTimer();
+        };
+    }
+    tryToClearTimer() {
+        let result = false;
+        if (this.timer !== undefined) {
+            result = true;
+            clearTimeout(this.timer);
+            this.timer = undefined;
+        }
+        return result;
+    }
+    setTimer(func) {
+        this.timer = setTimeout(func, 300);
+    }
+    ReloadPage() {
+        this.tryToClearTimer();
+        this.setTimer(this.emitOnDebounced);
+    }
+    ReloadFiles(...filesNames) {
+        this.tryToClearTimer();
+        if (this.reloadFiles !== undefined) {
+            this.reloadFiles = this.reloadFiles.concat(filesNames);
+        }
+        this.setTimer(this.emitOnDebounced);
+    }
+}
+var LiveReloadActionsCreators$1 = new LiveReloadActionsCreators();
+
 class WatchTaskBase extends TaskBase {
     constructor(...args) {
         super(...args);
@@ -553,6 +646,10 @@ class WatcherTasksHandler extends TasksHandler {
         });
         this.watchers = {};
         this.fileChangeHandler = (pathName, stats) => {
+            let targetPathName = this.removeRootSourcePath(pathName);
+            targetPathName = this.changeExtensionToBuilded(targetPathName);
+            LiveReloadActionsCreators$1.ReloadFiles(targetPathName);
+            logger.log(`'${pathName}' was changed.`);
         };
         this.fileUnlinkHandler = (pathName) => {
             let targetPathName = this.changeExtensionToBuilded(pathName);
@@ -582,6 +679,16 @@ class WatcherTasksHandler extends TasksHandler {
             this.watchers[task.Name].on('change', this.fileChangeHandler);
         });
     }
+    removeRootSourcePath(pathName) {
+        let pathList = pathName.split(path.sep);
+        if (pathList[0] === Configuration.GulpConfig.Directories.Source) {
+            pathList[0] = "";
+            return path.join(...pathList);
+        }
+        else {
+            return pathName;
+        }
+    }
     changeExtensionToBuilded(pathName) {
         let currentExtension = path.extname(pathName);
         if (currentExtension.length > 1) {
@@ -600,21 +707,30 @@ class WatcherTasksHandler extends TasksHandler {
             return path.join(...pathList);
         }
         else {
-            logger.warn(`WarcherTasksHandler.changeRootPathToBuild(): "${pathName}" path root is not under Source directory (${Configuration.GulpConfig.Directories.Source})`);
+            logger.warn(`WarcherTasksHandler.changeRootPathToBuild(): "${pathName}" path root is not under Source directory (${Configuration.GulpConfig.Directories.Source}) `);
             return pathName;
         }
     }
 }
 
-class ServerStarter {
+class ServerStaRrter {
     constructor() {
         this.server = express();
+        this.liveReloadServer = tinyLr({});
+        this.actionsListeners = new Array();
+        this.onReloadFilesList = (action) => {
+            this.reloadFiles(action.FilesNames.join(","));
+        };
+        this.onReloadPage = (action) => {
+            this.reloadFiles("index.html");
+        };
         this.onRequest = (req, res) => {
             let { Build } = Configuration.GulpConfig.Directories;
             res.sendFile('index.html', { root: Build });
         };
         this.onClose = () => {
             logger.info(`Server closed.`);
+            this.removeActionsListeners();
         };
         this.onError = (err) => {
             if (err.code === 'EADDRINUSE') {
@@ -627,21 +743,46 @@ class ServerStarter {
         };
         let { ServerConfig, Directories } = Configuration.GulpConfig;
         let serverUrl = `http://${ServerConfig.Ip}:${ServerConfig.Port}`;
+        this.configureServer(Directories.Build);
+        this.startListeners(ServerConfig.Port, ServerConfig.LiveReloadPort);
+        this.addEventListeners();
         this.openBrowser(serverUrl);
-        this.server.use(express.static(Directories.Build));
-        this.Listener = this.server.listen(ServerConfig.Port);
-        this.addListeners();
         logger.info(`Server started at '${serverUrl}'`);
+        this.addActionsListeners();
     }
     get isQuiet() {
         return (process.argv.findIndex(x => x === "--quiet") !== -1 || process.argv.findIndex(x => x === "-Q") !== -1);
+    }
+    addActionsListeners() {
+        this.actionsListeners.push(ActionsEmitter$1.On(ReloadFiles, this.onReloadFilesList));
+        this.actionsListeners.push(ActionsEmitter$1.On(ReloadPage, this.onReloadPage));
+    }
+    removeActionsListeners() {
+        this.actionsListeners.forEach(x => { x.remove(); });
+        this.actionsListeners = new Array();
+    }
+    reloadFiles(files) {
+        http.get({
+            hostname: Configuration.GulpConfig.ServerConfig.Ip,
+            port: Configuration.GulpConfig.ServerConfig.LiveReloadPort,
+            path: `/changed?files=${files}`,
+            agent: false
+        });
+    }
+    configureServer(wwwroot) {
+        this.server.use(connectLiveReload({ port: Configuration.GulpConfig.ServerConfig.LiveReloadPort }));
+        this.server.use(express.static(wwwroot));
+    }
+    startListeners(serverPort, liveReloadServerPort) {
+        this.Listener = this.server.listen(serverPort);
+        this.liveReloadServer.listen(liveReloadServerPort);
     }
     openBrowser(serverUrl) {
         if (!this.isQuiet) {
             child_process.spawn('explorer', [serverUrl]);
         }
     }
-    addListeners() {
+    addEventListeners() {
         this.Listener.once("close", this.onClose);
         this.Listener.once('error', this.onError);
         this.server.all('/*', this.onRequest);
@@ -659,7 +800,7 @@ class DefaultTask extends TaskBase {
     }
     startWatcherWithServer(done) {
         new WatcherTasksHandler();
-        new ServerStarter();
+        new ServerStaRrter();
         done();
     }
 }

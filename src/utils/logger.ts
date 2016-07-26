@@ -50,9 +50,12 @@ class Console {
         if (loggerType !== undefined) {
             typeString = typeString + " " + loggerType.Type;
         }
+        if (log !== console.log) {
+            typeString = typeString + ":";
+        }
 
         this.discernWords(type, color, ...messages).then((resolvedMessages) => {
-            log(`${this.getTimeNowWithStyles()}${this.styles.bold.open}${color}${typeString}:`, ...resolvedMessages, this.styles.reset.open);
+            log(`${this.getTimeNowWithStyles()}${this.styles.bold.open}${color}${typeString}`, ...resolvedMessages, this.styles.reset.open);
         });
     }
 

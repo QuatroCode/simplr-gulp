@@ -1,1 +1,5 @@
-asds
+{
+    "some": {
+        "json": "configuration"
+    }
+}

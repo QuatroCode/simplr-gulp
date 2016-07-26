@@ -8,9 +8,13 @@
         "sourceMap": true,
         "inlineSources": true
     },
+    "include": [
+        "src/**/*",
+        "typings/**/*"
+    ],
     "exclude": [
-        "node_modules",
         "src/libs",
-        "wwwroot"
+        "wwwroot",
+        "node_modules"
     ]
 }
