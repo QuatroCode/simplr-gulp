@@ -10,7 +10,7 @@
   "globalDependencies": {
     "chokidar": "registry:dt/chokidar#1.4.3+20160316155526",
     "clean-css": "registry:dt/clean-css#3.4.9+20160316155526",
-    "colors": "registry:dt/colors#0.6.0-1+20160501135139",
+    "colors": "https://gist.githubusercontent.com/GiedriusGrabauskas/268589c001176bbd09af51138b6255b0/raw/c78f8518a76e808a89d9ed402f2b62307221bb1b/colors.d.ts",
     "express": "registry:dt/express#4.0.0+20160317120654",
     "express-serve-static-core": "registry:dt/express-serve-static-core#0.0.0+20160602151406",
     "glob": "registry:dt/glob#5.0.10+20160317120654",
@@ -29,7 +29,5 @@
     "vinyl": "registry:dt/vinyl#1.1.0+20160316155526",
     "vinyl-fs": "registry:dt/vinyl-fs#0.0.0+20160317120654"
   },
-  "globalDevDependencies": {
-    "typescript": "registry:dt/typescript#0.4.0+20160317120654"
-  }
+  "globalDevDependencies": {}
 }

@@ -19,7 +19,7 @@ class LoggerType {
 
 class Console {
 
-    private styles = Colors.styles;
+    private styles = (Colors as any).styles;
 
     private getTimeNowWithStyles() {
         return `[${this.styles.grey.open}${GetTimeNow()}${this.styles.grey.close}]`;

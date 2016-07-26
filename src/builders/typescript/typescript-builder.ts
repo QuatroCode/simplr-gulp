@@ -25,7 +25,8 @@ class TypescriptBuilder extends BuilderBase<TypescriptBuilderCompiler> {
 
         let tsResult = gulp.src(Paths.Builders.AllFiles.InSource(".{ts,tsx}"))
             .pipe(tslint({
-                formatter: TsLintFormatter
+                //TODO: Fix any after updated gulp-tslint.d.ts
+                formatter: TsLintFormatter as any
             }))
             .pipe(ts(builder.Project, undefined, this.reporter)).js;
 
