@@ -19,6 +19,7 @@ var Lint = require('tslint/lib/lint');
 var cleanCSS = require('gulp-clean-css');
 var sass = require('gulp-sass');
 var rimraf = require('rimraf');
+var jspm = require('jspm');
 
 function __awaiter(thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -1087,10 +1088,42 @@ class CleanAllTask$1 extends TaskBase {
     }
 }
 
+class BundleTask extends TaskBase {
+    constructor(...args) {
+        super(...args);
+        this.Name = "Bundle";
+        this.Description = "Bundles the app libs with jspm bundle";
+        this.TaskFunction = (production, done) => {
+            let { BundleConfig } = Configuration.GulpConfig;
+            let appFile = path.join(Configuration.GulpConfig.Directories.App, BundleConfig.AppFile).split(path.sep).join("/");
+            let bundleCmd = appFile, buildDest = Paths$1.Builders.OneFile.InBuild(BundleConfig.BuildFile);
+            for (let i = 0; i < BundleConfig.Include.length; i++) {
+                bundleCmd += ` + ${BundleConfig.Include[i]}`;
+            }
+            for (let i = 0; i < BundleConfig.Exclude.length; i++) {
+                bundleCmd += ` - ${BundleConfig.Exclude[i]}`;
+            }
+            bundleCmd += ` - [app/**/*.css!]`;
+            let builder = new jspm.Builder();
+            logger.log(`jspm bundle ${bundleCmd} ${buildDest}`);
+            builder.bundle(bundleCmd, {
+                minify: true,
+                mangle: true
+            }).then((output) => {
+                fs.writeFileSync(buildDest, output.source);
+                done();
+            }).catch((e) => {
+                logger.error(e);
+                done();
+            });
+        };
+    }
+}
+
 class Tasks extends TasksHandler {
     constructor() {
         super(config => {
-            config.Tasks = [DefaultTask, WatchTask, CleanAllTask$1];
+            config.Tasks = [DefaultTask, WatchTask, CleanAllTask$1, BundleTask];
             config.TasksHandlers = [BuildTasksHandler, CleanTasksHandler];
             return config;
         });

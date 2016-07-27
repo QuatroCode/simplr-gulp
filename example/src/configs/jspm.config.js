@@ -2,17 +2,9 @@ SystemJS.config({
   baseURL: "/",
   defaultJSExtensions: true,
   buildCSS: false,
-  browserConfig: {
-    "paths": {
-      "npm:": "/libs/npm/",
-      "github:": "/libs/github/"
-    }
-  },
-  nodeConfig: {
-    "paths": {
-      "npm:": "libs/npm/",
-      "github:": "libs/github/"
-    }
+  paths: {
+    "github:": "libs/github/",
+    "npm:": "libs/npm/"
   }
 });
 

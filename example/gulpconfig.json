@@ -18,7 +18,7 @@
         "BuildFile": "build.js",
         "Include": [],
         "Exclude": [
-            "[wwwroot/js/app/**/*]"
+            "[app/**/*]"
         ]
     },
     "WebConfig": null,
