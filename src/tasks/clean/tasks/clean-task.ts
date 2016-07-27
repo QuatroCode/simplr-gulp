@@ -2,7 +2,7 @@ import TaskBase from '../../task-base';
 import * as rimraf from 'rimraf';
 import Paths from '../../../paths/paths';
 
-export default class CleanAllTask extends TaskBase {
+export default class CleanTask extends TaskBase {
 
     Name = "Clean";
 

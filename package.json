@@ -4,7 +4,10 @@
   "private": true,
   "author": "QuatroDev",
   "scripts": {
-    "test": "tsc -p . -outDir _tmp && RMDIR _tmp /S /Q && echo Test completed."
+    "typings-init": "typings install",
+    "compile-temp": "tsc -p . -outDir _tmp",
+    "test": "npm run typings-init && npm run compile-temp && RMDIR _tmp /S /Q && echo Test completed.",
+    "test-linux": "npm run typings-init && npm run compile-temp && rm -rf _tmp && echo Test completed."
   },
   "devDependencies": {
     "rollup": "0.34.1",

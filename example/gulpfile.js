@@ -208,7 +208,7 @@ const DEFAULT_GULP_CONFIG = {
         AppFile: "app.js",
         BuildFile: "build.js",
         Include: [],
-        Exclude: ['[wwwroot/js/app/**/*]']
+        Exclude: ['[app/**/*]']
     },
     WebConfig: null,
     CfgVersion: 2.02
@@ -1056,7 +1056,8 @@ class CleanAllTask extends TaskBase {
         this.Name = "Clean.All";
         this.Description = "Cleans build directory (wwwroot by default)";
         this.TaskFunction = (production, done) => {
-            rimraf("wwwroot/**/*", (error) => {
+            let ignoreLibsPath = [Paths$1.Directories.Build, "**", ".gitkeep"].join("/");
+            rimraf("wwwroot/**/*", { glob: { ignore: ignoreLibsPath } }, (error) => {
                 done();
             });
         };
@@ -1074,7 +1075,7 @@ class CleanTasksHandler extends TasksHandler {
     }
 }
 
-class CleanAllTask$1 extends TaskBase {
+class CleanTask extends TaskBase {
     constructor(...args) {
         super(...args);
         this.Name = "Clean";
@@ -1126,8 +1127,9 @@ class BundleTask extends TaskBase {
                 fs.writeFileSync(buildDest, output.source);
                 done();
             }).catch((e) => {
-                logger.error(e);
                 done();
+                logger.info("Please make sure that you have installed jspm packages ('jspm install')");
+                throw e;
             });
         };
     }
@@ -1136,7 +1138,7 @@ class BundleTask extends TaskBase {
 class Tasks extends TasksHandler {
     constructor() {
         super(config => {
-            config.Tasks = [DefaultTask, WatchTask, CleanAllTask$1, CleanBundleTask, BundleTask];
+            config.Tasks = [DefaultTask, WatchTask, CleanTask, CleanBundleTask, BundleTask];
             config.TasksHandlers = [BuildTasksHandler, CleanTasksHandler];
             return config;
         });
