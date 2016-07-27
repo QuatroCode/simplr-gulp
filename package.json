@@ -4,7 +4,7 @@
   "private": true,
   "author": "QuatroDev",
   "scripts": {
-    "test": "tsc -p . -outDir _tmp && RMDIR _tmp /S /Q && echo Test completed."
+    "test": "typings install && tsc -p . -outDir _tmp && RMDIR _tmp /S /Q && echo Test completed."
   },
   "devDependencies": {
     "rollup": "0.34.1",
