@@ -46,7 +46,7 @@ After first run, `gulpconfig.json` file will be generated for you to edit for yo
 * `Server` - Start localhost server.
 
 * `Clean` - cleans build directory (`wwwroot` by default) without `wwwroot/libs` folder
-    * `Clean.All` - cleans build directory (`wwwroot` by default)
+    * `Clean.All` - cleans build directory (`wwwroot` by default) without `wwwroot/**/.gitkeep` file
     * `Clean.Bundle` - remove build file (`build.js` by default) from build directory (`wwwroot` by default) 
 
 ## Prerequisites
