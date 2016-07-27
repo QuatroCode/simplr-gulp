@@ -47,7 +47,7 @@ After first run, `gulpconfig.json` file will be generated for you to edit for yo
 
 * `Clean` - cleans build directory (`wwwroot` by default) without `wwwroot/libs` folder
     * `Clean.All` - cleans build directory (`wwwroot` by default)
-    * `Clean.Bundle` - **(Not implemented)** remove build file (`build.js` by default) from build directory (`wwwroot` by default) 
+    * `Clean.Bundle` - remove build file (`build.js` by default) from build directory (`wwwroot` by default) 
 
 ## Prerequisites
 You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp-cli), [`typings`](https://github.com/typings/registry), [`jspm`](https://github.com/jspm/jspm-cli), [`rollup`](https://github.com/rollup/rollup)):
