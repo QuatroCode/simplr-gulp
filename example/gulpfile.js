@@ -1075,7 +1075,7 @@ class CleanTasksHandler extends TasksHandler {
     }
 }
 
-class CleanAllTask$1 extends TaskBase {
+class CleanTask extends TaskBase {
     constructor(...args) {
         super(...args);
         this.Name = "Clean";
@@ -1138,7 +1138,7 @@ class BundleTask extends TaskBase {
 class Tasks extends TasksHandler {
     constructor() {
         super(config => {
-            config.Tasks = [DefaultTask, WatchTask, CleanAllTask$1, CleanBundleTask, BundleTask];
+            config.Tasks = [DefaultTask, WatchTask, CleanTask, CleanBundleTask, BundleTask];
             config.TasksHandlers = [BuildTasksHandler, CleanTasksHandler];
             return config;
         });
