@@ -14,18 +14,18 @@ After first run, `gulpconfig.json` file will be generated for you to edit for yo
 ### Available commands
 #### Gulp tasks
 * `Build` - compiles source files with development enviroment (starts all `Build.*` subtasks)
-    * `Build.Assets` - *(Not implemented)* copies all `assets` folders and their contents from source to build directory
-    * `Build.Configs` - *(Not implemented)* copies `web.config` (for Asp.Net 5 projects) and `configs` folder from source to build directory
-    * `Build.Html` - *(Not implemented)* copies all `*.html` files from source to build directory
+    * `Build.Assets` - copies all `assets` folders and their contents from source to build directory
+    * `Build.Configs` - copies `web.config` (for Asp.Net 5 projects) and `configs` folder from source to build directory
+    * `Build.Html` - copies all `*.html` files from source to build directory
     * `Build.Scripts` - compiles TypeScript with sourcemap from source to build directory
-    * `Build.Styles` - *(Not implemented)* compiles `*.scss` files from source to build directory
+    * `Build.Styles` - compiles `*.scss` files from source to build directory
 
 * `Build:Production` - compiles, minifies and uglifies source files with production enviroment (starts all `Build.*:Production` subtasks)
-    * `Build.Assets:Production` - *(Not implemented)* copies all `assets` folders and their contents from source to build directory
-    * `Build.Configs:Production` - *(Not implemented)* copies `web.config` (for Asp.Net 5 projects) and `configs` folder from source to build directory
-    * `Build.Html:Production` - *(Not implemented)* copies all `*.html` files from source to build directory
+    * `Build.Assets:Production` - copies all `assets` folders and their contents from source to build directory
+    * `Build.Configs:Production` - copies `web.config` (for Asp.Net 5 projects) and `configs` folder from source to build directory
+    * `Build.Html:Production` - copies all `*.html` files from source to build directory
     * `Build.Scripts:Production` - compiles TypeScript from source to build directory
-    * `Build.Styles:Production` - *(Not implemented)* compiles and minifies `*.scss` files from source to build directory
+    * `Build.Styles:Production` - compiles and minifies `*.scss` files from source to build directory
 
 
 * `Watch` - watch source files and start tasks.  (starts all `Watch.*` subtasks)
@@ -37,13 +37,13 @@ After first run, `gulpconfig.json` file will be generated for you to edit for yo
 
 > **`Watch.*` subtasks available only at runtime.**
 
-#### TODO Gulp tasks
 * `Bundle` - bundles the app with `jspm bundle` with development enviroment
-* `Bundle:Production` - bundles the app with `jspm bundle` with production enviroment
+
 * `Server` - Start localhost server.
 
 * `Clean` - cleans build directory (`wwwroot` by default) without `wwwroot/libs` folder
     * `Clean.All` - cleans build directory (`wwwroot` by default)
+    * `Clean.Bundle` - **(Not implemented)** remove build file (`build.js` by default) from build directory (`wwwroot` by default) 
 
 ## Prerequisites
 You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp-cli), [`typings`](https://github.com/typings/registry), [`jspm`](https://github.com/jspm/jspm-cli), [`rollup`](https://github.com/rollup/rollup)):
