@@ -7,13 +7,14 @@ import BuildTasksHandler from './build/build-tasks-handler';
 import WatchTask from './watch/watch-task';
 import CleanTasksHandler from './clean/clean-tasks-handler';
 import CleanTask from './clean/tasks/clean-task';
+import CleanBundleTask from './clean/tasks/clean-bundle-task';
 import BundleTask from './bundle/bundle-task';
 
 export default class Tasks extends TasksHandler<Task> {
 
     constructor() {
         super(config => {
-            config.Tasks = [DefaultTask, WatchTask, CleanTask, BundleTask];
+            config.Tasks = [DefaultTask, WatchTask, CleanTask, CleanBundleTask, BundleTask];
             config.TasksHandlers = [BuildTasksHandler, CleanTasksHandler];
             return config;
         });

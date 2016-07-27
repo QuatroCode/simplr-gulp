@@ -1088,6 +1088,19 @@ class CleanAllTask$1 extends TaskBase {
     }
 }
 
+class CleanBundleTask extends TaskBase {
+    constructor(...args) {
+        super(...args);
+        this.Name = "Clean.Bundle";
+        this.Description = "Remove build file (build.js by default) from build directory (wwwroot by default)";
+        this.TaskFunction = (production, done) => {
+            rimraf(Paths$1.Builders.OneFile.InBuild(Configuration.GulpConfig.BundleConfig.BuildFile), (error) => {
+                done();
+            });
+        };
+    }
+}
+
 class BundleTask extends TaskBase {
     constructor(...args) {
         super(...args);
@@ -1123,7 +1136,7 @@ class BundleTask extends TaskBase {
 class Tasks extends TasksHandler {
     constructor() {
         super(config => {
-            config.Tasks = [DefaultTask, WatchTask, CleanAllTask$1, BundleTask];
+            config.Tasks = [DefaultTask, WatchTask, CleanAllTask$1, CleanBundleTask, BundleTask];
             config.TasksHandlers = [BuildTasksHandler, CleanTasksHandler];
             return config;
         });
