@@ -1,5 +1,6 @@
 import TaskBase from '../../task-base';
 import * as rimraf from 'rimraf';
+import Paths from '../../../paths/paths';
 
 export default class CleanAllTask extends TaskBase {
 
@@ -8,7 +9,8 @@ export default class CleanAllTask extends TaskBase {
     Description = "Cleans build directory (wwwroot by default)";
 
     TaskFunction = (production: boolean, done: () => void) => {
-        rimraf("wwwroot/**/*", (error: Error) => {
+        let ignoreLibsPath = [Paths.Directories.Build, "**", ".gitkeep"].join("/");
+        rimraf("wwwroot/**/*", { glob: { ignore: ignoreLibsPath } }, (error: Error) => {
             done();
         });
     }

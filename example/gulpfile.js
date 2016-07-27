@@ -208,7 +208,7 @@ const DEFAULT_GULP_CONFIG = {
         AppFile: "app.js",
         BuildFile: "build.js",
         Include: [],
-        Exclude: ['[wwwroot/js/app/**/*]']
+        Exclude: ['[app/**/*]']
     },
     WebConfig: null,
     CfgVersion: 2.02
@@ -1056,7 +1056,8 @@ class CleanAllTask extends TaskBase {
         this.Name = "Clean.All";
         this.Description = "Cleans build directory (wwwroot by default)";
         this.TaskFunction = (production, done) => {
-            rimraf("wwwroot/**/*", (error) => {
+            let ignoreLibsPath = [Paths$1.Directories.Build, "**", ".gitkeep"].join("/");
+            rimraf("wwwroot/**/*", { glob: { ignore: ignoreLibsPath } }, (error) => {
                 done();
             });
         };
@@ -1126,8 +1127,9 @@ class BundleTask extends TaskBase {
                 fs.writeFileSync(buildDest, output.source);
                 done();
             }).catch((e) => {
-                logger.error(e);
                 done();
+                logger.info("Please make sure that you have installed jspm packages ('jspm install')");
+                throw e;
             });
         };
     }
