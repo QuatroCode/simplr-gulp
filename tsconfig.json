@@ -1,18 +1,23 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es5",
+    "moduleResolution": "node",
+    "target": "es6",
     "noImplicitAny": true,
     "preserveConstEnums": true,
     "removeComments": true,
-    "outDir": "build"
+    "rootDir": "src",
+    "outDir": "dist",
+    "pretty": true,
+    "noImplicitUseStrict": true,
+    "strictNullChecks": true,
+    "noImplicitThis": true,
+    "noUnusedParameters": false,
+    "noUnusedLocals": true
   },
   "exclude": [
     "node_modules",
-    "build",
-    "tests"
-  ],
-  "files": [
-    "gulpfile.ts"
+    "dist",
+    "example"
   ]
 }
