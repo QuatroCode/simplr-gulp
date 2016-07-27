@@ -35,7 +35,7 @@ export const DEFAULT_GULP_CONFIG: GulpConfig = {
         AppFile: "app.js",
         BuildFile: "build.js",
         Include: [],
-        Exclude: ['[wwwroot/js/app/**/*]']
+        Exclude: ['[app/**/*]']
     },
     WebConfig: null,
     CfgVersion: 2.02
