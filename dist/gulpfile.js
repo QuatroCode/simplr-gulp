@@ -1081,8 +1081,11 @@ class CleanTask extends TaskBase {
         this.Name = "Clean";
         this.Description = "Cleans build directory (wwwroot by default) without wwwroot/libs folder";
         this.TaskFunction = (production, done) => {
-            let ignoreLibsPath = [Paths$1.Directories.Build, "libs", "**"].join("/");
-            rimraf(Paths$1.Builders.AllFiles.InBuild(), { glob: { ignore: ignoreLibsPath } }, (error) => {
+            let ignoreGlob = [
+                [Paths$1.Directories.Build, "libs/**"].join("/"),
+                [Paths$1.Directories.Build, "**/.gitkeep"].join("/")
+            ];
+            rimraf(Paths$1.Builders.AllFiles.InBuild(), { glob: { ignore: ignoreGlob } }, (error) => {
                 done();
             });
         };
