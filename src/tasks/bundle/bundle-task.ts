@@ -42,8 +42,9 @@ export default class BundleTask extends TaskBase {
             fs.writeFileSync(buildDest, output.source);
             done();
         }).catch((e: any) => {
-            Logger.error(e);
             done();
+            Logger.info("Please make sure that you have installed jspm packages ('jspm install')");
+            throw e;
         });
     }
 
