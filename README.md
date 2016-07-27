@@ -1,7 +1,11 @@
 # simplr-gulp
 
 ### I just want to use gulpfile.js
-Simply copy [dist/gulpfile.js](https://github.com/QuatroCode/simplr-gulp/blob/master/dist/gulpfile.js) to your project and run task:
+1) Install NPM dev-depenencies: 
+```cmd
+npm install colors connect-livereload express gulpjs/gulp#4.0 gulp-clean-css gulp-sass gulp-sourcemaps gulp-tslint gulp-typescript gulp-uglify jspm@beta rimraf tiny-lr tsconfig-lint typescript --save-dev
+```
+2) Copy [dist/gulpfile.js](https://github.com/QuatroCode/simplr-gulp/blob/master/dist/gulpfile.js) to your project and run task:
 ```
 gulp
 ```
