@@ -1,7 +1,7 @@
 # simplr-gulp
 
 ### I just want to use gulpfile.js
-1) Install NPM dev-depenencies: 
+1) Install NPM dev-depenencies in your project: 
 ```cmd
 npm install colors connect-livereload express gulpjs/gulp#4.0 gulp-clean-css gulp-sass gulp-sourcemaps gulp-tslint gulp-typescript gulp-uglify jspm@beta rimraf tiny-lr tsconfig-lint typescript --save-dev
 ```
