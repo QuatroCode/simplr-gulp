@@ -9,7 +9,11 @@ npm install simplr-gulp --save-dev
 ```js
 require('simplr-gulp');
 ```
-Which will run `gulp default` task and start watching your files (`*.ts`, `*.scss`, `index.html`, `configs`, etc.) and compiling them from source to build directory. Also it starts server tailored for Single Page Application.
+3) Start command:
+```cmd
+gulp -T
+```
+Which will show all available commands.
 
 All directories, server and live-reload settings are configured in `gulpconfig.json`.
 
@@ -17,6 +21,7 @@ After first run, `gulpconfig.json` file will be generated for you to edit for yo
 
 ### Available commands
 #### Gulp tasks
+* `default` - start `Watch` task with server.
 * `Build` - compiles source files with development enviroment (starts all `Build.*` subtasks)
     * `Build.Assets` - copies all `assets` folders and their contents from source to build directory
     * `Build.Configs` - copies `web.config` (for Asp.Net 5 projects) and `configs` folder from source to build directory
@@ -32,7 +37,7 @@ After first run, `gulpconfig.json` file will be generated for you to edit for yo
     * `Build.Styles:Production` - compiles and minifies `*.scss` files from source to build directory
 
 
-* `Watch` - watch source files and start tasks.  (starts all `Watch.*` subtasks)
+* `Watch` - watch source files, start tasks (all `Watch.*` subtasks) and call live reload action.
     * `Watch.Assets` - start task `Build.Assets`
     * `Watch.Configs` - start task `Build.Configs`
     * `Watch.Html` - start task `Build.Html`
@@ -42,8 +47,6 @@ After first run, `gulpconfig.json` file will be generated for you to edit for yo
 > **`Watch.*` subtasks available only at runtime.**
 
 * `Bundle` - bundles the app with `jspm bundle` with development enviroment
-
-* `Server` - Start localhost server.
 
 * `Clean` - cleans build directory (`wwwroot` by default) without `wwwroot/libs` folder and `wwwroot/**/.gitkeep` files
     * `Clean.All` - cleans build directory (`wwwroot` by default) without `wwwroot/**/.gitkeep` files
@@ -87,7 +90,7 @@ You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp-cli), [`ty
         "BuildFile": "build.js",
         "Include": [],
         "Exclude": [
-            "[wwwroot/js/app/**/*]"
+            "[app/**/*]"
         ]
     },
     "WebConfig": null,
