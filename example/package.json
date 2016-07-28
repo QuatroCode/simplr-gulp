@@ -1,19 +1,16 @@
 {
-  "name": "example",
+  "name": "simplr-gulp-example",
   "version": "1.0.0",
-  "description": "",
-  "main": "gulpfile.js",
+  "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "colors": "1.1.2",
     "connect-livereload": "0.5.4",
     "express": "4.14.0",
     "gulp": "github:gulpjs/gulp#4.0",
-    "gulp-clean-css": "2.0.11",
+    "gulp-clean-css": "2.0.12",
     "gulp-sass": "2.3.2",
     "gulp-sourcemaps": "1.6.0",
     "gulp-tslint": "6.0.2",
