@@ -228,9 +228,9 @@ class ConfigurationLoader {
     ;
     tryToReadConfigurationFile(cfgFileName = 'gulpconfig') {
         try {
-            let config = require(`./${cfgFileName}.json`);
+            let config = JSON.parse(fs.readFileSync(`./${cfgFileName}.json`, "utf8"));
             let valid = true;
-            if (parseInt(config.CfgVersion.toString()) !== parseInt(DEFAULT_GULP_CONFIG.CfgVersion.toString())) {
+            if (config.CfgVersion !== DEFAULT_GULP_CONFIG.CfgVersion) {
                 logger.warn(`'${cfgFileName}.json' file major version is not valid (v${config.CfgVersion} != v${DEFAULT_GULP_CONFIG.CfgVersion})!`);
                 valid = false;
             }
@@ -252,6 +252,7 @@ class ConfigurationLoader {
             this.config = DEFAULT_GULP_CONFIG;
             WriteToFileAsJson(`${cfgFileName}.json`, this.config);
             logger.warn("'gulpconfig.json' was not found or is not valid. Creating default configuration file.");
+            throw e;
         }
     }
     checkTypeScriptConfigurationFiles() {
