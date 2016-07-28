@@ -13,7 +13,8 @@
     "strictNullChecks": true,
     "noImplicitThis": true,
     "noUnusedParameters": false,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "skipLibCheck": true
   },
   "exclude": [
     "node_modules",
