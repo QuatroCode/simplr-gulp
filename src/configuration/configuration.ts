@@ -19,10 +19,9 @@ class ConfigurationLoader {
 
     private tryToReadConfigurationFile(cfgFileName: string = 'gulpconfig') {
         try {
-            let config = require(`./${cfgFileName}.json`) as GulpConfig;
-
+            let config = JSON.parse(fs.readFileSync(`./${cfgFileName}.json`, "utf8")) as GulpConfig;
             let valid = true;
-            if (parseInt(config.CfgVersion.toString()) !== parseInt(DEFAULT_GULP_CONFIG.CfgVersion.toString())) {
+            if (config.CfgVersion !== DEFAULT_GULP_CONFIG.CfgVersion) {
                 Console.warn(`'${cfgFileName}.json' file major version is not valid (v${config.CfgVersion} != v${DEFAULT_GULP_CONFIG.CfgVersion})!`);
                 valid = false;
             } else if (config.CfgVersion < DEFAULT_GULP_CONFIG.CfgVersion) {
