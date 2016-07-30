@@ -12,10 +12,17 @@ class ConfigurationLoader {
 
     public Init() { }
 
+    private packageJson: { [key: string]: any };
+
     constructor() {
         this.tryToReadConfigurationFile();
         this.checkTypeScriptConfigurationFiles();
+        this.readPackageJSON();
     };
+
+    private readPackageJSON() {
+        this.packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+    }
 
     private tryToReadConfigurationFile(cfgFileName: string = 'gulpconfig') {
         try {
@@ -74,6 +81,10 @@ class ConfigurationLoader {
 
     get DefaultExtensions() {
         return DEFAULT_EXTENSIONS_MAP;
+    }
+
+    get Package() {
+        return this.packageJson;
     }
 
 }
