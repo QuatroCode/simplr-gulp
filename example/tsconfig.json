@@ -6,7 +6,9 @@
         "preserveConstEnums": true,
         "removeComments": false,
         "sourceMap": true,
-        "inlineSources": true
+        "inlineSources": true,
+        "rootDir": "src",
+        "outDir": "wwwroot"
     },
     "include": [
         "src/**/*",
