@@ -10,8 +10,9 @@ export default class Tasks extends TasksHandler<Task> {
     constructor() {
         super(config => {
             config.Name = "Build.Configs";
-            config.Tasks = [BuildConfigsFiles, BuildConfigsFolders];
+            config.Tasks = [BuildConfigsFolders, BuildConfigsFiles];
             config.WithProduction = true;
+            config.TasksAsync = false;
             return config;
         });
     }
