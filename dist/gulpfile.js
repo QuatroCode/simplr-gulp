@@ -11,6 +11,7 @@ var http = require('http');
 var child_process = require('child_process');
 var connectLiveReload = require('connect-livereload');
 var tinyLr = require('tiny-lr');
+var through = require('through2');
 var ts = require('gulp-typescript');
 var uglify = require('gulp-uglify');
 var sourcemaps = require('gulp-sourcemaps');
@@ -223,9 +224,13 @@ class ConfigurationLoader {
     constructor() {
         this.tryToReadConfigurationFile();
         this.checkTypeScriptConfigurationFiles();
+        this.readPackageJSON();
     }
     Init() { }
     ;
+    readPackageJSON() {
+        this.packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+    }
     tryToReadConfigurationFile(cfgFileName = 'gulpconfig') {
         try {
             let config = JSON.parse(fs.readFileSync(`./${cfgFileName}.json`, "utf8"));
@@ -286,6 +291,9 @@ class ConfigurationLoader {
     }
     get DefaultExtensions() {
         return DEFAULT_EXTENSIONS_MAP;
+    }
+    get Package() {
+        return this.packageJson;
     }
 }
 var Configuration = new ConfigurationLoader();
@@ -824,10 +832,80 @@ class BuildConfigsFilesTask extends TaskBase {
         super(...args);
         this.Name = "Build.Configs.Files";
         this.Description = "Copies *.config files (web.config for Asp.Net 5 projects) from source to build directory";
-        this.TaskFunction = (production) => {
-            return gulp.src(Paths$1.Builders.AllFiles.InSource(".config"))
-                .pipe(gulp.dest(Paths$1.Directories.Build));
+        this.TaskFunction = (production, done) => {
+            let tasks = new Array();
+            if (production) {
+                let jspmConfigFileName = this.readJspmConfigFileName();
+                let task = this.prepareJspmConfigForProduction.bind(this, jspmConfigFileName);
+                task.displayName = this.Name + ".JspmConfigForProduction";
+                tasks.push(task);
+                return gulp.parallel(tasks)(done);
+            }
+            else {
+                done();
+            }
         };
+    }
+    readJspmConfigFileName() {
+        if (Configuration.Package != null) {
+            let jspmConfig = Configuration.Package['jspm'];
+            if (jspmConfig != null) {
+                let file = jspmConfig['configFile'];
+                if (file != null) {
+                    return file;
+                }
+                else {
+                    let configFiles = jspmConfig['configFiles'];
+                    if (configFiles != null) {
+                        file = configFiles['jspm'];
+                        if (file != null) {
+                            return file;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    prepareJspmConfigForProduction(source) {
+        return gulp.src(source)
+            .pipe(this.setSystemJSConfigProductionEnviroment(source))
+            .pipe(gulp.dest(Paths$1.Builders.OneDirectory.InBuild("configs")));
+    }
+    setSystemJSConfigProductionEnviroment(fullFileName) {
+        return through.obj((file, encoding, callback) => {
+            let content = file.contents.toString();
+            if (content.length > 0) {
+                var regex = /SystemJS\.config\(({[\s\S.]*?})\)/;
+                var json = content.match(regex);
+                if (json != null) {
+                    let jsonObj = undefined;
+                    try {
+                        eval('jsonObj = ' + json[1]);
+                        if (jsonObj != null) {
+                            jsonObj['production'] = true;
+                            let resultString = JSON.stringify(jsonObj, null, 4);
+                            resultString = `SystemJS.config(${resultString})`;
+                            let result = content.replace(new RegExp(regex), resultString);
+                            file.contents = new Buffer(result, 'utf8');
+                        }
+                        else {
+                            logger.error(`'${fullFileName}': SystemJS.config not found.`);
+                        }
+                    }
+                    catch (error) {
+                        logger.error(`'${fullFileName}' file content is not valid.`);
+                        logger.error(error);
+                    }
+                }
+                else {
+                    logger.warn(`'${fullFileName}' file content is not valid.`);
+                }
+            }
+            else {
+                logger.warn(`'${fullFileName}' file content is empty.`);
+            }
+            callback(null, file);
+        });
     }
 }
 
@@ -847,8 +925,9 @@ class Tasks$1 extends TasksHandler {
     constructor() {
         super(config => {
             config.Name = "Build.Configs";
-            config.Tasks = [BuildConfigsFilesTask, BuildConfigsFoldersTask];
+            config.Tasks = [BuildConfigsFoldersTask, BuildConfigsFilesTask];
             config.WithProduction = true;
+            config.TasksAsync = false;
             return config;
         });
     }
