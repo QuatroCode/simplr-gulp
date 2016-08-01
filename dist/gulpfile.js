@@ -1136,7 +1136,7 @@ class CleanAllTask extends TaskBase {
         this.Description = "Cleans build directory (wwwroot by default)";
         this.TaskFunction = (production, done) => {
             let ignoreLibsPath = [Paths$1.Directories.Build, "**", ".gitkeep"].join("/");
-            rimraf("wwwroot/**/*", { glob: { ignore: ignoreLibsPath } }, (error) => {
+            rimraf(Paths$1.Builders.AllFiles.InBuild(), { glob: { ignore: ignoreLibsPath } }, (error) => {
                 done();
             });
         };
@@ -1184,6 +1184,20 @@ class CleanBundleTask extends TaskBase {
     }
 }
 
+class CleanLibsTask extends TaskBase {
+    constructor(...args) {
+        super(...args);
+        this.Name = "Clean.Libs";
+        this.Description = "Cleans libs directory (wwwroot/libs by default)";
+        this.TaskFunction = (production, done) => {
+            let ignoreLibsPath = [Paths$1.Directories.Build, "**", ".gitkeep"].join("/");
+            rimraf(path.join(Paths$1.Directories.Build, "libs", "**", "*"), { glob: { ignore: ignoreLibsPath } }, (error) => {
+                done();
+            });
+        };
+    }
+}
+
 class BundleTask extends TaskBase {
     constructor(...args) {
         super(...args);
@@ -1220,7 +1234,7 @@ class BundleTask extends TaskBase {
 class Tasks extends TasksHandler {
     constructor() {
         super(config => {
-            config.Tasks = [DefaultTask, WatchTask, CleanTask, CleanBundleTask, BundleTask];
+            config.Tasks = [DefaultTask, WatchTask, CleanTask, CleanBundleTask, CleanLibsTask, BundleTask];
             config.TasksHandlers = [BuildTasksHandler, CleanTasksHandler];
             return config;
         });
