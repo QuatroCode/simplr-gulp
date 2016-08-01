@@ -1,4 +1,5 @@
-# simplr-gulp
+# simplr-gulp 
+[![NPM version](http://img.shields.io/npm/v/simplr-gulp.svg)](https://www.npmjs.com/package/simplr-gulp) [![Build Status](https://travis-ci.org/QuatroCode/simplr-gulp.svg?branch=master)](https://travis-ci.org/QuatroCode/simplr-gulp) [![dependencies Status](https://david-dm.org/quatrocode/simplr-gulp/status.svg)](https://david-dm.org/quatrocode/simplr-gulp) [![devDependencies Status](https://david-dm.org/quatrocode/simplr-gulp/dev-status.svg)](https://david-dm.org/quatrocode/simplr-gulp?type=dev) [![peerDependencies Status](https://david-dm.org/quatrocode/simplr-gulp/peer-status.svg)](https://david-dm.org/quatrocode/simplr-gulp?type=peer)
 
 ### I just want to use gulpfile.js
 1) Install `simplr-gulp` in your project: 
@@ -19,17 +20,23 @@ All directories, server and live-reload settings are configured in `gulpconfig.j
 
 After first run, `gulpconfig.json` file will be generated for you to edit for your own use.
 
+### Requirements
+* [NodeJS](https://nodejs.org): `>= 6.0.0`
+* [Typescript](http://www.typescriptlang.org/): `^1.8.10 || ^2.0.0`
+
 ### Available commands
 #### Gulp tasks
 * `default` - start `Watch` task with server.
-* `Build` - compiles source files with development enviroment (starts all `Build.*` subtasks)
+* `Build` - compiles source files with development environment (starts all `Build.*` subtasks)
     * `Build.Assets` - copies all `assets` folders and their contents from source to build directory
-    * `Build.Configs` - copies `web.config` (for Asp.Net 5 projects) and `configs` folder from source to build directory
+    * `Build.Configs` - copies `configs` folder from source to build directory with jspm environment
+        * `Build.Configs.Files` - copy `jspm.config.js` file from source to build directory with production environment (production only)
+        * `Build.Configs.Folders` - copies configs folder from source to build directory
     * `Build.Html` - copies all `*.html` files from source to build directory
     * `Build.Scripts` - compiles TypeScript with sourcemap from source to build directory
     * `Build.Styles` - compiles `*.scss` files from source to build directory
 
-* `Build:Production` - compiles, minifies and uglifies source files with production enviroment (starts all `Build.*:Production` subtasks)
+* `Build:Production` - compiles, minifies and uglifies source files with production environment (starts all `Build.*:Production` subtasks)
     * `Build.Assets:Production` - copies all `assets` folders and their contents from source to build directory
     * `Build.Configs:Production` - copies `web.config` (for Asp.Net 5 projects) and `configs` folder from source to build directory
     * `Build.Html:Production` - copies all `*.html` files from source to build directory
@@ -46,19 +53,12 @@ After first run, `gulpconfig.json` file will be generated for you to edit for yo
 
 > **`Watch.*` subtasks available only at runtime.**
 
-* `Bundle` - bundles the app with `jspm bundle` with development enviroment
+* `Bundle` - bundles the app with `jspm bundle` with development environment
 
 * `Clean` - cleans build directory (`wwwroot` by default) without `wwwroot/libs` folder and `wwwroot/**/.gitkeep` files
     * `Clean.All` - cleans build directory (`wwwroot` by default) without `wwwroot/**/.gitkeep` files
-    * `Clean.Bundle` - remove build file (`build.js` by default) from build directory (`wwwroot` by default) 
-
-## Prerequisites
-You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp-cli), [`typings`](https://github.com/typings/registry), [`jspm`](https://github.com/jspm/jspm-cli), [`rollup`](https://github.com/rollup/rollup)):
-
-1. `npm install gulp-cli -g`
-2. `npm install typings -g`
-3. `npm install jspm -g`
-4. `npm install rollup -g`
+    * `Clean.Bundle` - remove build file (`build.js` by default) from build directory (`wwwroot` by default)
+    * `Clean.Libs` - cleans libs directory (`wwwroot/libs` by default)
 
 ## Trying it yourself
 1. `git clone https://github.com/QuatroCode/simplr-gulp.git`
@@ -100,6 +100,14 @@ You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp-cli), [`ty
 > [More info about configuration](https://github.com/QuatroCode/simplr-gulp/wiki/Configuration)
 
 ## Development
+#### Prerequisites
+You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp-cli), [`typings`](https://github.com/typings/registry), [`jspm`](https://github.com/jspm/jspm-cli), [`rollup`](https://github.com/rollup/rollup)):
+
+1. `npm install gulp-cli -g`
+2. `npm install typings -g`
+3. `npm install jspm -g`
+4. `npm install rollup -g`
+
 #### If you want to update `simplr-gulp` package yourself
 1. `git clone https://github.com/QuatroCode/simplr-gulp.git`
 2. `cd simplr-gulp`
@@ -115,6 +123,8 @@ builder.bat -build:sample	    # build code to /example
 builder.bat -watch	            # build and start watcher to /dist
 builder.bat -watch:sample	    # build and start watcher to /example
 ```
+## License
+[GPL-3.0](LICENSE)
 
 ## Hyperlinks
 * [simplr-gulp wiki](https://github.com/QuatroCode/simplr-gulp/wiki)
@@ -124,3 +134,4 @@ builder.bat -watch:sample	    # build and start watcher to /example
 * [jspm](https://github.com/jspm/jspm-cli)
 * [rollup](https://github.com/rollup/rollup)
 * [TsLint](https://github.com/palantir/tslint)
+* [NodeJS](https://nodejs.org)

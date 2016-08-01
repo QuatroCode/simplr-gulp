@@ -73,3 +73,16 @@ export function GetClassName(constructor: Function) {
     }
     return "";
 }
+
+/**
+ * Replace all matches by regex.
+ * 
+ * @export
+ * @param {string} content
+ * @param {string} search
+ * @param {string} replace
+ * @returns
+ */
+export function ReplaceAll(content: string, regexSearch: RegExp | string, replace: string) {
+    return content.replace(new RegExp(regexSearch as string), replace);
+};

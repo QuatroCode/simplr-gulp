@@ -6,7 +6,9 @@
         "preserveConstEnums": true,
         "removeComments": true,
         "sourceMap": false,
-        "inlineSources": false
+        "inlineSources": false,
+        "rootDir": "src",
+        "outDir": "wwwroot"
     },
     "include": [
         "src/**/*",
@@ -14,7 +16,7 @@
     ],
     "exclude": [
         "src/libs",
-        "wwwroot"
+        "wwwroot",
         "node_modules"
     ]
 }

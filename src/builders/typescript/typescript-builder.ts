@@ -13,7 +13,11 @@ import Logger from '../../utils/logger';
 
 class Reporter implements ts.Reporter {
     error(error: any) {
-        Logger.withType("TS").error(`${error.relativeFilename}[${error.startPosition.line}, ${error.startPosition.character}]: ${error.diagnostic.messageText}`);
+        if (error.tsFile) {
+            Logger.withType("TS").error(`${error.relativeFilename}[${error.startPosition.line}, ${error.startPosition.character}]: `, error.diagnostic.messageText);
+        } else {
+            Logger.withType("TS").error(error.message);
+        }
     }
 }
 
@@ -25,8 +29,7 @@ class TypescriptBuilder extends BuilderBase<TypescriptBuilderCompiler> {
 
         let tsResult = gulp.src(Paths.Builders.AllFiles.InSource(".{ts,tsx}"))
             .pipe(tslint({
-                //TODO: Fix any after updated gulp-tslint.d.ts
-                formatter: TsLintFormatter as any
+                formatter: TsLintFormatter
             }))
             .pipe(ts(builder.Project, undefined, this.reporter)).js;
 
