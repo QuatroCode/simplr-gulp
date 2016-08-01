@@ -19,6 +19,9 @@ All directories, server and live-reload settings are configured in `gulpconfig.j
 
 After first run, `gulpconfig.json` file will be generated for you to edit for your own use.
 
+### Requirements
+* [NodeJS](https://nodejs.org) >= 6.0.0
+
 ### Available commands
 #### Gulp tasks
 * `default` - start `Watch` task with server.
@@ -127,3 +130,4 @@ builder.bat -watch:sample	    # build and start watcher to /example
 * [jspm](https://github.com/jspm/jspm-cli)
 * [rollup](https://github.com/rollup/rollup)
 * [TsLint](https://github.com/palantir/tslint)
+* [NodeJS](https://nodejs.org)
