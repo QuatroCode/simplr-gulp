@@ -9,7 +9,7 @@ export default class BuildConfigsFilesTask extends TaskBase {
 
     Name = "Build.Configs.Files";
 
-    Description = "Copies *.config files (web.config for Asp.Net 5 projects) from source to build directory";
+    Description = "Copy `jspm.config.js` file from source to build directory with production enviroment (production only)";
 
     TaskFunction = (production: boolean, done: () => void) => {
 

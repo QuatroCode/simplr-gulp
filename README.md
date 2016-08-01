@@ -22,14 +22,16 @@ After first run, `gulpconfig.json` file will be generated for you to edit for yo
 ### Available commands
 #### Gulp tasks
 * `default` - start `Watch` task with server.
-* `Build` - compiles source files with development enviroment (starts all `Build.*` subtasks)
+* `Build` - compiles source files with development environment (starts all `Build.*` subtasks)
     * `Build.Assets` - copies all `assets` folders and their contents from source to build directory
-    * `Build.Configs` - copies `web.config` (for Asp.Net 5 projects) and `configs` folder from source to build directory
+    * `Build.Configs` - copies `configs` folder from source to build directory with jspm environment
+        * `Build.Configs.Files` - copy `jspm.config.js` file from source to build directory with production environment (production only)
+        * `Build.Configs.Folders` - copies configs folder from source to build directory
     * `Build.Html` - copies all `*.html` files from source to build directory
     * `Build.Scripts` - compiles TypeScript with sourcemap from source to build directory
     * `Build.Styles` - compiles `*.scss` files from source to build directory
 
-* `Build:Production` - compiles, minifies and uglifies source files with production enviroment (starts all `Build.*:Production` subtasks)
+* `Build:Production` - compiles, minifies and uglifies source files with production environment (starts all `Build.*:Production` subtasks)
     * `Build.Assets:Production` - copies all `assets` folders and their contents from source to build directory
     * `Build.Configs:Production` - copies `web.config` (for Asp.Net 5 projects) and `configs` folder from source to build directory
     * `Build.Html:Production` - copies all `*.html` files from source to build directory
@@ -46,11 +48,12 @@ After first run, `gulpconfig.json` file will be generated for you to edit for yo
 
 > **`Watch.*` subtasks available only at runtime.**
 
-* `Bundle` - bundles the app with `jspm bundle` with development enviroment
+* `Bundle` - bundles the app with `jspm bundle` with development environment
 
 * `Clean` - cleans build directory (`wwwroot` by default) without `wwwroot/libs` folder and `wwwroot/**/.gitkeep` files
     * `Clean.All` - cleans build directory (`wwwroot` by default) without `wwwroot/**/.gitkeep` files
-    * `Clean.Bundle` - remove build file (`build.js` by default) from build directory (`wwwroot` by default) 
+    * `Clean.Bundle` - remove build file (`build.js` by default) from build directory (`wwwroot` by default)
+    * `Clean.Libs` - cleans libs directory (`wwwroot/libs` by default)
 
 ## Prerequisites
 You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp-cli), [`typings`](https://github.com/typings/registry), [`jspm`](https://github.com/jspm/jspm-cli), [`rollup`](https://github.com/rollup/rollup)):

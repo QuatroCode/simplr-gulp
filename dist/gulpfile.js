@@ -831,7 +831,7 @@ class BuildConfigsFilesTask extends TaskBase {
     constructor(...args) {
         super(...args);
         this.Name = "Build.Configs.Files";
-        this.Description = "Copies *.config files (web.config for Asp.Net 5 projects) from source to build directory";
+        this.Description = "Copy `jspm.config.js` file from source to build directory with production enviroment (production only)";
         this.TaskFunction = (production, done) => {
             let tasks = new Array();
             if (production) {
