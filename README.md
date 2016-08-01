@@ -1,4 +1,6 @@
-# simplr-gulp
+# simplr-gulp [![Build Status](https://travis-ci.org/QuatroCode/simplr-gulp.svg?branch=master)](https://travis-ci.org/QuatroCode/simplr-gulp)  [![Dependencies](https://david-dm.org/quatrocode/simplr-gulp.svg)](https://david-dm.org/quatrocode/simplr-gulp) [![Dev Dependencies](https://david-dm.org/quatrocode/simplr-gulp/dev-status.svg)](https://david-dm.org/quatrocode/simplr-gulp#info=devDependencies)
+
+[![NPM](https://nodei.co/npm/simplr-gulp.png)](https://www.npmjs.com/package/simplr-gulp)
 
 ### I just want to use gulpfile.js
 1) Install `simplr-gulp` in your project: 
