@@ -13,7 +13,7 @@ import Logger from '../../utils/logger';
 
 class Reporter implements ts.Reporter {
     error(error: any) {
-        Logger.withType("TS").error(`${error.relativeFilename}[${error.startPosition.line}, ${error.startPosition.character}]: ${error.diagnostic.messageText}`);
+        Logger.withType("TS").error(`${error.relativeFilename}[${error.startPosition.line}, ${error.startPosition.character}]: `, error.diagnostic.messageText);
     }
 }
 

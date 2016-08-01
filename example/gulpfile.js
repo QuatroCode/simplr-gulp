@@ -1004,7 +1004,7 @@ class TypescriptBuilderCompiler {
 
 class Reporter {
     error(error) {
-        logger.withType("TS").error(`${error.relativeFilename}[${error.startPosition.line}, ${error.startPosition.character}]: ${error.diagnostic.messageText}`);
+        logger.withType("TS").error(`${error.relativeFilename}[${error.startPosition.line}, ${error.startPosition.character}]: `, error.diagnostic.messageText);
     }
 }
 class TypescriptBuilder extends BuilderBase$1 {
