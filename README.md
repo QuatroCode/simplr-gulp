@@ -20,7 +20,8 @@ All directories, server and live-reload settings are configured in `gulpconfig.j
 After first run, `gulpconfig.json` file will be generated for you to edit for your own use.
 
 ### Requirements
-* [NodeJS](https://nodejs.org) >= 6.0.0
+* [NodeJS](https://nodejs.org): `>= 6.0.0`
+* [Typescript](http://www.typescriptlang.org/): `^1.8.10 || ^2.0.0`
 
 ### Available commands
 #### Gulp tasks
@@ -57,14 +58,6 @@ After first run, `gulpconfig.json` file will be generated for you to edit for yo
     * `Clean.All` - cleans build directory (`wwwroot` by default) without `wwwroot/**/.gitkeep` files
     * `Clean.Bundle` - remove build file (`build.js` by default) from build directory (`wwwroot` by default)
     * `Clean.Libs` - cleans libs directory (`wwwroot/libs` by default)
-
-## Prerequisites
-You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp-cli), [`typings`](https://github.com/typings/registry), [`jspm`](https://github.com/jspm/jspm-cli), [`rollup`](https://github.com/rollup/rollup)):
-
-1. `npm install gulp-cli -g`
-2. `npm install typings -g`
-3. `npm install jspm -g`
-4. `npm install rollup -g`
 
 ## Trying it yourself
 1. `git clone https://github.com/QuatroCode/simplr-gulp.git`
@@ -106,6 +99,14 @@ You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp-cli), [`ty
 > [More info about configuration](https://github.com/QuatroCode/simplr-gulp/wiki/Configuration)
 
 ## Development
+#### Prerequisites
+You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp-cli), [`typings`](https://github.com/typings/registry), [`jspm`](https://github.com/jspm/jspm-cli), [`rollup`](https://github.com/rollup/rollup)):
+
+1. `npm install gulp-cli -g`
+2. `npm install typings -g`
+3. `npm install jspm -g`
+4. `npm install rollup -g`
+
 #### If you want to update `simplr-gulp` package yourself
 1. `git clone https://github.com/QuatroCode/simplr-gulp.git`
 2. `cd simplr-gulp`
@@ -121,6 +122,8 @@ builder.bat -build:sample	    # build code to /example
 builder.bat -watch	            # build and start watcher to /dist
 builder.bat -watch:sample	    # build and start watcher to /example
 ```
+## License
+[GPL-3.0](LICENSE)
 
 ## Hyperlinks
 * [simplr-gulp wiki](https://github.com/QuatroCode/simplr-gulp/wiki)
