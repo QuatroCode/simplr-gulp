@@ -15,6 +15,7 @@ var through = require('through2');
 var ts = require('gulp-typescript');
 var uglify = require('gulp-uglify');
 var sourcemaps = require('gulp-sourcemaps');
+var filter = require('gulp-filter');
 var tslint = _interopDefault(require('gulp-tslint'));
 var Lint = require('tslint/lib/lint');
 var cleanCSS = require('gulp-clean-css');
@@ -1090,10 +1091,13 @@ class TypescriptBuilder extends BuilderBase$1 {
         this.reporter = new Reporter();
     }
     build(production, builder, done) {
+        let dTsFilter = filter(["*", "!**/*.d.ts"], { restore: true });
         let tsResult = gulp.src(builder.Config.Src)
+            .pipe(dTsFilter)
             .pipe(tslint({
             formatter: ErrorHandler
         }))
+            .pipe(dTsFilter.restore)
             .pipe(ts(builder.Project, undefined, this.reporter)).js;
         if (production) {
             tsResult = tsResult.pipe(uglify({ mangle: true }));

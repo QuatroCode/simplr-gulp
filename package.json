@@ -30,6 +30,7 @@
     "*.md"
   ],
   "devDependencies": {
+    "@types/gulp-filter": "^3.0.28",
     "rollup": "0.34.1",
     "rollup-plugin-typescript": "0.7.7",
     "rollup-watch": "2.5.0",
@@ -55,7 +56,8 @@
     "rimraf": "^2.5.4",
     "through2": "^2.0.1",
     "tiny-lr": "^0.2.1",
-    "tsconfig-lint": "^0.11.0"
+    "tsconfig-lint": "^0.11.0",
+    "gulp-filter": "^4.0.0"
   },
   "engines": {
     "node": ">=6.0.0"
