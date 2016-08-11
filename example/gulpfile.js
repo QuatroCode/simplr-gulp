@@ -1009,8 +1009,10 @@ class TypescriptBuilderCompiler {
         this.Config.Src = this.generateSrc(this.Config.Include, this.Config.Exclude);
     }
     createTsProject(configFile) {
+        let requiredTypescript = require("typescript");
+        logger.withType("TS").info(`Using Typescript@${requiredTypescript.version}`);
         return ts.createProject(configFile, {
-            typescript: require('typescript')
+            typescript: requiredTypescript
         });
     }
     generateSrc(include, exclude) {
