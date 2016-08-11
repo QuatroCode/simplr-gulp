@@ -996,9 +996,79 @@ class ErrorHandler extends Lint.Formatters.AbstractFormatter {
 
 class TypescriptBuilderCompiler {
     constructor(configFile) {
-        this.Project = ts.createProject(configFile, {
+        this.Project = this.createTsProject(configFile);
+        let tsConfig = this.Project.config;
+        this.setConfig(tsConfig);
+    }
+    setConfig(tsConfig) {
+        this.Config = {};
+        this.Config.RootDir = this.generateRootDir(tsConfig.compilerOptions['rootDir']);
+        this.Config.OutDir = this.generateOutDir(tsConfig.compilerOptions['outDir']);
+        this.Config.Include = this.generateInclude(tsConfig.include, this.Config.RootDir);
+        this.Config.Exclude = this.generateExclude(tsConfig.exclude);
+        this.Config.Src = this.generateSrc(this.Config.Include, this.Config.Exclude);
+    }
+    createTsProject(configFile) {
+        return ts.createProject(configFile, {
             typescript: require('typescript')
         });
+    }
+    generateSrc(include, exclude) {
+        let src = include;
+        if (exclude !== undefined) {
+            src = src.concat(exclude);
+        }
+        return src;
+    }
+    generateInclude(include, rootDir) {
+        if (include != null) {
+            let tempInclude = include.map(inc => {
+                if (inc !== undefined) {
+                    if (path.extname(inc).length === 0) {
+                        return this.addAvailableTsExtensions(inc);
+                    }
+                    else {
+                        return inc;
+                    }
+                }
+            });
+            let resultInclude = tempInclude.filter(x => x != null);
+            resultInclude.push(rootDir);
+            return resultInclude;
+        }
+        else {
+            return [rootDir];
+        }
+    }
+    generateExclude(exclude) {
+        if (exclude != null) {
+            let tempExclude = exclude.map(exc => {
+                if (exc !== undefined) {
+                    return `!${exc}`;
+                }
+            });
+            if (tempExclude.length > 0) {
+                let resultInclude = tempExclude.filter(x => x != null);
+                if (tempExclude.length > 0) {
+                    return resultInclude;
+                }
+            }
+        }
+        return undefined;
+    }
+    generateRootDir(rootDir) {
+        if (rootDir != null) {
+            return path.join(rootDir, "**", "*", this.addAvailableTsExtensions());
+        }
+        else {
+            return Paths$1.Builders.AllFiles.InSource(this.addAvailableTsExtensions());
+        }
+    }
+    generateOutDir(outDir) {
+        return outDir || Paths$1.Directories.Build;
+    }
+    addAvailableTsExtensions(name = "") {
+        return path.join(name + ".{ts,tsx}");
     }
 }
 
@@ -1018,7 +1088,7 @@ class TypescriptBuilder extends BuilderBase$1 {
         this.reporter = new Reporter();
     }
     build(production, builder, done) {
-        let tsResult = gulp.src(Paths$1.Builders.AllFiles.InSource(".{ts,tsx}"))
+        let tsResult = gulp.src(builder.Config.Src)
             .pipe(tslint({
             formatter: ErrorHandler
         }))
@@ -1029,7 +1099,7 @@ class TypescriptBuilder extends BuilderBase$1 {
         else {
             tsResult = tsResult.pipe(sourcemaps.init()).pipe(sourcemaps.write());
         }
-        tsResult.pipe(gulp.dest(Paths$1.Directories.Build)).on("end", done);
+        tsResult.pipe(gulp.dest(builder.Config.OutDir)).on("end", done);
     }
     initBuilder(production) {
         if (production) {

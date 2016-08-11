@@ -1,6 +1,5 @@
 import BuilderBase from '../builder-base';
 import Configuration from '../../configuration/configuration';
-import Paths from '../../paths/paths';
 import * as gulp from 'gulp';
 import * as ts from 'gulp-typescript';
 import * as uglify from 'gulp-uglify';
@@ -27,7 +26,7 @@ class TypescriptBuilder extends BuilderBase<TypescriptBuilderCompiler> {
 
     protected build(production: boolean, builder: TypescriptBuilderCompiler, done: () => void) {
 
-        let tsResult = gulp.src(Paths.Builders.AllFiles.InSource(".{ts,tsx}"))
+        let tsResult = gulp.src(builder.Config.Src)
             .pipe(tslint({
                 formatter: TsLintFormatter
             }))
@@ -38,8 +37,7 @@ class TypescriptBuilder extends BuilderBase<TypescriptBuilderCompiler> {
         } else {
             tsResult = tsResult.pipe(sourcemaps.init()).pipe(sourcemaps.write());
         }
-
-        tsResult.pipe(gulp.dest(Paths.Directories.Build)).on("end", done);
+        tsResult.pipe(gulp.dest(builder.Config.OutDir)).on("end", done);
     }
 
     protected initBuilder(production: boolean) {
