@@ -1016,7 +1016,7 @@ class TypescriptBuilderCompiler {
     generateSrc(include, exclude) {
         let src = include;
         if (exclude !== undefined) {
-            src = src.concat(exclude);
+            src = exclude.concat(src);
         }
         return src;
     }
