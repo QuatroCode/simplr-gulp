@@ -1,6 +1,7 @@
 import * as ts from 'gulp-typescript';
 import Paths from '../../paths/paths';
 import * as path from 'path';
+import Logger from '../../utils/logger';
 
 interface TsConfig extends ts.TsConfig {
     include?: Array<string>;
@@ -37,15 +38,17 @@ export default class TypescriptBuilderCompiler {
 
 
     private createTsProject(configFile: string): ts.Project {
+        let requiredTypescript = require("typescript");
+        Logger.withType("TS").info(`Using Typescript@${requiredTypescript.version}`);
         return ts.createProject(configFile, {
-            typescript: require('typescript')
+            typescript: requiredTypescript
         });
     }
 
     private generateSrc(include: Array<string>, exclude: Array<string> | undefined): Array<string> {
         let src = include;
         if (exclude !== undefined) {
-            src = src.concat(exclude);
+            src = exclude.concat(src);
         }
         return src;
     }

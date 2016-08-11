@@ -4,6 +4,7 @@ import * as gulp from 'gulp';
 import * as ts from 'gulp-typescript';
 import * as uglify from 'gulp-uglify';
 import * as sourcemaps from 'gulp-sourcemaps';
+import * as filter from 'gulp-filter';
 import tslint from 'gulp-tslint';
 import TsLintFormatter from './tslint/tslint-formatter';
 import TypescriptBuilderCompiler from './typescript-builder-compiler';
@@ -26,10 +27,13 @@ class TypescriptBuilder extends BuilderBase<TypescriptBuilderCompiler> {
 
     protected build(production: boolean, builder: TypescriptBuilderCompiler, done: () => void) {
 
+        let dTsFilter = filter(["*", "!**/*.d.ts"], { restore: true });
         let tsResult = gulp.src(builder.Config.Src)
+            .pipe(dTsFilter)
             .pipe(tslint({
                 formatter: TsLintFormatter
             }))
+            .pipe(dTsFilter.restore)
             .pipe(ts(builder.Project, undefined, this.reporter)).js;
 
         if (production) {
