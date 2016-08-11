@@ -7,11 +7,11 @@
         "removeComments": false,
         "sourceMap": true,
         "inlineSources": true,
-        "rootDir": "src",
-        "outDir": "wwwroot"
+        "rootDir": "src/app",
+        "outDir": "wwwroot/app"
     },
     "include": [
-        "src/**/*",
+        "src/app/**/*",
         "typings/**/*"
     ],
     "exclude": [
