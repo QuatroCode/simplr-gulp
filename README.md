@@ -55,6 +55,8 @@ After first run, `gulpconfig.json` file will be generated for you to edit for yo
 
 * `Bundle` - bundles the app with `jspm bundle` with development environment
 
+* `Jspm.CdnPaths:Production` - Generate CDN paths into [src/configs/jspm.config.production.js](example/src/configs/jspm.config.production.js) (cdnjs.com)
+
 * `Clean` - cleans build directory (`wwwroot` by default) without `wwwroot/libs` folder and `wwwroot/**/.gitkeep` files
     * `Clean.All` - cleans build directory (`wwwroot` by default) without `wwwroot/**/.gitkeep` files
     * `Clean.Bundle` - remove build file (`build.js` by default) from build directory (`wwwroot` by default)
