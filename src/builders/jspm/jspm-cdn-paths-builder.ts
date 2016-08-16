@@ -6,7 +6,7 @@ import Paths from '../../paths/paths';
 import Logger from '../../utils/logger';
 import * as jspm from 'jspm';
 
-import { CdnJsApi, PackageItem, JspmPaths } from './jspm-cdn-paths-contacts';
+import { CdnJsApi, PackageItem, JspmPaths, JspmPathsLists } from './jspm-cdn-paths-contacts';
 
 const CDN_API = {
     Hostname: "api.cdnjs.com",
@@ -19,14 +19,44 @@ export default class JspmCdnPaths {
 
     public async Start(done: () => void) {
         let packagesList = this.getPackagesList();
-        let paths = await this.startDownload(packagesList);
-        if (paths != null && Object.keys(paths).length !== 0) {
-            await this.saveResultToFile(paths);
+        let results = await this.startDownload(packagesList);
+        if (results != null && Object.keys(results).length !== 0) {
+            await this.saveResultToFile(results.Paths);
         }
+        this.printResults(results);
         done();
     }
 
-     private async saveResultToFile(paths: JspmPaths) {
+    private printResults(results: JspmPathsLists) {
+        let logger = Logger.withType("JSPM");
+        if (results.Resolved.length > 0) {
+            logger.info(
+                [`Successfully resolved ${results.Resolved.length} path${(results.Resolved.length > 1) ? "s" : ""}:`]
+                    .concat(
+                    results.Resolved.map((item, index) => {
+                        return `${this.resultPrefix(index, results.Resolved.length)} ${item.FullName}: '${results.Paths[item.FullName]}'`;
+                    })
+                    )
+                    .join("\r\n"));
+        }
+
+        if (results.Unresolved.length > 0) {
+            logger.warn(
+                [`Failed to resolved ${results.Unresolved.length} path${(results.Unresolved.length > 1) ? "s" : ""}:`]
+                    .concat(
+                    results.Unresolved.map((item, index) => {
+                        return `${this.resultPrefix(index, results.Unresolved.length)} ${item.FullName}`;
+                    })
+                    )
+                    .join("\r\n"));
+        }
+    }
+
+    private resultPrefix(index: number, itemsLength: number) {
+        return `\t\t\t ${(index === itemsLength - 1) ? "└─" : "├─"}`;
+    }
+
+    private async saveResultToFile(paths: JspmPaths) {
         let logger = Logger.withType("JSPM");
         return new Promise(resolve => {
             let pathname = path.join(Paths.Directories.Source, "configs", "jspm.config.production.js");
@@ -47,17 +77,20 @@ export default class JspmCdnPaths {
         });
     }
 
-    private async startDownload(packagesList: Array<PackageItem>, paths: JspmPaths = {}) {
-        return new Promise<JspmPaths>(async resolve => {
+    private async startDownload(packagesList: Array<PackageItem>, results: JspmPathsLists = { Resolved: [], Unresolved: [], Paths: {} }) {
+        return new Promise<JspmPathsLists>(async resolve => {
             if (packagesList.length > 0) {
                 let item = packagesList.shift() !;
                 let cdnLink = await this.getCdnLink(item);
                 if (cdnLink !== undefined) {
-                    paths[item.FullName] = cdnLink.replace(/^https?\:/i, "");
+                    results.Resolved.push(item);
+                    results.Paths[item.FullName] = cdnLink.replace(/^https?\:/i, "");
+                } else {
+                    results.Unresolved.push(item);
                 }
-                resolve(await this.startDownload(packagesList, paths));
+                resolve(await this.startDownload(packagesList, results));
             } else {
-                resolve(paths);
+                resolve(results);
             }
         });
     }
@@ -145,14 +178,14 @@ export default class JspmCdnPaths {
 
         let asset = found.assets[assetIndex];
         let searchingFiles = new Array<string>();
-        let originalName = packageItem.Details.OriginalName!.toLowerCase();
+        let originalName = (packageItem.Details.OriginalName || packageItem.Details.Name).toLowerCase();
         // Searching .min.js or .js by order priority
         searchingFiles.push(`${originalName}.min.js`);
         searchingFiles.push(`${originalName}.js`);
 
-        let foundFile = asset.files.find(x => searchingFiles.findIndex(y => y === x) !== -1);
+        let foundFile = searchingFiles.find(searchingFile => asset.files.findIndex(file => searchingFile === file) !== -1);
         if (foundFile !== undefined) {
-            logger.info(`File '${foundFile}' found.`);
+            logger.info(`File '${foundFile}' found in '${found.name}@${asset.version}'`);
             return this.buildCdnLinkWithCustomFile(link || found.latest, foundFile);
         }
         return undefined;
@@ -221,7 +254,25 @@ export default class JspmCdnPaths {
                     }
                 }
             } else {
-                resolve(undefined);
+                logger.info(`Package '${packageItem.Details.Name}' with original name was not found. Searching file in assets.`);
+                let resolved = false;
+
+                for (let i = 0; i < responseDto.results.length; i++) {
+                    let item = responseDto.results[i];
+                    let foundAsset = item.assets.findIndex(x => x.version === packageItem.Details.Version);
+                    if (foundAsset !== -1) {
+                        let resolvedItem = this.tryToResolveSplitedPackage(packageItem, foundAsset, item);
+                        if (resolvedItem !== undefined) {
+                            resolved = true;
+                            resolve(resolvedItem);
+                            break;
+                        }
+                    }
+                }
+
+                if (!resolved) {
+                    resolve(undefined);
+                }
             }
         });
     }
