@@ -36,6 +36,8 @@
       "baseURL": "wwwroot"
     },
     "dependencies": {
+      "immutable": "npm:immutable@^3.8.1",
+      "moment": "npm:moment@^2.14.1",
       "react-dom": "npm:react-dom@^15.2.1"
     },
     "devDependencies": {},
@@ -75,6 +77,9 @@
         "ignore": [
           "test.js"
         ]
+      },
+      "npm:moment@2.14.1": {
+        "jspmNodeConversion": false
       }
     }
   }

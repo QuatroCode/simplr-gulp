@@ -1323,12 +1323,33 @@ class JspmCdnPaths {
     Start(done) {
         return __awaiter(this, void 0, void 0, function* () {
             let packagesList = this.getPackagesList();
-            let paths = yield this.startDownload(packagesList);
-            if (paths != null && Object.keys(paths).length !== 0) {
-                yield this.saveResultToFile(paths);
+            let results = yield this.startDownload(packagesList);
+            if (results != null && Object.keys(results).length !== 0) {
+                yield this.saveResultToFile(results.Paths);
             }
+            this.printResults(results);
             done();
         });
+    }
+    printResults(results) {
+        let logger$$ = logger.withType("JSPM");
+        if (results.Resolved.length > 0) {
+            logger$$.info([`Successfully resolved ${results.Resolved.length} path${(results.Resolved.length > 1) ? "s" : ""}:`]
+                .concat(results.Resolved.map((item, index) => {
+                return `${this.resultPrefix(index, results.Resolved.length)} ${item.FullName}: '${results.Paths[item.FullName]}'`;
+            }))
+                .join("\r\n"));
+        }
+        if (results.Unresolved.length > 0) {
+            logger$$.warn([`Failed to resolved ${results.Unresolved.length} path${(results.Unresolved.length > 1) ? "s" : ""}:`]
+                .concat(results.Unresolved.map((item, index) => {
+                return `${this.resultPrefix(index, results.Unresolved.length)} ${item.FullName}`;
+            }))
+                .join("\r\n"));
+        }
+    }
+    resultPrefix(index, itemsLength) {
+        return `\t\t\t ${(index === itemsLength - 1) ? "└─" : "├─"}`;
     }
     saveResultToFile(paths) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -1351,19 +1372,23 @@ class JspmCdnPaths {
             });
         });
     }
-    startDownload(packagesList, paths = {}) {
+    startDownload(packagesList, results = { Resolved: [], Unresolved: [], Paths: {} }) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
                 if (packagesList.length > 0) {
                     let item = packagesList.shift();
                     let cdnLink = yield this.getCdnLink(item);
                     if (cdnLink !== undefined) {
-                        paths[item.FullName] = cdnLink.replace(/^https?\:/i, "");
+                        results.Resolved.push(item);
+                        results.Paths[item.FullName] = cdnLink.replace(/^https?\:/i, "");
                     }
-                    resolve(yield this.startDownload(packagesList, paths));
+                    else {
+                        results.Unresolved.push(item);
+                    }
+                    resolve(yield this.startDownload(packagesList, results));
                 }
                 else {
-                    resolve(paths);
+                    resolve(results);
                 }
             }));
         });
@@ -1451,12 +1476,12 @@ class JspmCdnPaths {
         let logger$$ = logger.withType(`JSPM [${packageItem.FullName}]`);
         let asset = found.assets[assetIndex];
         let searchingFiles = new Array();
-        let originalName = packageItem.Details.OriginalName.toLowerCase();
+        let originalName = (packageItem.Details.OriginalName || packageItem.Details.Name).toLowerCase();
         searchingFiles.push(`${originalName}.min.js`);
         searchingFiles.push(`${originalName}.js`);
-        let foundFile = asset.files.find(x => searchingFiles.findIndex(y => y === x) !== -1);
+        let foundFile = searchingFiles.find(searchingFile => asset.files.findIndex(file => searchingFile === file) !== -1);
         if (foundFile !== undefined) {
-            logger$$.info(`File '${foundFile}' found.`);
+            logger$$.info(`File '${foundFile}' found in '${found.name}@${asset.version}'`);
             return this.buildCdnLinkWithCustomFile(link || found.latest, foundFile);
         }
         return undefined;
@@ -1531,7 +1556,23 @@ class JspmCdnPaths {
                     }
                 }
                 else {
-                    resolve(undefined);
+                    logger$$.info(`Package '${packageItem.Details.Name}' with original name was not found. Searching file in assets.`);
+                    let resolved = false;
+                    for (let i = 0; i < responseDto.results.length; i++) {
+                        let item = responseDto.results[i];
+                        let foundAsset = item.assets.findIndex(x => x.version === packageItem.Details.Version);
+                        if (foundAsset !== -1) {
+                            let resolvedItem = this.tryToResolveSplitedPackage(packageItem, foundAsset, item);
+                            if (resolvedItem !== undefined) {
+                                resolved = true;
+                                resolve(resolvedItem);
+                                break;
+                            }
+                        }
+                    }
+                    if (!resolved) {
+                        resolve(undefined);
+                    }
                 }
             }));
         });

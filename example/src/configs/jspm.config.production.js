@@ -2,7 +2,8 @@
 SystemJS.config({
     paths: {
     "npm:immutable@3.8.1": "//cdnjs.cloudflare.com/ajax/libs/immutable/3.8.1/immutable.min.js",
+    "npm:moment@2.14.1": "//cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js",
     "npm:react@15.2.1": "//cdnjs.cloudflare.com/ajax/libs/react/15.2.1/react.min.js",
-    "npm:react-dom@15.2.1": "//cdnjs.cloudflare.com/ajax/libs/react/15.2.1/react-dom.js"
+    "npm:react-dom@15.2.1": "//cdnjs.cloudflare.com/ajax/libs/react/15.2.1/react-dom.min.js"
 }
 });

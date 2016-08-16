@@ -31,4 +31,9 @@ export interface PackageItem {
     Details: PackageDetails;
 }
 
+export interface JspmPathsLists {
+    Resolved: Array<PackageItem>;
+    Unresolved: Array<PackageItem>;
+    Paths: JspmPaths;
+}
 export type JspmPaths = { [fullName: string]: string };
