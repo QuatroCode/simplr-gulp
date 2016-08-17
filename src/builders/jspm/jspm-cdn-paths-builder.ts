@@ -220,7 +220,7 @@ export default class JspmCdnPaths {
                 } else {
                     logger.info(`Not targeting the latest version '${found.version}', trying to find version '${packageItem.Details.Version}'`);
                     let assetIndex = found.assets.findIndex(x => x.version === packageItem.Details.Version);
-                    if (assetIndex !== undefined) {
+                    if (assetIndex !== -1) {
                         let asset = found.assets[assetIndex];
                         logger.info(`Version '${packageItem.Details.Version}' found.`);
                         let link = this.buildCdnLink(found.latest, found.version, packageItem.Details.Version);

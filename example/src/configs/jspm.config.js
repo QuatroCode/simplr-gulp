@@ -31,6 +31,7 @@ SystemJS.config({
     "process": "github:jspm/nodelibs-process@0.2.0-alpha",
     "react": "npm:react@15.2.1",
     "react-dom": "npm:react-dom@15.2.1",
+    "react-scroll": "npm:react-scroll@1.2.0",
     "stream": "github:jspm/nodelibs-stream@0.2.0-alpha",
     "string_decoder": "github:jspm/nodelibs-string_decoder@0.2.0-alpha",
     "url": "github:jspm/nodelibs-url@0.2.0-alpha",
@@ -318,6 +319,11 @@ SystemJS.config({
         "bn.js": "npm:bn.js@4.11.5",
         "inherits": "npm:inherits@2.0.1",
         "minimalistic-assert": "npm:minimalistic-assert@1.0.0"
+      }
+    },
+    "npm:react-scroll@1.2.0": {
+      "map": {
+        "object-assign": "npm:object-assign@4.1.0"
       }
     }
   }
