@@ -17,7 +17,10 @@ class Reporter implements ts.Reporter {
         if (error.tsFile) {
             let fileName = error.relativeFilename || error.tsFile.fileName;
             fileName = path.normalize(fileName);
-            Logger.withType("TS").error(`${fileName}[${error.startPosition.line}, ${error.startPosition.character}]: `, error.diagnostic.messageText);
+
+            let messageText = (typeof error.diagnostic.messageText === "string") ? error.diagnostic.messageText : error.diagnostic.messageText.messageText;
+
+            Logger.withType("TS").error(`${fileName}[${error.startPosition.line}, ${error.startPosition.character}]: `, messageText);
         } else {
             Logger.withType("TS").error(error.message);
         }
