@@ -1080,7 +1080,9 @@ class TypescriptBuilderCompiler {
 class Reporter {
     error(error) {
         if (error.tsFile) {
-            logger.withType("TS").error(`${error.relativeFilename}[${error.startPosition.line}, ${error.startPosition.character}]: `, error.diagnostic.messageText);
+            let fileName = error.relativeFilename || error.tsFile.fileName;
+            fileName = path.normalize(fileName);
+            logger.withType("TS").error(`${fileName}[${error.startPosition.line}, ${error.startPosition.character}]: `, error.diagnostic.messageText);
         }
         else {
             logger.withType("TS").error(error.message);
