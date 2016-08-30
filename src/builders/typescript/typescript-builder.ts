@@ -1,6 +1,7 @@
 import BuilderBase from '../builder-base';
 import Configuration from '../../configuration/configuration';
 import * as gulp from 'gulp';
+import * as path from 'path';
 import * as ts from 'gulp-typescript';
 import * as uglify from 'gulp-uglify';
 import * as sourcemaps from 'gulp-sourcemaps';
@@ -14,7 +15,12 @@ import Logger from '../../utils/logger';
 class Reporter implements ts.Reporter {
     error(error: any) {
         if (error.tsFile) {
-            Logger.withType("TS").error(`${error.relativeFilename}[${error.startPosition.line}, ${error.startPosition.character}]: `, error.diagnostic.messageText);
+            let fileName = error.relativeFilename || error.tsFile.fileName;
+            fileName = path.normalize(fileName);
+
+            let messageText = (typeof error.diagnostic.messageText === "string") ? error.diagnostic.messageText : error.diagnostic.messageText.messageText;
+
+            Logger.withType("TS").error(`${fileName}[${error.startPosition.line}, ${error.startPosition.character}]: `, messageText);
         } else {
             Logger.withType("TS").error(error.message);
         }
