@@ -46,7 +46,7 @@ class StylesBuilder extends BuilderBase<null> {
         if (!production) {
             sassResults = sassResults.pipe(sourcemaps.write());
         } else {
-            sassResults = sassResults.pipe(cleanCSS());
+            sassResults = sassResults.pipe(cleanCSS({ processImportFrom: ['local'] }));
         }
 
         sassResults.pipe(gulp.dest(Paths.Directories.BuildApp))
