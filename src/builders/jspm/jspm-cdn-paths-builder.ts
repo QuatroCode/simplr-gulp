@@ -199,6 +199,25 @@ export default class JspmCdnPaths {
         return undefined;
     }
 
+    private checkIfFileExist(files: Array<string>, link: string, fileName: string) {
+        let resultObj = {
+            Found: false,
+            Link: link
+        };
+        files.forEach(originalName => {
+            if (originalName === fileName) {
+                resultObj.Found = true;
+                return false;
+            } else if (originalName.toLocaleLowerCase() === fileName) {
+                resultObj.Found = true;
+                let parsedFile = path.parse(link);
+                resultObj.Link = parsedFile.dir + "/" + originalName;
+                return false;
+            }
+        });
+        return resultObj;
+    }
+
     private async getLinkFromResponseByVersion(packageItem: PackageItem, responseDto: CdnJsApi.ResponseDto, splited: boolean) {
         let logger = Logger.withType(`JSPM [${packageItem.FullName}]`);
 
@@ -228,13 +247,21 @@ export default class JspmCdnPaths {
                             if (splited) {
                                 resolve(this.tryToResolveSplitedPackage(packageItem, assetIndex, found, link));
                             } else {
-                                let fileName = path.parse(link).base;
-                                logger.info(`Checking file '${fileName}'`);
-                                if (asset.files.findIndex(x => x === fileName) !== -1) {
-                                    logger.info(`File '${fileName}' found.`);
-                                    resolve(link);
+
+                                let checkFile = path.parse(link).base;
+                                logger.info(`Checking file '${checkFile}'`);
+                                let results = this.checkIfFileExist(asset.files, link, checkFile);
+                                if (!results.Found && checkFile.indexOf("-") !== -1) {
+                                    logger.info(`Checking file '${checkFile}'`);
+                                    checkFile = checkFile.split("-").join("");
+                                    results = this.checkIfFileExist(asset.files, link, checkFile);
+                                }
+
+                                if (results.Found) {
+                                    logger.info(`File successfully found.`);
+                                    resolve(results.Link);
                                 } else {
-                                    logger.info(`File '${fileName}' does not exist in '${packageItem.Details.Version}' version.`);
+                                    logger.info(`File does not found in '${packageItem.Details.Version}' version.`);
                                     resolve(undefined);
                                 }
                             }
