@@ -46,11 +46,11 @@ export default class TypescriptBuilderCompiler {
     }
 
     private generateSrc(include: Array<string>, exclude: Array<string> | undefined): Array<string> {
-        let src = include;
-        if (exclude !== undefined) {
-            src = exclude.concat(src);
+        if (exclude == null) {
+            return include;
+        } else {
+            return include.concat(exclude);
         }
-        return src;
     }
 
     private generateInclude(include: Array<string> | undefined, rootDir: string): Array<string> {

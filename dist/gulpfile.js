@@ -1019,11 +1019,12 @@ class TypescriptBuilderCompiler {
         });
     }
     generateSrc(include, exclude) {
-        let src = include;
-        if (exclude !== undefined) {
-            src = exclude.concat(src);
+        if (exclude == null) {
+            return include;
         }
-        return src;
+        else {
+            return include.concat(exclude);
+        }
     }
     generateInclude(include, rootDir) {
         if (include != null) {
@@ -1156,7 +1157,7 @@ class StylesBuilder extends BuilderBase$1 {
             sassResults = sassResults.pipe(sourcemaps.write());
         }
         else {
-            sassResults = sassResults.pipe(cleanCSS());
+            sassResults = sassResults.pipe(cleanCSS({ processImportFrom: ['local'] }));
         }
         sassResults.pipe(gulp.dest(Paths$1.Directories.BuildApp))
             .on('end', done);
