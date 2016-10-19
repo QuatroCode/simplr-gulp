@@ -10,7 +10,7 @@ export default class BuildConfigsFoldersTask extends TaskBase {
     Description = "Copies configs folder from source to build directory";
 
     TaskFunction = (production: boolean) => {
-        return gulp.src(Paths.Builders.OneDirectory.InSource(path.join("configs", "**", "*")))
+        return gulp.src(Paths.Builders.OneDirectory.InSource(["configs", "**", "*"].join("/")))
             .pipe(gulp.dest(path.join(Paths.Directories.Build, "configs")));
     }
 

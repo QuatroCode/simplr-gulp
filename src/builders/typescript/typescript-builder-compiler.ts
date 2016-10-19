@@ -2,6 +2,7 @@ import * as ts from 'gulp-typescript';
 import Paths from '../../paths/paths';
 import * as path from 'path';
 import Logger from '../../utils/logger';
+import { FixSeparator } from '../../utils/helpers';
 
 interface TsConfig extends ts.TsConfig {
     include?: Array<string>;
@@ -46,16 +47,20 @@ export default class TypescriptBuilderCompiler {
     }
 
     private generateSrc(include: Array<string>, exclude: Array<string> | undefined): Array<string> {
-        if (exclude == null) {
-            return include;
-        } else {
-            return include.concat(exclude);
+        let results = include;
+        if (exclude != null) {
+            results = results.concat(exclude);
+
         }
+        return results.map(src => {
+            return FixSeparator(src);
+        });
     }
 
     private generateInclude(include: Array<string> | undefined, rootDir: string): Array<string> {
+        let results: Array<string>;
         if (include != null) {
-            let tempInclude = include.map(inc => {
+            let resultInclude = include.map(inc => {
                 if (inc !== undefined) {
                     if (path.extname(inc).length === 0) {
                         return this.addAvailableTsExtensions(inc);
@@ -63,13 +68,18 @@ export default class TypescriptBuilderCompiler {
                         return inc;
                     }
                 }
+            }).filter(x => x != null) as Array<string>;
+            resultInclude = resultInclude.map(src => {
+                return FixSeparator(src);
             });
-            let resultInclude = tempInclude.filter(x => x != null) as Array<string>;
-            resultInclude.push(rootDir);
-            return resultInclude;
+            if (resultInclude.indexOf(rootDir) === -1) {
+                resultInclude.push(rootDir);
+            }
+            results = resultInclude;
         } else {
-            return [rootDir];
+            results = [FixSeparator(rootDir)];
         }
+        return results;
     }
 
     private generateExclude(exclude: Array<string> | undefined): Array<string> | undefined {
@@ -91,7 +101,7 @@ export default class TypescriptBuilderCompiler {
 
     private generateRootDir(rootDir: string | undefined): string {
         if (rootDir != null) {
-            return path.join(rootDir, "**", "*", this.addAvailableTsExtensions());
+            return [rootDir, "**", `*${this.addAvailableTsExtensions()}`].join("/");
         } else {
             return Paths.Builders.AllFiles.InSource(this.addAvailableTsExtensions());
         }
@@ -102,7 +112,7 @@ export default class TypescriptBuilderCompiler {
     }
 
     private addAvailableTsExtensions(name: string = ""): string {
-        return path.join(name + ".{ts,tsx}");
+        return name + ".{ts,tsx}";
     }
 
 }

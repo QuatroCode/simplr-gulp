@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 
 /**
  * Write JSON object to file
@@ -86,3 +87,19 @@ export function GetClassName(constructor: Function) {
 export function ReplaceAll(content: string, regexSearch: RegExp | string, replace: string) {
     return content.replace(new RegExp(regexSearch as string), replace);
 };
+
+
+export function FixSeparator(link: string) {
+    const correctSep = "/";
+    let wrongSeps = ["\\"];
+    if (path.sep !== correctSep && wrongSeps.indexOf(path.sep) === -1) {
+        wrongSeps.push(path.sep);
+    }
+    for (let i = 0; i < wrongSeps.length; i++) {
+        let wrongSep = wrongSeps[i];
+        while (link.indexOf(wrongSep) !== -1) {
+            link = link.replace(wrongSep, correctSep);
+        }
+    }
+    return link;
+}

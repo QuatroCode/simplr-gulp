@@ -22,6 +22,10 @@ abstract class BuilderBase {
         let startPath = Paths.Directories.BuildApp;
         return this.builder(startPath, param);
     }
+
+    protected joinPaths(...pathsList: Array<string>): string {
+        return pathsList.join("/");
+    }
 }
 
 export default BuilderBase;

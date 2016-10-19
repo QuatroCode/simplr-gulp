@@ -4,8 +4,8 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 
 var fs = require('fs');
 var Colors = require('colors/safe');
-var gulp = require('gulp');
 var path = require('path');
+var gulp = require('gulp');
 var express = require('express');
 var http = require('http');
 var child_process = require('child_process');
@@ -56,6 +56,20 @@ function GetClassName(constructor) {
         }
     }
     return "";
+}
+function FixSeparator(link) {
+    const correctSep = "/";
+    let wrongSeps = ["\\"];
+    if (path.sep !== correctSep && wrongSeps.indexOf(path.sep) === -1) {
+        wrongSeps.push(path.sep);
+    }
+    for (let i = 0; i < wrongSeps.length; i++) {
+        let wrongSep = wrongSeps[i];
+        while (link.indexOf(wrongSep) !== -1) {
+            link = link.replace(wrongSep, correctSep);
+        }
+    }
+    return link;
 }
 
 var LogType;
@@ -522,9 +536,9 @@ class DirectoriesBuilder {
     constructor() {
         this.gulpConfig = Configuration.GulpConfig;
         this.Source = this.gulpConfig.Directories.Source;
-        this.SourceApp = path.join(this.Source, this.gulpConfig.Directories.App);
+        this.SourceApp = [this.Source, this.gulpConfig.Directories.App].join("/");
         this.Build = this.gulpConfig.Directories.Build;
-        this.BuildApp = path.join(this.Build, this.gulpConfig.Directories.App);
+        this.BuildApp = [this.Build, this.gulpConfig.Directories.App].join("/");
     }
 }
 
@@ -545,15 +559,18 @@ class BuilderBase {
         let startPath = Paths$1.Directories.BuildApp;
         return this.builder(startPath, param);
     }
+    joinPaths(...pathsList) {
+        return pathsList.join("/");
+    }
 }
 
 class AllFilesBuilder extends BuilderBase {
     builder(startPath, name) {
         if (name !== undefined) {
-            return path.join(startPath, '**', '*' + name);
+            return this.joinPaths(startPath, '**', '*' + name);
         }
         else {
-            return path.join(startPath, '**', '*');
+            return this.joinPaths(startPath, '**', '*');
         }
     }
 }
@@ -561,7 +578,7 @@ class AllFilesBuilder extends BuilderBase {
 class OneFileBuilder extends BuilderBase {
     builder(startPath, name) {
         if (name !== undefined) {
-            return path.join(startPath, name);
+            return this.joinPaths(startPath, name);
         }
         else {
             return startPath;
@@ -572,10 +589,10 @@ class OneFileBuilder extends BuilderBase {
 class AllDirectoriesBuilder extends BuilderBase {
     builder(startPath, name) {
         if (name !== undefined) {
-            return path.join(startPath, "**", name, "**", "*");
+            return this.joinPaths(startPath, "**", name, "**", "*");
         }
         else {
-            return path.join(startPath, "**", "*");
+            return this.joinPaths(startPath, "**", "*");
         }
     }
 }
@@ -583,7 +600,7 @@ class AllDirectoriesBuilder extends BuilderBase {
 class OneDirectoryBuilder extends BuilderBase {
     builder(startPath, name) {
         if (name != null) {
-            return path.join(startPath, name);
+            return this.joinPaths(startPath, name);
         }
         else {
             return startPath;
@@ -918,7 +935,7 @@ class BuildConfigsFoldersTask extends TaskBase {
         this.Name = "Build.Configs.Folders";
         this.Description = "Copies configs folder from source to build directory";
         this.TaskFunction = (production) => {
-            return gulp.src(Paths$1.Builders.OneDirectory.InSource(path.join("configs", "**", "*")))
+            return gulp.src(Paths$1.Builders.OneDirectory.InSource(["configs", "**", "*"].join("/")))
                 .pipe(gulp.dest(path.join(Paths$1.Directories.Build, "configs")));
         };
     }
@@ -1019,16 +1036,18 @@ class TypescriptBuilderCompiler {
         });
     }
     generateSrc(include, exclude) {
-        if (exclude == null) {
-            return include;
+        let results = include;
+        if (exclude != null) {
+            results = results.concat(exclude);
         }
-        else {
-            return include.concat(exclude);
-        }
+        return results.map(src => {
+            return FixSeparator(src);
+        });
     }
     generateInclude(include, rootDir) {
+        let results;
         if (include != null) {
-            let tempInclude = include.map(inc => {
+            let resultInclude = include.map(inc => {
                 if (inc !== undefined) {
                     if (path.extname(inc).length === 0) {
                         return this.addAvailableTsExtensions(inc);
@@ -1037,14 +1056,19 @@ class TypescriptBuilderCompiler {
                         return inc;
                     }
                 }
+            }).filter(x => x != null);
+            resultInclude = resultInclude.map(src => {
+                return FixSeparator(src);
             });
-            let resultInclude = tempInclude.filter(x => x != null);
-            resultInclude.push(rootDir);
-            return resultInclude;
+            if (resultInclude.indexOf(rootDir) === -1) {
+                resultInclude.push(rootDir);
+            }
+            results = resultInclude;
         }
         else {
-            return [rootDir];
+            results = [FixSeparator(rootDir)];
         }
+        return results;
     }
     generateExclude(exclude) {
         if (exclude != null) {
@@ -1064,7 +1088,7 @@ class TypescriptBuilderCompiler {
     }
     generateRootDir(rootDir) {
         if (rootDir != null) {
-            return path.join(rootDir, "**", "*", this.addAvailableTsExtensions());
+            return [rootDir, "**", `*${this.addAvailableTsExtensions()}`].join("/");
         }
         else {
             return Paths$1.Builders.AllFiles.InSource(this.addAvailableTsExtensions());
@@ -1074,7 +1098,7 @@ class TypescriptBuilderCompiler {
         return outDir || Paths$1.Directories.Build;
     }
     addAvailableTsExtensions(name = "") {
-        return path.join(name + ".{ts,tsx}");
+        return name + ".{ts,tsx}";
     }
 }
 
@@ -1098,8 +1122,8 @@ class TypescriptBuilder extends BuilderBase$1 {
     }
     build(production, builder, done) {
         let dTsFilter = filter(["*", "!**/*.d.ts"], { restore: true });
-        let tsResult = gulp.src(builder.Config.Src)
-            .pipe(dTsFilter)
+        let tsSrc = gulp.src(builder.Config.Src);
+        let tsResult = tsSrc.pipe(dTsFilter)
             .pipe(tslint({
             formatter: ErrorHandler
         }))
@@ -1359,7 +1383,7 @@ class JspmCdnPaths {
         return __awaiter(this, void 0, void 0, function* () {
             let logger$$ = logger.withType("JSPM");
             return new Promise(resolve => {
-                let pathname = path.join(Paths$1.Directories.Source, "configs", "jspm.config.production.js");
+                let pathname = [Paths$1.Directories.Source, "configs", "jspm.config.production.js"].join("/");
                 logger$$.info(`Generating file '${pathname}'`);
                 let data = [
                     "/* Generated by simplr-gulp */",
@@ -1553,6 +1577,7 @@ class JspmCdnPaths {
                                     logger$$.info(`Checking file '${checkFile}'`);
                                     let results = this.checkIfFileExist(asset.files, link, checkFile);
                                     if (!results.Found && checkFile.indexOf("-") !== -1) {
+                                        logger$$.info(`Checking file '${checkFile}'`);
                                         checkFile = checkFile.split("-").join("");
                                         results = this.checkIfFileExist(asset.files, link, checkFile);
                                     }
