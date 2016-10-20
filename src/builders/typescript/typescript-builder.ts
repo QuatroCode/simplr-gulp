@@ -33,13 +33,13 @@ class TypescriptBuilder extends BuilderBase<TypescriptBuilderCompiler> {
 
     protected build(production: boolean, builder: TypescriptBuilderCompiler, done: () => void) {
 
-        let dTsFilter = filter(["*", "!**/*.d.ts"], { restore: true });
+        let tsFilter = filter(["**/*.ts", "!**/*.d.ts"], { restore: true });
         let tsSrc = gulp.src(builder.Config.Src);
-        let tsResult = tsSrc.pipe(dTsFilter)
+        let tsResult = tsSrc.pipe(tsFilter)
             .pipe(tslint({
                 formatter: TsLintFormatter
             }))
-            .pipe(dTsFilter.restore)
+            .pipe(tsFilter.restore)
             .pipe(ts(builder.Project, undefined, this.reporter)).js;
 
         if (production) {

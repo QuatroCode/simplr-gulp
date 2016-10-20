@@ -1121,13 +1121,13 @@ class TypescriptBuilder extends BuilderBase$1 {
         this.reporter = new Reporter();
     }
     build(production, builder, done) {
-        let dTsFilter = filter(["*", "!**/*.d.ts"], { restore: true });
+        let tsFilter = filter(["**/*.ts", "!**/*.d.ts"], { restore: true });
         let tsSrc = gulp.src(builder.Config.Src);
-        let tsResult = tsSrc.pipe(dTsFilter)
+        let tsResult = tsSrc.pipe(tsFilter)
             .pipe(tslint({
             formatter: ErrorHandler
         }))
-            .pipe(dTsFilter.restore)
+            .pipe(tsFilter.restore)
             .pipe(ts(builder.Project, undefined, this.reporter)).js;
         if (production) {
             tsResult = tsResult.pipe(uglify({ mangle: true }));
