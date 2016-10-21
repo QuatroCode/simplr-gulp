@@ -1127,15 +1127,14 @@ class TypescriptBuilder extends BuilderBase$1 {
             .pipe(tslint({
             formatter: ErrorHandler
         }))
-            .pipe(tsFilter.restore)
-            .pipe(ts(builder.Project, undefined, this.reporter)).js;
-        if (production) {
-            tsResult = tsResult.pipe(uglify({ mangle: true }));
+            .pipe(tsFilter.restore);
+        if (!production) {
+            tsResult = tsResult.pipe(sourcemaps.init());
         }
-        else {
-            tsResult = tsResult.pipe(sourcemaps.init()).pipe(sourcemaps.write());
-        }
-        tsResult.pipe(gulp.dest(builder.Config.OutDir)).on("end", done);
+        tsResult = tsResult.pipe(ts(builder.Project, undefined, this.reporter)).js;
+        tsResult.pipe((production) ? uglify({ mangle: true }) : sourcemaps.write())
+            .pipe(gulp.dest(builder.Config.OutDir))
+            .on("end", done);
     }
     initBuilder(production) {
         if (production) {
