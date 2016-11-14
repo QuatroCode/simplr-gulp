@@ -9,7 +9,7 @@ import * as tinyLr from 'tiny-lr';
 import ActionsEmitter, { } from './utils/actions-emitter';
 import { ReloadFiles, ReloadPage } from './actions/live-reload/live-reload-actions';
 
-export default class ServerStaRrter {
+export default class ServerStarter {
     public server = express();
     public liveReloadServer = tinyLr({});
 
