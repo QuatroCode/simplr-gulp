@@ -524,11 +524,45 @@ class WatchTaskBase extends TaskBase {
             if (production) {
                 taskName = this.addTasksProductionSuffix(taskName);
             }
-            return gulp.parallel(taskName)(done);
+            return gulp.parallel(this.getStarterFunction(taskName), taskName)(() => {
+                this.emit("end");
+                done();
+            });
         };
+        this.listeners = {};
+        this.uniqId = 0;
+    }
+    getStarterFunction(taskName) {
+        let func = (done) => {
+            this.emit("start");
+            done();
+        };
+        func.displayName = taskName + ".Starter";
+        return func;
     }
     addTasksProductionSuffix(text) {
         return text + ":Production";
+    }
+    get UniqueId() {
+        return this.uniqId++;
+    }
+    On(eventName, callback) {
+        let id = this.UniqueId;
+        this.listeners[id] = { Callback: callback, Event: eventName };
+        return { remove: this.removeListener.bind(this, id) };
+    }
+    emit(eventName, ...params) {
+        Object.keys(this.listeners).forEach(key => {
+            let listener = this.listeners[key];
+            if (listener.Event === eventName) {
+                listener.Callback(params);
+            }
+        });
+    }
+    removeListener(id) {
+        if (this.listeners[id] != null) {
+            delete this.listeners[id];
+        }
     }
 }
 
@@ -674,10 +708,24 @@ class WatcherTasksHandler extends TasksHandler {
             return config;
         });
         this.watchers = {};
+        this.runningTasks = new Array();
+        this.onTaskStart = (taskName) => {
+            this.runningTasks.push(taskName);
+        };
+        this.onTaskEnd = (taskName) => {
+            let found = this.runningTasks.indexOf(taskName);
+            if (found > -1) {
+                this.runningTasks.splice(found, 1);
+            }
+            if (this.runningTasks.length === 0) {
+                this.onAllTaskEnded();
+            }
+        };
+        this.pendingReloadFiles = new Array();
         this.fileChangeHandler = (pathName, stats) => {
             let targetPathName = this.removeRootSourcePath(pathName);
             targetPathName = this.changeExtensionToBuilded(targetPathName);
-            LiveReloadActionsCreators$1.ReloadFiles(targetPathName);
+            this.pendingReloadFiles.push(targetPathName);
             logger.log(`'${pathName}' was changed.`);
         };
         this.fileUnlinkHandler = (pathName) => {
@@ -703,10 +751,17 @@ class WatcherTasksHandler extends TasksHandler {
     registerWatchers() {
         Object.keys(this.constructedTasks).forEach(name => {
             let task = this.constructedTasks[name];
-            this.watchers[task.Name] = gulp.watch(task.Globs, gulp.parallel(this.generateName(task.Name)));
+            let process = gulp.parallel(this.generateName(task.Name));
+            this.watchers[task.Name] = gulp.watch(task.Globs, process);
             this.watchers[task.Name].on('unlink', this.fileUnlinkHandler);
             this.watchers[task.Name].on('change', this.fileChangeHandler);
+            task.On("start", this.onTaskStart.bind(this, task.Name));
+            task.On("end", this.onTaskEnd.bind(this, task.Name));
         });
+    }
+    onAllTaskEnded() {
+        LiveReloadActionsCreators$1.ReloadFiles(...this.pendingReloadFiles);
+        this.pendingReloadFiles = new Array();
     }
     removeRootSourcePath(pathName) {
         let pathList = pathName.split(path.sep);
@@ -742,7 +797,7 @@ class WatcherTasksHandler extends TasksHandler {
     }
 }
 
-class ServerStaRrter {
+class ServerStarter {
     constructor() {
         this.server = express();
         this.liveReloadServer = tinyLr({});
@@ -824,13 +879,23 @@ class DefaultTask extends TaskBase {
         this.Name = "default";
         this.Description = "Build and start Watch with Server tasks.";
         this.TaskFunction = (production, done) => {
-            gulp.parallel("Build")(() => { this.startWatcherWithServer(done); });
+            if (this.startWithoutBuild) {
+                this.startWatcherWithServer(done);
+            }
+            else {
+                gulp.parallel("Build")(() => {
+                    this.startWatcherWithServer(done);
+                });
+            }
         };
     }
     startWatcherWithServer(done) {
         new WatcherTasksHandler();
-        new ServerStaRrter();
+        new ServerStarter();
         done();
+    }
+    get startWithoutBuild() {
+        return (process.argv.findIndex(x => x === "--no-build") !== -1);
     }
 }
 

@@ -34,20 +34,45 @@ export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
     private registerWatchers() {
         Object.keys(this.constructedTasks).forEach(name => {
             let task = this.constructedTasks[name];
-            this.watchers[task.Name] = gulp.watch(task.Globs, gulp.parallel(this.generateName(task.Name)));
-
+            let process = gulp.parallel(this.generateName(task.Name));
+            this.watchers[task.Name] = gulp.watch(task.Globs, process);
             this.watchers[task.Name].on('unlink', this.fileUnlinkHandler);
             this.watchers[task.Name].on('change', this.fileChangeHandler);
+            task.On("start", this.onTaskStart.bind(this, task.Name));
+            task.On("end", this.onTaskEnd.bind(this, task.Name));
         });
     }
+
+    private runningTasks = new Array<string>();
+
+    private onTaskStart = (taskName: string) => {
+        this.runningTasks.push(taskName);
+    }
+
+    private onTaskEnd = (taskName: string) => {
+        let found = this.runningTasks.indexOf(taskName);
+        if (found > -1) {
+            this.runningTasks.splice(found, 1);
+        }
+        if (this.runningTasks.length === 0) {
+            this.onAllTaskEnded();
+        }
+    }
+
+    private onAllTaskEnded() {
+        LiveReloadActionsCreators.ReloadFiles(...this.pendingReloadFiles);
+        this.pendingReloadFiles = new Array();
+    }
+
+    private pendingReloadFiles = new Array<string>();
 
     private fileChangeHandler = (pathName: string, stats: fs.Stats) => {
         let targetPathName = this.removeRootSourcePath(pathName);
         targetPathName = this.changeExtensionToBuilded(targetPathName);
-        LiveReloadActionsCreators.ReloadFiles(targetPathName);
-        Logger.log(`'${pathName}' was changed.`); 
+        this.pendingReloadFiles.push(targetPathName);
+        Logger.log(`'${pathName}' was changed.`);
     }
-    
+
 
     private fileUnlinkHandler = (pathName: string) => {
         let targetPathName = this.changeExtensionToBuilded(pathName);
@@ -93,10 +118,8 @@ export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
             pathList[0] = Configuration.GulpConfig.Directories.Build;
             return path.join(...pathList);
         } else {
-            Logger.warn(`WarcherTasksHandler.changeRootPathToBuild(): "${pathName}" path root is not under Source directory (${Configuration.GulpConfig.Directories.Source }) `);
+            Logger.warn(`WarcherTasksHandler.changeRootPathToBuild(): "${pathName}" path root is not under Source directory (${Configuration.GulpConfig.Directories.Source}) `);
             return pathName;
         }
     }
-
-    //TODO: Implement onDone
 }
