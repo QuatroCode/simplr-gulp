@@ -10,12 +10,22 @@ export default class DefaultTask extends TaskBase {
     Description = "Build and start Watch with Server tasks.";
 
     TaskFunction = (production: boolean, done: () => void) => {
-        gulp.parallel("Build")(() => { this.startWatcherWithServer(done); });
+        if (this.startWithoutBuild) {
+            this.startWatcherWithServer(done);
+        } else {
+            gulp.parallel("Build")(() => {
+                this.startWatcherWithServer(done);
+            });
+        }
     }
 
     private startWatcherWithServer(done: () => void) {
         new WatcherTasksHandler();
         new Server();
         done();
+    }
+
+    private get startWithoutBuild() {
+        return (process.argv.findIndex(x => x === "--no-build") !== -1);
     }
 }
