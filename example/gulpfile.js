@@ -20,6 +20,7 @@ var tslint = _interopDefault(require('gulp-tslint'));
 var Lint = require('tslint/lib/lint');
 var cleanCSS = require('gulp-clean-css');
 var sass = require('gulp-sass');
+var autoprefixer = require('gulp-autoprefixer');
 var rimraf = require('rimraf');
 var jspm = require('jspm');
 var https = require('https');
@@ -1241,6 +1242,7 @@ class StylesBuilder extends BuilderBase$1 {
             this.errorHandler(error);
             done();
         }));
+        sassResults = sassResults.pipe(autoprefixer());
         if (!production) {
             sassResults = sassResults.pipe(sourcemaps.write());
         }

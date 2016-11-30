@@ -3,6 +3,7 @@ import Paths from '../../paths/paths';
 import * as gulp from 'gulp';
 import * as cleanCSS from 'gulp-clean-css';
 import * as sass from 'gulp-sass';
+import * as autoprefixer from "gulp-autoprefixer";
 import * as sourcemaps from 'gulp-sourcemaps';
 import Logger from '../../utils/logger';
 import { Duplex } from 'stream';
@@ -42,6 +43,8 @@ class StylesBuilder extends BuilderBase<null> {
                     done();
                 })
             );
+
+        sassResults = sassResults.pipe(autoprefixer());
 
         if (!production) {
             sassResults = sassResults.pipe(sourcemaps.write());
