@@ -34,7 +34,7 @@
     "rollup-plugin-typescript": "0.7.7",
     "rollup-watch": "2.5.0",
     "tslint": "3.14.0",
-    "typescript": "2.0.0",
+    "typescript": "^2.1.4",
     "typings": "2.0.0"
   },
   "peerDependencies": {

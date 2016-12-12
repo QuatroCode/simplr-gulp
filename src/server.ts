@@ -4,6 +4,8 @@ import { RequestHandler } from 'express-serve-static-core';
 import Logger from './utils/logger';
 import Configuration from './configuration/configuration';
 import { spawn } from 'child_process';
+import { exec } from 'child_process';
+import * as path from "path";
 import * as connectLiveReload from 'connect-livereload';
 import * as tinyLr from 'tiny-lr';
 import ActionsEmitter, { } from './utils/actions-emitter';
@@ -73,7 +75,28 @@ export default class ServerStarter {
 
     private openBrowser(serverUrl: string) {
         if (!this.isQuiet) {
-            spawn('explorer', [serverUrl]);
+            let opener = '';
+            switch (process.platform) {
+                case 'darwin':
+                    opener = 'open';
+                    break;
+                case 'win32':
+                    opener = 'start ""';
+                    break;
+                default:
+                    opener = path.join(__dirname, '../vendor/xdg-open');
+                    break;
+            }
+
+            if (process.env.SUDO_USER) {
+                opener = `sudo -u ${process.env.SUDO_USER} ${opener}`;
+            }
+            try {
+                exec(`opener "${serverUrl}"`);
+            } catch (error) {
+                Logger.error("Error with openBrowser.", error);
+                Logger.info("Please create new issue here: https://github.com/quatrocode/simplr-gulp/issues");
+            }
         }
     }
 
