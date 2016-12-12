@@ -3,7 +3,6 @@ import * as http from 'http';
 import { RequestHandler } from 'express-serve-static-core';
 import Logger from './utils/logger';
 import Configuration from './configuration/configuration';
-import { spawn } from 'child_process';
 import { exec } from 'child_process';
 import * as path from "path";
 import * as connectLiveReload from 'connect-livereload';

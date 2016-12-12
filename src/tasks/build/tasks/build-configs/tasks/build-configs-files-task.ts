@@ -60,7 +60,7 @@ export default class BuildConfigsFilesTask extends TaskBase {
                 var regex = /SystemJS\.config\(({[\s\S.]*?})\)/;
                 var json = content.match(regex);
                 if (json != null) {
-                    let jsonObj: { [key: string]: any } | undefined = undefined;
+                    let jsonObj: any | undefined;
                     try {
                         eval('jsonObj = ' + json[1]);
                         if (jsonObj != null) {
