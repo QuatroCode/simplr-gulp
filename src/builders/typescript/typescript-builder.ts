@@ -45,7 +45,7 @@ class TypescriptBuilder extends BuilderBase<TypescriptBuilderCompiler> {
             tsResult = tsResult.pipe(sourcemaps.init());
         }
 
-        tsResult = tsResult.pipe(ts(builder.Project, undefined, this.reporter)).js;
+        tsResult = builder.Project.src().pipe((builder.Project as any)(this.reporter)).js;
 
         tsResult.pipe((production) ? uglify({ mangle: true }) : sourcemaps.write())
             .pipe(gulp.dest(builder.Config.OutDir))
