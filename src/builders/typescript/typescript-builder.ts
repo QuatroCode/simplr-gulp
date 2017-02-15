@@ -34,7 +34,7 @@ class TypescriptBuilder extends BuilderBase<TypescriptBuilderCompiler> {
     protected build(production: boolean, builder: TypescriptBuilderCompiler, done: () => void) {
 
         let tsFilter = filter(["**/*", "!**/*.d.ts"], { restore: true });
-        let tsSrc = gulp.src(builder.Config.Src);
+        let tsSrc = builder.Project.src();
         let tsResult = tsSrc.pipe(tsFilter)
             .pipe(tslint({
                 formatter: TsLintFormatter
@@ -45,7 +45,7 @@ class TypescriptBuilder extends BuilderBase<TypescriptBuilderCompiler> {
             tsResult = tsResult.pipe(sourcemaps.init());
         }
 
-        tsResult = builder.Project.src().pipe((builder.Project as any)(this.reporter)).js;
+        tsResult = tsResult.pipe((builder.Project as any)(this.reporter)).js;
 
         tsResult.pipe((production) ? uglify({ mangle: true }) : sourcemaps.write())
             .pipe(gulp.dest(builder.Config.OutDir))
