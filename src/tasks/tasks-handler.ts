@@ -54,73 +54,68 @@ abstract class TasksHandler<T extends Task> {
 
     private registerTasks(tasks: Array<TaskConstructor<T>>) {
         let constructedTasks: { [name: string]: T } = {};
-        if (tasks != null && tasks.length > 0) {
-            tasks.forEach(task => {
-                let constructedTask = new task();
-                let fullName = this.generateName(constructedTask.Name);
-                if (constructedTasks[fullName] != null) {
-                    Logger.warn(`(${this._moduleName}) Task "${fullName}" already exist.`);
-                } else {
-                    constructedTasks[fullName] = constructedTask;
-                    this.registerTaskFunction(fullName, false, constructedTask);
-                    if (this.configuration.WithProduction) {
-                        this.registerTaskFunction(`${fullName}:Production`, true, constructedTask);
-                    }
-                }
-            });
-        } else {
+
+        if (tasks == null || tasks.length === 0) {
             Logger.warn(`(${this._moduleName}) The tasks list is empty.`);
+            return constructedTasks;
         }
+
+        tasks.forEach(task => {
+            let constructedTask = new task();
+            let fullName = this.generateName(constructedTask.Name);
+            if (constructedTasks[fullName] != null) {
+                Logger.warn(`(${this._moduleName}) Task "${fullName}" already exist.`);
+            } else {
+                constructedTasks[fullName] = constructedTask;
+                this.registerTaskFunction(fullName, false, constructedTask);
+                if (this.configuration.WithProduction) {
+                    this.registerTaskFunction(`${fullName}:Production`, true, constructedTask);
+                }
+            }
+        });
+
         return constructedTasks;
     }
 
     private registerTaskFunction(name: string, production: boolean, constructedTask: T) {
-        let func: gulp.TaskFunction = (done: () => void) => {
-            let taskRunner = constructedTask.TaskFunction(production, done);
-            if (taskRunner !== undefined) {
-                if (taskRunner instanceof Promise) {
-                    taskRunner.then(() => {
-                        done();
-                    });
-                } else {
-                    return taskRunner;
-                }
-            }
-        };
-
+        let func: gulp.TaskFunction = constructedTask.TaskFunction.bind(this, production);
         func.displayName = name;
         if (constructedTask.Description != null && !production) {
             func.description = "# " + constructedTask.Description;
         }
-
-        gulp.task(func);
+        gulp.task(name, func);
     }
+
 
     private loadTasksHandlers(tasksHandlers: Array<TasksHandlerContructor<TasksHandler<any>>>) {
         let constructedTasksHander: { [name: string]: TasksHandler<any> } = {};
-        if (tasksHandlers != null && tasksHandlers.length > 0) {
-            tasksHandlers.forEach(handler => {
-                let taskHandler = new handler();
-                let fullName = taskHandler.TaskName;
-                if (constructedTasksHander[fullName] != null) {
-                    Logger.warn(`(${this._moduleName}) Task handler "${fullName}" already exist.`);
-                } else {
-                    constructedTasksHander[fullName] = taskHandler;
-                }
-            });
+        if (tasksHandlers == null || tasksHandlers.length === 0) {
+            return constructedTasksHander;
         }
+
+        tasksHandlers.forEach(handler => {
+            let taskHandler = new handler();
+            let fullName = taskHandler.TaskName;
+            if (constructedTasksHander[fullName] != null) {
+                Logger.warn(`(${this._moduleName}) Tasks handler "${fullName}" already exist.`);
+            } else {
+                constructedTasksHander[fullName] = taskHandler;
+            }
+        });
         return constructedTasksHander;
     }
 
     private registerMainTask() {
-        if (this.configuration.Name != null && this.configuration.Name.length > 0) {
-            let method = (this.configuration.TasksAsync) ? gulp.parallel : gulp.series;
-            let tasksList = Object.keys(this.constructedTasks).concat(Object.keys(this.constructedTasksHander));
-            gulp.task(this.configuration.Name, method(tasksList));
-            if (this.configuration.WithProduction) {
-                let tasksListProduction = tasksList.map(x => { return `${x}:Production`; });
-                gulp.task(this.configuration.Name + ':Production', method(tasksListProduction));
-            }
+        if (this.configuration.Name == null || this.configuration.Name.length === 0) {
+            return;
+        }
+
+        let method = this.configuration.TasksAsync ? gulp.parallel : gulp.series;
+        let tasksList = Object.keys(this.constructedTasks).concat(Object.keys(this.constructedTasksHander));
+        gulp.task(this.configuration.Name, method(tasksList));
+        if (this.configuration.WithProduction) {
+            let tasksListProduction = tasksList.map(x => { return `${x}:Production`; });
+            gulp.task(`${this.configuration.Name}:Production`, method(tasksListProduction));
         }
     }
 
