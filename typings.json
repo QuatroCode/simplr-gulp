@@ -23,7 +23,6 @@
     "glob-stream": "registry:dt/glob-stream#3.1.12+20160316155526",
     "gulp-autoprefixer": "registry:dt/gulp-autoprefixer#0.0.0+20160316155526",
     "gulp-clean-css": "https://gist.githubusercontent.com/GiedriusGrabauskas/7e9407a92178bccd7e7db2336bc36424/raw/032223e3875742209764b68bfe64a05c39416634/gulp-clean-css.d.ts",
-    "gulp-filter": "registry:dt/gulp-filter#3.0.1+20160316155526",
     "gulp-sass": "registry:dt/gulp-sass#0.0.0+20160316155526",
     "gulp-sourcemaps": "registry:dt/gulp-sourcemaps#0.0.0+20160316155526",
     "gulp-uglify": "registry:dt/gulp-uglify#0.0.0+20160316155526",
