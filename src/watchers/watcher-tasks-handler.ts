@@ -35,7 +35,7 @@ export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
         Object.keys(this.constructedTasks).forEach(name => {
             let task = this.constructedTasks[name];
             let process = gulp.parallel(this.generateName(task.Name));
-            this.watchers[task.Name] = gulp.watch(task.Globs, process);
+            this.watchers[task.Name] = gulp.watch(task.Globs, { ignoreInitial: true }, process);
             this.watchers[task.Name].on('unlink', this.fileUnlinkHandler);
             this.watchers[task.Name].on('change', this.fileChangeHandler);
             task.On("start", this.onTaskStart.bind(this, task.Name));
