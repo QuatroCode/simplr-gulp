@@ -7,9 +7,6 @@ export default class BuildStylesgTask extends TaskBase {
 
     Description = "Compiles *.scss files from source to build directory";
 
-    TaskFunction = (production: boolean, done: () => void) => {
-        StylesBuilder.Build(production, done);
-    }
-
+    TaskFunction = StylesBuilder.Build;
 
 }

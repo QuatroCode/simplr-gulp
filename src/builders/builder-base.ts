@@ -12,7 +12,7 @@ abstract class BuilderBase<TClass> {
 
     protected abstract initBuilder(production: boolean): TClass;
 
-    public Build(production: boolean, done: () => void) {
+    public Build = (production: boolean, done: () => void) => {
         let compiler = this.getBuilder(production);
         let maybePromise = this.build(production, compiler, done);
         if (maybePromise !== undefined) {

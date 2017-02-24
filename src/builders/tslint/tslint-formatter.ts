@@ -1,5 +1,5 @@
 import * as Lint from "tslint/lib/lint";
-import Logger from '../../../utils/logger';
+import Logger from '../../utils/logger';
 
 export default class ErrorHandler extends Lint.Formatters.AbstractFormatter {
     public format(failures: Lint.RuleFailure[]) {
