@@ -34,6 +34,8 @@ After first run, `gulpconfig.json` file will be generated for you to edit for yo
         * `Build.Configs.Folders` - copies configs folder from source to build directory
     * `Build.Html` - copies all `*.html` files from source to build directory
     * `Build.Scripts` - compiles TypeScript with sourcemap from source to build directory
+        * `Build.Scripts.Typescript` - compiles TypeScript with sourcemap from source to build directory
+        * `Build.Scripts.Tslint` - check for tslint warnings
     * `Build.Styles` - compiles `*.scss` files from source to build directory
 
 * `Build:Production` - compiles, minifies and uglifies source files with production environment (starts all `Build.*:Production` subtasks)
@@ -41,6 +43,8 @@ After first run, `gulpconfig.json` file will be generated for you to edit for yo
     * `Build.Configs:Production` - copies `web.config` (for Asp.Net 5 projects) and `configs` folder from source to build directory
     * `Build.Html:Production` - copies all `*.html` files from source to build directory
     * `Build.Scripts:Production` - compiles TypeScript from source to build directory
+        * `Build.Scripts.Typescript:Production` - compiles TypeScript from source to build directory
+        * `Build.Scripts.Tslint:Production` - check for tslint warnings
     * `Build.Styles:Production` - compiles and minifies `*.scss` files from source to build directory
 
 
