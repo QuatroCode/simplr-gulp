@@ -3,7 +3,6 @@ import * as path from "path";
 import * as ts from "typescript";
 import * as Linter from "tslint";
 import { glob } from "multi-glob";
-// import * as glob from "glob";
 import { ILinterOptionsRaw, LintResult } from "tslint/lib/lint";
 import Configuration from "../../configuration/configuration";
 import { Logger } from "../../utils/logger";
@@ -159,11 +158,6 @@ export class DirectTypescriptBuilder {
         }
 
         return await this.Lint(globbedFiles);
-        // return new Promise<LintResult[]>(async (resolve, reject) => {
-        //     let tsConfigFromJson: TsConfig = this.LoadTsConfig(production);
-        //     let globbedFiles = await this.GlobTypescriptFiles(tsConfigFromJson.include, tsConfigFromJson.exclude);
-        //     resolve(await this.Lint(globbedFiles));
-        // });
     }
 
     public PrintDiagnostics(diagnostics: ts.Diagnostic[], logger: Logger) {

@@ -14,6 +14,9 @@
     "gulpconfig"
   ],
   "author": "Giedrius Grabauskas <giedrius@quatrodev.com> (https://github.com/GiedriusGrabauskas)",
+  "contributors": [
+    "Dovydas Navickas <dovydas@quatrodev.com> (https://github.com/DovydasNavickas)"
+  ],
   "main": "dist/main.js",
   "scripts": {
     "typings-init": "typings install",
@@ -23,7 +26,7 @@
   "bugs": "https://github.com/QuatroCode/simplr-gulp/issues",
   "repository": "QuatroCode/simplr-gulp",
   "homepage": "https://github.com/QuatroCode/simplr-gulp",
-  "license": "GPL-3.0",
+  "license": "AGPL-3.0",
   "files": [
     "dist",
     "*.md"
@@ -31,6 +34,7 @@
   "devDependencies": {
     "@types/gulp-cached": "0.0.29",
     "@types/node": "^7.0.5",
+    "multi-glob": "^1.0.1",
     "tslint": "3.14.0",
     "typescript": "^2.2.1",
     "typings": "2.0.0"
