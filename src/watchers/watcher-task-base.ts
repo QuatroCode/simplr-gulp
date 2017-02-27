@@ -1,7 +1,7 @@
 import TaskBase, { Task } from '../tasks/task-base';
 import * as gulp from 'gulp';
 import * as fs from "fs";
-import Logger from "../utils/logger";
+import { LoggerInstance } from "../utils/logger";
 
 export interface WatchTask extends Task {
     Globs: gulp.Globs;
@@ -53,7 +53,7 @@ abstract class WatchTaskBase extends TaskBase implements WatchTask {
 
         if (this.UseWatchTaskFunctionOnly) {
             if (this.WatchTaskFunction == null) {
-                Logger.withType(`in class ${this._className}`)
+                LoggerInstance.withType(`in class ${this._className}`)
                     .error(`Cannot use "UseWatchTaskFunctionOnly" without "WatchTaskFunction" function.`);
                 completeTask();
                 return;
@@ -65,7 +65,7 @@ abstract class WatchTaskBase extends TaskBase implements WatchTask {
                 maybePromise
                     .then(completeTask)
                     .catch((error) => {
-                        Logger.withType(taskName).error(error);
+                        LoggerInstance.withType(taskName).error(error);
                         completeTask();
                     });
             }

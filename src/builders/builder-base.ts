@@ -1,4 +1,4 @@
-import Logger from '../utils/logger';
+import { LoggerInstance } from '../utils/logger';
 
 
 export interface BuildersList<TClass> {
@@ -19,7 +19,7 @@ abstract class BuilderBase<TClass> {
             maybePromise.then(() => {
                 done();
             }, error => {
-                Logger.error(error);
+                LoggerInstance.error(error);
                 done();
             });
         }

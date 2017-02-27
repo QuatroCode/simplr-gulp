@@ -3,7 +3,7 @@ import * as gulp from 'gulp';
 import Paths from '../../../../../paths/paths';
 import * as through from 'through2';
 import Configuration from '../../../../../configuration/configuration';
-import Logger from '../../../../../utils/logger';
+import { LoggerInstance } from '../../../../../utils/logger';
 import * as cache from 'gulp-cached';
 
 export default class BuildConfigsFilesTask extends TaskBase {
@@ -72,18 +72,18 @@ export default class BuildConfigsFilesTask extends TaskBase {
                             let result = content.replace(new RegExp(regex), resultString);
                             file.contents = new Buffer(result, 'utf8');
                         } else {
-                            Logger.error(`'${fullFileName}': SystemJS.config not found.`);
+                            LoggerInstance.error(`'${fullFileName}': SystemJS.config not found.`);
                         }
                     } catch (error) {
-                        Logger.error(`'${fullFileName}' file content is not valid.`);
-                        Logger.error(error);
+                        LoggerInstance.error(`'${fullFileName}' file content is not valid.`);
+                        LoggerInstance.error(error);
                     }
 
                 } else {
-                    Logger.warn(`'${fullFileName}' file content is not valid.`);
+                    LoggerInstance.warn(`'${fullFileName}' file content is not valid.`);
                 }
             } else {
-                Logger.warn(`'${fullFileName}' file content is empty.`);
+                LoggerInstance.warn(`'${fullFileName}' file content is empty.`);
             }
             callback(null, file);
         });

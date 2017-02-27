@@ -1,10 +1,10 @@
 import * as ts from "gulp-typescript";
 import * as path from "path";
-import Logger from "../../utils/logger";
+import { LoggerInstance } from "../../utils/logger";
 
 
 export function LogTypeScriptError(fileName: string, startPosition: number, characterCount: number, messageText: string | any) {
-    Logger.withType("TS").error(`${fileName}[${startPosition}, ${characterCount}]: `, messageText);
+    LoggerInstance.withType("TS").error(`${fileName}[${startPosition}, ${characterCount}]: `, messageText);
 }
 
 
@@ -18,7 +18,7 @@ export class Reporter implements ts.Reporter {
 
             LogTypeScriptError(fileName, error.startPosition.line, error.startPosition.character, messageText);
         } else {
-            Logger.withType("TS").error(error.message);
+            LoggerInstance.withType("TS").error(error.message);
         }
     }
 }

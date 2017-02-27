@@ -5,7 +5,7 @@ import * as cleanCSS from 'gulp-clean-css';
 import * as sass from 'gulp-sass';
 import * as autoprefixer from "gulp-autoprefixer";
 import * as sourcemaps from 'gulp-sourcemaps';
-import Logger from '../../utils/logger';
+import { LoggerInstance } from '../../utils/logger';
 import { Duplex } from 'stream';
 import * as cache from 'gulp-cached';
 
@@ -62,12 +62,12 @@ class StylesBuilder extends BuilderBase<null> {
     private errorHandler(error: ErrorDto) {
         if (error != null) {
             if (error.relativePath != null && error.line != null && error.column != null && error.messageOriginal != null) {
-                Logger.withType("SCSS").error(`${error.relativePath}[${error.line}, ${error.column}]: ${error.messageOriginal}`);
+                LoggerInstance.withType("SCSS").error(`${error.relativePath}[${error.line}, ${error.column}]: ${error.messageOriginal}`);
             } else {
-                Logger.error("Error in 'gulp-sass' plugin: \n", error);
+                LoggerInstance.error("Error in 'gulp-sass' plugin: \n", error);
             }
         } else {
-            Logger.error(`Unknown error in 'gulp-sass' plugin.`);
+            LoggerInstance.error(`Unknown error in 'gulp-sass' plugin.`);
         }
     }
 

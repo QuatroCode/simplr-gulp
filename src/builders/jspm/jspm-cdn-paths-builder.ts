@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as https from 'https';
 import * as url from 'url';
 import Paths from '../../paths/paths';
-import Logger from '../../utils/logger';
+import { LoggerInstance } from '../../utils/logger';
 import * as jspm from 'jspm';
 
 import { CdnJsApi, PackageItem, JspmPaths, JspmPathsLists } from './jspm-cdn-paths-contacts';
@@ -28,7 +28,7 @@ export default class JspmCdnPaths {
     }
 
     private printResults(results: JspmPathsLists) {
-        let logger = Logger.withType("JSPM");
+        let logger = LoggerInstance.withType("JSPM");
         if (results.Resolved.length > 0) {
             logger.info(
                 [`Successfully resolved ${results.Resolved.length} path${(results.Resolved.length > 1) ? "s" : ""}:`]
@@ -57,7 +57,7 @@ export default class JspmCdnPaths {
     }
 
     private async saveResultToFile(paths: JspmPaths) {
-        let logger = Logger.withType("JSPM");
+        let logger = LoggerInstance.withType("JSPM");
         return new Promise(resolve => {
             let pathname = [Paths.Directories.Source, "configs", "jspm.config.production.js"].join("/");
             logger.info(`Generating file '${pathname}'`);
@@ -80,7 +80,7 @@ export default class JspmCdnPaths {
     private async startDownload(packagesList: Array<PackageItem>, results: JspmPathsLists = { Resolved: [], Unresolved: [], Paths: {} }) {
         return new Promise<JspmPathsLists>(async resolve => {
             if (packagesList.length > 0) {
-                let item = packagesList.shift() !;
+                let item = packagesList.shift()!;
                 let cdnLink = await this.getCdnLink(item);
                 if (cdnLink !== undefined) {
                     results.Resolved.push(item);
@@ -99,7 +99,7 @@ export default class JspmCdnPaths {
     private async getCdnLink(packageItem: PackageItem, splited: boolean = false) {
         return new Promise<string | undefined>(resolve => {
 
-            let logger = Logger.withType(`JSPM [${packageItem.FullName}]`);
+            let logger = LoggerInstance.withType(`JSPM [${packageItem.FullName}]`);
 
             let requestDetails = {
                 protocol: "https:",
@@ -174,7 +174,7 @@ export default class JspmCdnPaths {
     }
 
     private tryToResolveSplitedPackage(packageItem: PackageItem, assetIndex: number, found: CdnJsApi.ItemDto, link: string | undefined = undefined): undefined | string {
-        let logger = Logger.withType(`JSPM [${packageItem.FullName}]`);
+        let logger = LoggerInstance.withType(`JSPM [${packageItem.FullName}]`);
 
         let asset = found.assets[assetIndex];
         let searchingFiles = new Array<string>();
@@ -219,7 +219,7 @@ export default class JspmCdnPaths {
     }
 
     private async getLinkFromResponseByVersion(packageItem: PackageItem, responseDto: CdnJsApi.ResponseDto, splited: boolean) {
-        let logger = Logger.withType(`JSPM [${packageItem.FullName}]`);
+        let logger = LoggerInstance.withType(`JSPM [${packageItem.FullName}]`);
 
         return new Promise<string | undefined>(async resolve => {
             let found = responseDto.results.find(x => x.name === packageItem.Details.Name);

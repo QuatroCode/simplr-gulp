@@ -1,7 +1,7 @@
 import * as express from 'express';
 import * as http from 'http';
 import { RequestHandler } from 'express-serve-static-core';
-import Logger from './utils/logger';
+import { LoggerInstance } from './utils/logger';
 import Configuration from './configuration/configuration';
 import { exec } from 'child_process';
 import * as path from "path";
@@ -23,13 +23,13 @@ export default class ServerStarter {
     }
 
     constructor() {
-        let {ServerConfig, Directories} = Configuration.GulpConfig;
+        let { ServerConfig, Directories } = Configuration.GulpConfig;
         let serverUrl = `http://${ServerConfig.Ip}:${ServerConfig.Port}`;
         this.configureServer(Directories.Build);
         this.startListeners(ServerConfig.Port, ServerConfig.LiveReloadPort);
         this.addEventListeners();
         this.openBrowser(serverUrl);
-        Logger.info(`Server started at '${serverUrl}'`);
+        LoggerInstance.info(`Server started at '${serverUrl}'`);
         this.addActionsListeners();
     }
 
@@ -93,8 +93,8 @@ export default class ServerStarter {
             try {
                 exec(`${opener} "${serverUrl}"`);
             } catch (error) {
-                Logger.error("Error with openBrowser.", error);
-                Logger.info("Please create new issue here: https://github.com/quatrocode/simplr-gulp/issues");
+                LoggerInstance.error("Error with openBrowser.", error);
+                LoggerInstance.info("Please create new issue here: https://github.com/quatrocode/simplr-gulp/issues");
             }
         }
     }
@@ -111,16 +111,16 @@ export default class ServerStarter {
     }
 
     private onClose = () => {
-        Logger.info(`Server closed.`);
+        LoggerInstance.info(`Server closed.`);
         this.removeActionsListeners();
     }
 
     private onError = (err: NodeJS.ErrnoException) => {
         if (err.code === 'EADDRINUSE') {
-            Logger.error(`Port ${Configuration.GulpConfig.ServerConfig.Port} already in use.`);
+            LoggerInstance.error(`Port ${Configuration.GulpConfig.ServerConfig.Port} already in use.`);
             this.Listener.close();
         } else {
-            Logger.error(`Exeption not handled. Please create issues with error code "${err.code}" here: https://github.com/QuatroCode/simplr-gulp/issues \n`, err);
+            LoggerInstance.error(`Exeption not handled. Please create issues with error code "${err.code}" here: https://github.com/QuatroCode/simplr-gulp/issues \n`, err);
         }
     }
 }
