@@ -21,7 +21,7 @@ abstract class TasksHandler<T extends Task> {
     constructor(config: (context: Configuration<T>) => Configuration<T>) {
         this.configuration = config(this.initConfiguration);
         this.constructedTasks = this.registerTasks(this.configuration.Tasks);
-        this.constructedTasksHander = this.loadTasksHandlers(this.configuration.TasksHandlers);
+        this.constructedTasksHandler = this.loadTasksHandlers(this.configuration.TasksHandlers);
         if (this.configuration.HandlerAsTask) {
             this.registerMainTask();
         }
@@ -30,7 +30,7 @@ abstract class TasksHandler<T extends Task> {
     private configuration: Configuration<T>;
 
     protected constructedTasks: { [name: string]: T };
-    protected constructedTasksHander: { [name: string]: TasksHandler<any> };
+    protected constructedTasksHandler: { [name: string]: TasksHandler<any> };
 
     private readonly _className = GetClassName(this.constructor);
 
@@ -111,7 +111,7 @@ abstract class TasksHandler<T extends Task> {
         }
 
         let method = this.configuration.TasksAsync ? gulp.parallel : gulp.series;
-        let tasksList = Object.keys(this.constructedTasks).concat(Object.keys(this.constructedTasksHander));
+        let tasksList = Object.keys(this.constructedTasks).concat(Object.keys(this.constructedTasksHandler));
         gulp.task(this.configuration.Name, method(tasksList));
         if (this.configuration.WithProduction) {
             let tasksListProduction = tasksList.map(x => { return `${x}:Production`; });
