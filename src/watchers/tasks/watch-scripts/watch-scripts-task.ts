@@ -3,7 +3,8 @@ import Paths from "../../../paths/paths";
 import * as fs from "fs";
 import { LoggerInstance } from "../../../utils/logger";
 import { DirectTypescriptBuilder } from "../../../builders/typescript/typescript-direct-builder";
-import { TimePromise } from "../../../utils/helpers";
+import { TimePromise, TimedPromiseResult } from "../../../utils/helpers";
+import { LintResult } from "tslint/lib/lint";
 
 
 export default class WatchScriptsTask extends WatchTaskBase {
@@ -35,7 +36,12 @@ export default class WatchScriptsTask extends WatchTaskBase {
             this.Builder.PrintDiagnostics(diagnostics, LoggerInstance);
 
             logger.info("Linting...");
-            let timedLint = await TimePromise(() => this.Builder.Lint([this.changedFile.Name]));
+            let timedLint: TimedPromiseResult<LintResult[]>;
+            if (this.buildSingleFile) {
+                timedLint = await TimePromise(() => this.Builder.Lint([this.changedFile.Name]));
+            } else {
+                timedLint = await TimePromise(() => this.Builder.LintAll(false));
+            }
             let lintResults = timedLint.Result;
             logger.info(`Linting done in ${timedLint.Elapsed}ms.`);
             this.Builder.PrintLintResults(lintResults, LoggerInstance);
