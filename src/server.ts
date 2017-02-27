@@ -91,7 +91,7 @@ export default class ServerStarter {
                 opener = `sudo -u ${process.env.SUDO_USER} ${opener}`;
             }
             try {
-                exec(`opener "${serverUrl}"`);
+                exec(`${opener} "${serverUrl}"`);
             } catch (error) {
                 Logger.error("Error with openBrowser.", error);
                 Logger.info("Please create new issue here: https://github.com/quatrocode/simplr-gulp/issues");
