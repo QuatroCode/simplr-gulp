@@ -36,8 +36,18 @@ export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
             let task = this.constructedTasks[name];
             let process = gulp.parallel(this.generateName(task.Name));
             this.watchers[task.Name] = gulp.watch(task.Globs, { ignoreInitial: true }, process);
-            this.watchers[task.Name].on('unlink', this.fileUnlinkHandler);
-            this.watchers[task.Name].on('change', this.fileChangeHandler);
+            this.watchers[task.Name].on("unlink", (path: string) => {
+                this.fileUnlinkHandler(path);
+                if (task.Unlink != null) {
+                    task.Unlink(path);
+                }
+            });
+            this.watchers[task.Name].on("change", (pathName: string, stats: fs.Stats) => {
+                this.fileChangeHandler(pathName, stats);
+                if (task.Change != null) {
+                    task.Change(pathName, stats);
+                }
+            });
             task.On("start", this.onTaskStart.bind(this, task.Name));
             task.On("end", this.onTaskEnd.bind(this, task.Name));
         });
