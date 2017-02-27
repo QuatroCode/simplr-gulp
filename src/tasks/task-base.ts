@@ -1,4 +1,5 @@
-import { Duplex } from 'stream';
+import { Duplex } from "stream";
+import { GetClassName } from '../utils/helpers';
 
 export interface Task {
     Name: string;
@@ -22,6 +23,7 @@ abstract class TaskBase implements Task {
     public abstract Name: string;
     public abstract TaskFunction: TaskFunction;
     public abstract Description: string;
+    protected readonly _className = GetClassName(this.constructor);
 }
 
 export default TaskBase;
