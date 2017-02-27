@@ -4,6 +4,7 @@ import Paths from '../../../../../paths/paths';
 import * as through from 'through2';
 import Configuration from '../../../../../configuration/configuration';
 import Logger from '../../../../../utils/logger';
+import * as cache from 'gulp-cached';
 
 export default class BuildConfigsFilesTask extends TaskBase {
 
@@ -48,6 +49,7 @@ export default class BuildConfigsFilesTask extends TaskBase {
 
     private prepareJspmConfigForProduction(source: string) {
         return gulp.src(source)
+            .pipe(cache("configs.files"))
             .pipe(this.setSystemJSConfigProductionEnviroment(source))
             .pipe(gulp.dest(Paths.Builders.OneDirectory.InBuild("configs")));
     }

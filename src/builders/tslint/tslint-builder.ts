@@ -1,19 +1,21 @@
-import BuilderBase from '../builder-base';
-import * as gulp from 'gulp';
-import Paths from '../../paths/paths';
-import tslint from 'gulp-tslint';
-import TsLintFormatter from './tslint-formatter';
+import * as gulp from "gulp";
+import BuilderBase from "../builder-base";
+import tslint from "gulp-tslint";
+import TsLintFormatter from "./tslint-formatter";
+import Paths from "../../paths/paths";
+import * as cache from "gulp-cached";
+
 
 class TslintBuilder extends BuilderBase<void> {
 
     protected build(production: boolean, builder: void, done: () => void) {
-
-        let tsSrc = gulp.src([
+        
+        gulp.src([
                 Paths.Builders.AllFiles.InSourceApp(".ts*"),
                 `!${Paths.Builders.AllFiles.InSourceApp("d.ts")}`
-            ]);
-        tsSrc = tsSrc.pipe(
-            tslint({
+            ])
+            .pipe(cache("scripts.tslint"))
+            .pipe(tslint({
                 formatter: TsLintFormatter
             }))
             .on("end", done);

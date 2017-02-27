@@ -1,28 +1,11 @@
-import BuilderBase from '../builder-base';
-import Configuration from '../../configuration/configuration';
-import * as gulp from 'gulp';
-import * as path from 'path';
-import * as ts from 'gulp-typescript';
-import * as uglify from 'gulp-uglify';
-import * as sourcemaps from 'gulp-sourcemaps';
-import TypescriptBuilderCompiler from './typescript-builder-compiler';
-import Logger from '../../utils/logger';
-
-
-class Reporter implements ts.Reporter {
-    error(error: any) {
-        if (error.tsFile) {
-            let fileName = error.relativeFilename || error.tsFile.fileName;
-            fileName = path.normalize(fileName);
-
-            let messageText = (typeof error.diagnostic.messageText === "string") ? error.diagnostic.messageText : error.diagnostic.messageText.messageText;
-
-            Logger.withType("TS").error(`${fileName}[${error.startPosition.line}, ${error.startPosition.character}]: `, messageText);
-        } else {
-            Logger.withType("TS").error(error.message);
-        }
-    }
-}
+import BuilderBase from "../builder-base";
+import Configuration from "../../configuration/configuration";
+import * as gulp from "gulp";
+import * as uglify from "gulp-uglify";
+import * as sourcemaps from "gulp-sourcemaps";
+import { TypescriptBuilderCompiler } from "./typescript-builder-compiler";
+import * as cache from "gulp-cached";
+import { Reporter } from "./typescript-reporter";
 
 class TypescriptBuilder extends BuilderBase<TypescriptBuilderCompiler> {
 
@@ -30,7 +13,9 @@ class TypescriptBuilder extends BuilderBase<TypescriptBuilderCompiler> {
 
     protected build(production: boolean, builder: TypescriptBuilderCompiler, done: () => void) {
 
-        let tsResult = builder.Project.src();
+        let tsResult = builder.Project
+            .src()
+            .pipe(cache("scripts.typescript"));
 
         if (!production) {
             tsResult = tsResult.pipe(sourcemaps.init());

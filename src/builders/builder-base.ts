@@ -25,7 +25,7 @@ abstract class BuilderBase<TClass> {
         }
     }
 
-    private getBuilder(production: boolean) {
+    protected getBuilder(production: boolean) {
         if (production) {
             if (this.builders.Production === undefined) {
                 this.builders.Production = this.initBuilder(production);

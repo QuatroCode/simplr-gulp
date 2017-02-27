@@ -16,7 +16,7 @@ interface Config {
     Src: Array<string> | string;
 }
 
-export default class TypescriptBuilderCompiler {
+export class TypescriptBuilderCompiler {
 
     constructor(configFile: string) {
         this.Project = this.createTsProject(configFile);

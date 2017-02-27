@@ -1,6 +1,7 @@
 import TaskBase from '../../../task-base';
 import * as gulp from 'gulp';
 import Paths from '../../../../paths/paths';
+import * as cache from 'gulp-cached';
 
 export default class BuildHtmlTask extends TaskBase {
 
@@ -10,6 +11,7 @@ export default class BuildHtmlTask extends TaskBase {
 
     TaskFunction = (production: boolean, done: () => void) => {
         gulp.src(Paths.Builders.AllFiles.InSource(".{htm,html}"))
+            .pipe(cache("html"))
             .pipe(gulp.dest(Paths.Directories.Build))
             .on("end", done);
     }

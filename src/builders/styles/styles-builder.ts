@@ -7,6 +7,7 @@ import * as autoprefixer from "gulp-autoprefixer";
 import * as sourcemaps from 'gulp-sourcemaps';
 import Logger from '../../utils/logger';
 import { Duplex } from 'stream';
+import * as cache from 'gulp-cached';
 
 //TODO: Temporary solution for this interface
 interface ErrorDto {
@@ -30,7 +31,9 @@ class StylesBuilder extends BuilderBase<null> {
 
     protected build(production: boolean, builder: null, done: () => void) {
 
-        let sassResults: Duplex | NodeJS.ReadWriteStream = gulp.src(Paths.Builders.AllFiles.InSourceApp(".scss"));
+        let sassResults: Duplex | NodeJS.ReadWriteStream = gulp
+            .src(Paths.Builders.AllFiles.InSourceApp(".scss"))
+            .pipe(cache("styles"));
 
         if (!production) {
             sassResults = sassResults.pipe(sourcemaps.init());
