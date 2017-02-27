@@ -17,7 +17,7 @@ class LoggerType {
     }
 }
 
-class Console {
+export class Logger {
 
     private styles = (Colors as any).styles;
 
@@ -54,37 +54,34 @@ class Console {
             typeString = typeString + ":";
         }
 
-        this.discernWords(type, color, ...messages).then((resolvedMessages) => {
-            log(`${this.getTimeNowWithStyles()}${this.styles.bold.open}${color}${typeString}`, ...resolvedMessages, this.styles.reset.open);
-        });
+        let resolvedMessages = this.discernWords(type, color, ...messages);
+        log(`${this.getTimeNowWithStyles()}${this.styles.bold.open}${color}${typeString}`, ...resolvedMessages, this.styles.reset.open);
     }
 
-    private async discernWords(type: LogType, color: string, ...messages: Array<string | any>) {
-        return new Promise<Array<any>>(resolve => {
-            if (type === LogType.Default || type === LogType.Info) {
+    private discernWords(type: LogType, color: string, ...messages: Array<string | any>): Array<string | any> {
+        if (type === LogType.Default || type === LogType.Info) {
 
-                let resolveMessages = messages.map(message => {
-                    if (typeof message === 'string') {
-                        let msg: string = message;
-                        let openColor = true;
-                        while (msg.search("'") !== -1) {
-                            if (openColor) {
-                                openColor = !openColor;
-                                msg = msg.replace("'", this.styles.magenta.open);
-                            } else {
-                                openColor = !openColor;
-                                msg = msg.replace("'", color);
-                            }
+            let resolveMessages = messages.map(message => {
+                if (typeof message === 'string') {
+                    let msg: string = message;
+                    let openColor = true;
+                    while (msg.search("'") !== -1) {
+                        if (openColor) {
+                            openColor = !openColor;
+                            msg = msg.replace("'", this.styles.magenta.open);
+                        } else {
+                            openColor = !openColor;
+                            msg = msg.replace("'", color);
                         }
-                        return msg;
                     }
-                    return message;
-                });
-                resolve(resolveMessages);
-            } else {
-                resolve(messages);
-            }
-        });
+                    return msg;
+                }
+                return message;
+            });
+            return (resolveMessages);
+        } else {
+            return (messages);
+        }
     }
 
     private getLoggerTypeFromMessages(messages: Array<any>) {
@@ -122,5 +119,5 @@ class Console {
     }
 }
 
-let logger = new Console();
-export default logger; 
+export let LoggerInstance = new Logger();
+export default LoggerInstance; 
