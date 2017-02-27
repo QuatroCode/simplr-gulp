@@ -17,9 +17,8 @@
   "main": "dist/main.js",
   "scripts": {
     "typings-init": "typings install",
-    "compile": "tsc -p . --noEmit",
-    "test": "npm run typings-init && npm run compile && echo Test completed.",
-    "test-linux": "npm run typings-init && npm run compile && echo Test completed."
+    "build": "tsc -p .",
+    "test": "npm run typings-init && tsc -p . --noEmit && echo Test completed."
   },
   "bugs": "https://github.com/QuatroCode/simplr-gulp/issues",
   "repository": "QuatroCode/simplr-gulp",
@@ -32,9 +31,6 @@
   "devDependencies": {
     "@types/gulp-cached": "0.0.29",
     "@types/node": "^7.0.5",
-    "rollup": "0.34.1",
-    "rollup-plugin-typescript": "0.7.7",
-    "rollup-watch": "2.5.0",
     "tslint": "3.14.0",
     "typescript": "^2.2.1",
     "typings": "2.0.0"

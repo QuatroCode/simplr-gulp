@@ -9,7 +9,7 @@ node_js:
   - "stable"
 
 script:
-  - npm run test-linux
+  - npm test
   
 branches:
   only:
