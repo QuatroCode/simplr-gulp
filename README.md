@@ -130,7 +130,7 @@ builder.bat -watch	            # build and start watcher to /dist
 builder.bat -watch:sample	    # build and start watcher to /example
 ```
 ## License
-[GPL-3.0](LICENSE)
+[AGPL-3.0](LICENSE)
 
 ## Hyperlinks
 * [simplr-gulp wiki](https://github.com/QuatroCode/simplr-gulp/wiki)
