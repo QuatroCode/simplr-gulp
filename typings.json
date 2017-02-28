@@ -32,7 +32,8 @@
     "uglify-js": "registry:dt/uglify-js#2.6.1+20160316155526",
     "undertaker": "registry:dt/undertaker#0.12.0+20160316155526",
     "vinyl": "registry:dt/vinyl#1.1.0+20160316155526",
-    "vinyl-fs": "registry:dt/vinyl-fs#0.0.0+20160317120654"
+    "vinyl-fs": "registry:dt/vinyl-fs#0.0.0+20160317120654",
+    "multi-glob": "https://gist.githubusercontent.com/DovydasNavickas/1623f16adf75ce99ba81e3055d9cbc3d/raw/9ce05b42df310dea62862746e5d5212bb3f774d3/multi-glob.d.ts"
   },
   "globalDevDependencies": {}
 }

@@ -88,7 +88,7 @@ export class DirectTypescriptBuilder {
                 let excluded = exclude.map(item => `!${item}`);
                 patterns = patterns.concat(excluded);
             }
-            glob(patterns, (error: Error, globbedFiles: string[]) => {
+            glob(patterns, (error, globbedFiles) => {
                 if (error != null) {
                     reject(error);
                     return;
