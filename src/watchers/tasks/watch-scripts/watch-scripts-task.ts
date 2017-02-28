@@ -15,6 +15,7 @@ export default class WatchScriptsTask extends WatchTaskBase {
     constructor() {
         super();
         this.Builder = new DirectTypescriptBuilder();
+        this.Builder.PrintTypescriptVersion(LoggerInstance);
     }
 
     TaskNamePrefix = "Build";
@@ -26,25 +27,25 @@ export default class WatchScriptsTask extends WatchTaskBase {
 
     private changedFile: { Name: string, Stats: fs.Stats };
 
-    protected WatchTaskFunction = () => {
+    protected WatchTaskFunction = (production: boolean) => {
         return new Promise(async (resolve, reject) => {
             let logger = LoggerInstance.withType("Scripts");
             logger.info("Compiling...");
-            let timedBuild = await TimePromise(() => this.Builder.Build([this.changedFile.Name], false, !this.buildSingleFile));
+            let timedBuild = await TimePromise(() => this.Builder.Build([this.changedFile.Name], production, !this.buildSingleFile));
             let diagnostics = timedBuild.Result;
             logger.info(`Compilation done in ${timedBuild.Elapsed}ms.`);
-            this.Builder.PrintDiagnostics(diagnostics, LoggerInstance, false);
+            this.Builder.PrintDiagnostics(diagnostics, LoggerInstance, production);
 
             logger.info("Linting...");
             let timedLint: TimedPromiseResult<LintResult[]>;
             if (this.buildSingleFile) {
                 timedLint = await TimePromise(() => this.Builder.Lint([this.changedFile.Name]));
             } else {
-                timedLint = await TimePromise(() => this.Builder.LintAll(false));
+                timedLint = await TimePromise(() => this.Builder.LintAll(production));
             }
             let lintResults = timedLint.Result;
             logger.info(`Linting done in ${timedLint.Elapsed}ms.`);
-            this.Builder.PrintLintResults(lintResults, LoggerInstance, false);
+            this.Builder.PrintLintResults(lintResults, LoggerInstance, production);
 
             resolve();
         });

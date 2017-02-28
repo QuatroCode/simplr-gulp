@@ -152,6 +152,10 @@ export class DirectTypescriptBuilder {
         return await this.Lint(globbedFiles);
     }
 
+    public PrintTypescriptVersion(logger: Logger) {
+        logger.withType("TS").info(`Using Typescript@${ts.version}`);
+    }
+
     public PrintDiagnostics(diagnostics: ts.Diagnostic[], logger: Logger, production: boolean) {
         let tsConfig = this.LoadTsConfig(production);
         let skipDefaultLibCheck = tsConfig.compilerOptions.skipDefaultLibCheck;
