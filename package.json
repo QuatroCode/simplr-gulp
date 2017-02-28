@@ -34,7 +34,6 @@
   "devDependencies": {
     "@types/gulp-cached": "0.0.29",
     "@types/node": "^7.0.5",
-    "multi-glob": "^1.0.1",
     "tslint": "3.14.0",
     "typescript": "^2.2.1",
     "typings": "2.0.0"
@@ -59,7 +58,8 @@
     "rimraf": "^2.5.4",
     "through2": "^2.0.1",
     "tiny-lr": "^0.2.1",
-    "tsconfig-lint": "^0.11.0"
+    "tsconfig-lint": "^0.11.0",
+    "multi-glob": "^1.0.1"
   },
   "engines": {
     "node": ">=6.0.0"
