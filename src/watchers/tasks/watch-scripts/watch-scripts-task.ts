@@ -33,7 +33,7 @@ export default class WatchScriptsTask extends WatchTaskBase {
             let timedBuild = await TimePromise(() => this.Builder.Build([this.changedFile.Name], false, !this.buildSingleFile));
             let diagnostics = timedBuild.Result;
             logger.info(`Compilation done in ${timedBuild.Elapsed}ms.`);
-            this.Builder.PrintDiagnostics(diagnostics, LoggerInstance);
+            this.Builder.PrintDiagnostics(diagnostics, LoggerInstance, false);
 
             logger.info("Linting...");
             let timedLint: TimedPromiseResult<LintResult[]>;

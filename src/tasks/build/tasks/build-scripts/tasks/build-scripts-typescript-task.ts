@@ -21,7 +21,7 @@ export default class BuildScriptsTask extends TaskBase {
             let timedBuild = await TimePromise(() => this.Builder.Build(undefined, production, true));
             let diagnostics = timedBuild.Result;
             logger.info(`Compilation done in ${timedBuild.Elapsed}ms.`);
-            this.Builder.PrintDiagnostics(diagnostics, LoggerInstance);
+            this.Builder.PrintDiagnostics(diagnostics, LoggerInstance, production);
 
             // Indicate that compilation is done
             done();
@@ -31,7 +31,7 @@ export default class BuildScriptsTask extends TaskBase {
             let timedLint = await TimePromise(() => this.Builder.LintAll(production));
             let lintResults = timedLint.Result;
             logger.info(`Linting done in ${timedLint.Elapsed}ms.`);
-            this.Builder.PrintLintResults(lintResults, LoggerInstance);
+            this.Builder.PrintLintResults(lintResults, LoggerInstance, production);
         });
     };
 }

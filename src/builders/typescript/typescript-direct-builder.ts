@@ -145,24 +145,19 @@ export class DirectTypescriptBuilder {
         });
     }
 
-    public async LintAll(production: boolean, lintDefinitions: boolean = false): Promise<LintResult[]> {
+    public async LintAll(production: boolean): Promise<LintResult[]> {
         let tsConfigFromJson: TsConfig = this.LoadTsConfig(production);
         let globbedFiles = await this.GlobTypescriptFiles(tsConfigFromJson.include, tsConfigFromJson.exclude);
-
-        if (!lintDefinitions) {
-            let dts = ".d.ts";
-            let dtsLength = dts.length;
-            globbedFiles = globbedFiles.filter(file => {
-                return file.substr(file.length - dtsLength) !== dts;
-            });
-        }
 
         return await this.Lint(globbedFiles);
     }
 
-    public PrintDiagnostics(diagnostics: ts.Diagnostic[], logger: Logger) {
+    public PrintDiagnostics(diagnostics: ts.Diagnostic[], logger: Logger, production: boolean) {
+        let tsConfig = this.LoadTsConfig(production);
+        let skipDefaultLibCheck = tsConfig.compilerOptions.skipDefaultLibCheck;
         for (let diagnostic of diagnostics) {
-            if (diagnostic.file == null || diagnostic.file.isDeclarationFile) {
+            if (diagnostic.file == null ||
+                diagnostic.file.isDeclarationFile && skipDefaultLibCheck === true) {
                 return;
             }
 
@@ -174,11 +169,24 @@ export class DirectTypescriptBuilder {
         }
     }
 
-    public PrintLintResults(results: LintResult[], logger: Logger) {
+    public PrintLintResults(results: LintResult[], logger: Logger, production: boolean) {
+        let tsConfig = this.LoadTsConfig(production);
+        let skipDefaultLibCheck = tsConfig.compilerOptions.skipDefaultLibCheck;
+
         for (let lintResult of results.filter(x => x.failureCount > 0)) {
             for (let failure of lintResult.failures) {
+                let fileName = failure.getFileName();
+
+                if (skipDefaultLibCheck === true) {
+                    let dts = ".d.ts";
+                    let dtsLength = dts.length;
+                    if (fileName.substr(fileName.length - dtsLength) === dts) {
+                        continue;
+                    }
+                }
+
                 let position = failure.getStartPosition().getLineAndCharacter();
-                let line = `${failure.getFileName()}[${position.line + 1}, ${position.character + 1}]: ${failure.getFailure()} (${failure.getRuleName()})`;
+                let line = `${fileName}[${position.line + 1}, ${position.character + 1}]: ${failure.getFailure()} (${failure.getRuleName()})`;
                 logger.warn(line);
             };
         }
