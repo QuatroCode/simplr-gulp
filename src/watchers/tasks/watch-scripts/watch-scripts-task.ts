@@ -44,7 +44,7 @@ export default class WatchScriptsTask extends WatchTaskBase {
             }
             let lintResults = timedLint.Result;
             logger.info(`Linting done in ${timedLint.Elapsed}ms.`);
-            this.Builder.PrintLintResults(lintResults, LoggerInstance);
+            this.Builder.PrintLintResults(lintResults, LoggerInstance, false);
 
             resolve();
         });
