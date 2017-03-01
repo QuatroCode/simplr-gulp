@@ -6,7 +6,8 @@ import { DirectTypescriptBuilder } from "../../../builders/typescript/typescript
 import { TimePromise, TimedPromiseResult } from "../../../utils/helpers";
 import { LintResult } from "tslint/lib/lint";
 
-
+const noTsFlag: string = "--noTs";
+const noTsLintFlag: string = "--noTsLint";
 export default class WatchScriptsTask extends WatchTaskBase {
     Builder: DirectTypescriptBuilder;
     /**
@@ -30,24 +31,35 @@ export default class WatchScriptsTask extends WatchTaskBase {
     protected WatchTaskFunction = (production: boolean) => {
         return new Promise(async (resolve, reject) => {
             let logger = LoggerInstance.withType("Scripts");
-            logger.info("Compiling...");
-            let timedBuild = await TimePromise(() => this.Builder.Build([this.changedFile.Name], production, !this.buildSingleFile));
-            let diagnostics = timedBuild.Result;
-            logger.info(`Compilation done in ${timedBuild.Elapsed}ms.`);
-            this.Builder.PrintDiagnostics(diagnostics, LoggerInstance, production);
 
-            logger.info("Linting...");
-            let timedLint: TimedPromiseResult<LintResult[]>;
-            if (this.buildSingleFile) {
-                timedLint = await TimePromise(() => this.Builder.Lint([this.changedFile.Name]));
-            } else {
-                timedLint = await TimePromise(() => this.Builder.LintAll(production));
+            if (this.noTs && this.noTsLint) {
+                logger.warn(`Both ${noTsFlag} and ${noTsLintFlag} flags are active. Nothing to do here...`);
             }
-            let lintResults = timedLint.Result;
-            logger.info(`Linting done in ${timedLint.Elapsed}ms.`);
-            this.Builder.PrintLintResults(lintResults, LoggerInstance, production);
 
+            if (!this.noTs) {
+                logger.info("Compiling...");
+                let timedBuild = await TimePromise(() => this.Builder.Build([this.changedFile.Name], production, !this.buildSingleFile));
+                let diagnostics = timedBuild.Result;
+                logger.info(`Compilation done in ${timedBuild.Elapsed}ms.`);
+                this.Builder.PrintDiagnostics(diagnostics, LoggerInstance, production);
+            }
+
+            // Resolve prematurely
             resolve();
+
+            if (!this.noTsLint) {
+                // And lint asynchronously
+                logger.info("Linting...");
+                let timedLint: TimedPromiseResult<LintResult[]>;
+                if (this.buildSingleFile) {
+                    timedLint = await TimePromise(() => this.Builder.Lint([this.changedFile.Name]));
+                } else {
+                    timedLint = await TimePromise(() => this.Builder.LintAll(production));
+                }
+                let lintResults = timedLint.Result;
+                logger.info(`Linting done in ${timedLint.Elapsed}ms.`);
+                this.Builder.PrintLintResults(lintResults, LoggerInstance, production);
+            }
         });
     }
 
@@ -60,5 +72,13 @@ export default class WatchScriptsTask extends WatchTaskBase {
 
     private get buildSingleFile() {
         return (process.argv.findIndex(x => x === "--fast") !== -1);
+    }
+
+    private get noTsLint() {
+        return (process.argv.findIndex(x => x === noTsLintFlag) !== -1);
+    }
+
+    private get noTs() {
+        return (process.argv.findIndex(x => x === noTsFlag) !== -1);
     }
 }
