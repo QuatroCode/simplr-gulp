@@ -33,6 +33,7 @@
   ],
   "devDependencies": {
     "@types/gulp-cached": "0.0.29",
+    "@types/mz": "0.0.30",
     "@types/node": "^7.0.5",
     "tslint": "3.14.0",
     "typescript": "^2.2.1",
@@ -55,11 +56,12 @@
     "gulp-typescript": "^3.1.4",
     "gulp-uglify": "^1.5.4",
     "jspm": "0.17.0-beta.25",
+    "multi-glob": "^1.0.1",
+    "mz": "^2.6.0",
     "rimraf": "^2.5.4",
     "through2": "^2.0.1",
     "tiny-lr": "^0.2.1",
-    "tsconfig-lint": "^0.11.0",
-    "multi-glob": "^1.0.1"
+    "tsconfig-lint": "^0.11.0"
   },
   "engines": {
     "node": ">=6.0.0"

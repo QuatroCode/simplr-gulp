@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import { fs } from "mz";
 import * as path from "path";
 import * as ts from "typescript";
 import * as Linter from "tslint";
@@ -118,31 +118,23 @@ export class DirectTypescriptBuilder {
     }
 
     public async Lint(files: string[], lintDefinitions: boolean = false): Promise<LintResult[]> {
-        return new Promise<LintResult[]>((resolve, reject) => {
-            let tslintConfigPath = path.normalize(`${process.cwd()}/tslint.json`);
-            try {
-                let configurationFile = Linter.loadConfigurationFromPath(tslintConfigPath);
-                let options: ILinterOptionsRaw = {
-                    formatter: "verbose",
-                    configuration: configurationFile
-                };
-                let lintResults: LintResult[] = [];
-                for (let file of files) {
-                    let stats = fs.lstatSync(file);
-                    if (stats.isFile()) {
-                        let contents = fs.readFileSync(file, "utf8");
-                        let linter = new Linter(file, contents, options, this.typescriptProgram);
-                        let result = linter.lint();
-                        lintResults.push(result);
-                    }
-                }
-                resolve(lintResults);
+        let tslintConfigPath = path.normalize(`${process.cwd()}/tslint.json`);
+        let configurationFile = Linter.loadConfigurationFromPath(tslintConfigPath);
+        let options: ILinterOptionsRaw = {
+            formatter: "verbose",
+            configuration: configurationFile
+        };
+        let lintResults: LintResult[] = [];
+        for (let file of files) {
+            let stats = await fs.stat(file);
+            if (stats.isFile()) {
+                let contents = await fs.readFile(file, "utf8");
+                let linter = new Linter(file, contents, options, this.typescriptProgram);
+                let result = linter.lint();
+                lintResults.push(result);
             }
-            catch (error) {
-                console.error(error);
-                reject(error);
-            }
-        });
+        }
+        return lintResults;
     }
 
     public async LintAll(production: boolean): Promise<LintResult[]> {
