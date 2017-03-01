@@ -62,7 +62,6 @@ export class DirectTypescriptBuilder {
 
                 // Resolve with combined diagnostics
                 resolve(result.PreEmitDiagnostics.concat(result.EmitResult.diagnostics));
-
             }
         });
     }

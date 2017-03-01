@@ -6,10 +6,8 @@ export interface BuildersList<TClass> {
     Development: TClass | undefined;
 }
 
-abstract class BuilderBase<TClass> {
-
+export abstract class BuilderBase<TClass> {
     protected abstract build(production: boolean, builder: TClass, done?: Function): void | PromiseLike<any>;
-
     protected abstract initBuilder(production: boolean): TClass;
 
     public Build = (production: boolean, done: () => void) => {
@@ -43,7 +41,4 @@ abstract class BuilderBase<TClass> {
         Production: undefined,
         Development: undefined
     };
-
 }
-
-export default BuilderBase;

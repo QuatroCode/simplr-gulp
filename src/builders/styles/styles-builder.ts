@@ -1,4 +1,4 @@
-import BuilderBase from '../builder-base';
+import { BuilderBase } from '../builder-base';
 import Paths from '../../paths/paths';
 import * as gulp from 'gulp';
 import * as cleanCSS from 'gulp-clean-css';
@@ -26,10 +26,8 @@ interface ErrorDto {
     plugin?: string;
 }
 
-class StylesBuilder extends BuilderBase<null> {
-
-
-    protected build(production: boolean, builder: null, done: () => void) {
+export class StylesBuilder extends BuilderBase<undefined> {
+    protected build(production: boolean, builder: undefined, done: () => void) {
 
         let sassResults: Duplex | NodeJS.ReadWriteStream = gulp
             .src(Paths.Builders.AllFiles.InSourceApp(".scss"))
@@ -72,8 +70,6 @@ class StylesBuilder extends BuilderBase<null> {
     }
 
     protected initBuilder(production: boolean) {
-        return null;
+        return undefined;
     }
 }
-
-export default new StylesBuilder();
