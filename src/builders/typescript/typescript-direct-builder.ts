@@ -104,7 +104,7 @@ export class DirectTypescriptBuilder {
         });
     }
 
-    protected LoadTsConfig(production: boolean): TsConfig {
+    public LoadTsConfig(production: boolean): TsConfig {
         let tsConfigName = production ?
             Configuration.GulpConfig.TypeScriptConfig.Production :
             Configuration.GulpConfig.TypeScriptConfig.Development;

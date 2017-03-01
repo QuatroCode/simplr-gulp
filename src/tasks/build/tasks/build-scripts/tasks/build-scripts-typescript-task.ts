@@ -2,6 +2,8 @@ import TaskBase from '../../../../task-base';
 import { DirectTypescriptBuilder } from "../../../../../builders/typescript/typescript-direct-builder";
 import { LoggerInstance } from "../../../../../utils/logger";
 import { TimePromise } from "../../../../../utils/helpers";
+import * as gulp from "gulp";
+import * as uglify from "gulp-uglify";
 
 export default class BuildScriptsTask extends TaskBase {
     constructor() {
@@ -16,6 +18,10 @@ export default class BuildScriptsTask extends TaskBase {
 
     TaskFunction = async (production: boolean, done: () => void) => {
         await this.Build(production);
+
+        if (production || true) {
+            await this.Uglify(production);
+        }
 
         // Indicate that compilation is done
         done();
@@ -40,5 +46,22 @@ export default class BuildScriptsTask extends TaskBase {
         let lintResults = timedLint.Result;
         logger.info(`Linting done in ${timedLint.Elapsed}ms.`);
         this.Builder.PrintLintResults(lintResults, LoggerInstance, production);
+    }
+
+    protected Uglify(production: boolean) {
+        return new Promise((resolve) => {
+            let logger = LoggerInstance.withType("Scripts.TypeScript");
+            logger.info("Uglifying...");
+            let start = +(new Date);
+            let tsConfig = this.Builder.LoadTsConfig(production);
+            let jsFilesPattern = `${tsConfig.compilerOptions.outDir}/**/*.js`;
+            gulp.src(jsFilesPattern)
+                .pipe(uglify({ mangle: true }))
+                .pipe(gulp.dest(tsConfig.compilerOptions.outDir))
+                .on("end", () => {
+                    logger.info(`Uglifying done in ${+(new Date) - start}ms.`);
+                    resolve();
+                });
+        });
     }
 }
