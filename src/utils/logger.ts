@@ -1,5 +1,4 @@
-import * as Colors from 'colors/safe';
-import { GetTimeNow } from './helpers';
+import { colors, log } from "gulp-util";
 
 enum LogType {
     Default,
@@ -17,74 +16,74 @@ class LoggerType {
     }
 }
 
-class Console {
-
-    private styles = (Colors as any).styles;
-
-    private getTimeNowWithStyles() {
-        return `[${this.styles.grey.open}${GetTimeNow()}${this.styles.grey.close}]`;
-    }
+export class Logger {
 
     private showMessage(type: LogType, loggerType: LoggerType | undefined, ...messages: Array<any>) {
-        let typeString = ` ${LogType[type].toLocaleUpperCase()}`;
-        let log = console.log;
-        let color = this.styles.white.open;
+
+        let isDefaultLogType = false;
+
+        let color,
+            typeString;
+
         switch (type) {
             case LogType.Error: {
-                color = this.styles.red.open;
-                log = console.error;
+                color = colors.styles.red.open;
             } break;
             case LogType.Info: {
-                color = this.styles.cyan.open;
-                log = console.info;
+                color = colors.styles.cyan.open;
             } break;
             case LogType.Warning: {
-                color = this.styles.yellow.open;
-                log = console.warn;
+                color = colors.styles.yellow.open;
             } break;
             default: {
-                typeString = "";
+                color = colors.styles.white.open;
+                isDefaultLogType = true;
             }
+        }
+
+        if (!isDefaultLogType) {
+            typeString = LogType[type].toLocaleUpperCase();
+        } else {
+            typeString = "";
         }
 
         if (loggerType !== undefined) {
             typeString = typeString + " " + loggerType.Type;
         }
-        if (log !== console.log) {
+
+        if (!isDefaultLogType || loggerType !== undefined) {
             typeString = typeString + ":";
         }
 
-        this.discernWords(type, color, ...messages).then((resolvedMessages) => {
-            log(`${this.getTimeNowWithStyles()}${this.styles.bold.open}${color}${typeString}`, ...resolvedMessages, this.styles.reset.open);
-        });
+        let resolvedMessages = this.discernWords(type, color, ...messages);
+
+        log(`${colors.styles.bold.open}${color}${typeString}${resolvedMessages.join(" ")}`, colors.styles.reset.open);
     }
 
-    private async discernWords(type: LogType, color: string, ...messages: Array<string | any>) {
-        return new Promise<Array<any>>(resolve => {
-            if (type === LogType.Default || type === LogType.Info) {
+    private discernWords(type: LogType, ...messages: Array<string | any>): Array<string | any> {
+        if (type === LogType.Default || type === LogType.Info) {
 
-                let resolveMessages = messages.map(message => {
-                    if (typeof message === 'string') {
-                        let msg: string = message;
-                        let openColor = true;
-                        while (msg.search("'") !== -1) {
-                            if (openColor) {
-                                openColor = !openColor;
-                                msg = msg.replace("'", this.styles.magenta.open);
-                            } else {
-                                openColor = !openColor;
-                                msg = msg.replace("'", color);
-                            }
+            let resolveMessages = messages.map(message => {
+                if (typeof message === "string") {
+                    let msg: string = message;
+                    let openColor = true;
+                    while (msg.search("'") !== -1) {
+                        if (openColor) {
+                            openColor = !openColor;
+                            msg = msg.replace("'", colors.styles.magenta.open);
+                        } else {
+                            openColor = !openColor;
+                            msg = msg.replace("'", colors.styles.magenta.close);
                         }
-                        return msg;
                     }
-                    return message;
-                });
-                resolve(resolveMessages);
-            } else {
-                resolve(messages);
-            }
-        });
+                    return msg;
+                }
+                return message;
+            });
+            return (resolveMessages);
+        } else {
+            return (messages);
+        }
     }
 
     private getLoggerTypeFromMessages(messages: Array<any>) {
@@ -122,5 +121,5 @@ class Console {
     }
 }
 
-let logger = new Console();
-export default logger; 
+export let LoggerInstance = new Logger();
+export default LoggerInstance;

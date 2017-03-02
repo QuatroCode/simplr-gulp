@@ -1,7 +1,7 @@
 import * as gulp from 'gulp';
 import * as fs from 'fs';
 import Configuration from '../configuration/configuration';
-import Logger from '../utils/logger';
+import { LoggerInstance } from '../utils/logger';
 import * as path from 'path';
 import { WatchTask } from './watcher-task-base';
 import LiveReloadActionsCreators from '../actions/live-reload/live-reload-actions-creators';
@@ -26,7 +26,7 @@ export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
         });
 
         this.registerWatchers();
-        Logger.info(`Started watching files in '${Configuration.GulpConfig.Directories.Source}' folder.`);
+        LoggerInstance.info(`Started watching files in '${Configuration.GulpConfig.Directories.Source}' folder.`);
     }
 
     private watchers: { [name: string]: fs.FSWatcher } = {};
@@ -36,8 +36,18 @@ export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
             let task = this.constructedTasks[name];
             let process = gulp.parallel(this.generateName(task.Name));
             this.watchers[task.Name] = gulp.watch(task.Globs, { ignoreInitial: true }, process);
-            this.watchers[task.Name].on('unlink', this.fileUnlinkHandler);
-            this.watchers[task.Name].on('change', this.fileChangeHandler);
+            this.watchers[task.Name].on("unlink", (path: string) => {
+                this.fileUnlinkHandler(path);
+                if (task.Unlink != null) {
+                    task.Unlink(path);
+                }
+            });
+            this.watchers[task.Name].on("change", (pathName: string, stats: fs.Stats) => {
+                this.fileChangeHandler(pathName, stats);
+                if (task.Change != null) {
+                    task.Change(pathName, stats);
+                }
+            });
             task.On("start", this.onTaskStart.bind(this, task.Name));
             task.On("end", this.onTaskEnd.bind(this, task.Name));
         });
@@ -70,7 +80,7 @@ export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
         let targetPathName = this.removeRootSourcePath(pathName);
         targetPathName = this.changeExtensionToBuilded(targetPathName);
         this.pendingReloadFiles.push(targetPathName);
-        Logger.log(`'${pathName}' was changed.`);
+        LoggerInstance.log(`'${pathName}' was changed.`);
     }
 
 
@@ -80,12 +90,12 @@ export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
         fs.unlink(targetPathName, (err) => {
             if (err != null) {
                 if (err.code === "ENOENT") {
-                    Logger.warn(`'${targetPathName}' has already been deleted.`);
+                    LoggerInstance.warn(`'${targetPathName}' has already been deleted.`);
                 } else {
-                    Logger.error(`Failed to delete file '${targetPathName}'\n`, err);
+                    LoggerInstance.error(`Failed to delete file '${targetPathName}'\n`, err);
                 }
             } else {
-                Logger.log(`'${targetPathName}' was deleted successfully.`);
+                LoggerInstance.log(`'${targetPathName}' was deleted successfully.`);
             }
         });
     }
@@ -118,7 +128,9 @@ export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
             pathList[0] = Configuration.GulpConfig.Directories.Build;
             return path.join(...pathList);
         } else {
-            Logger.warn(`WarcherTasksHandler.changeRootPathToBuild(): "${pathName}" path root is not under Source directory (${Configuration.GulpConfig.Directories.Source}) `);
+            LoggerInstance
+                .withType("WarcherTasksHandler.changeRootPathToBuild()")
+                .warn(`"${pathName}" path root is not under Source directory (${Configuration.GulpConfig.Directories.Source}) `);
             return pathName;
         }
     }

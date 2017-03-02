@@ -103,3 +103,17 @@ export function FixSeparator(link: string) {
     }
     return link;
 }
+
+export interface TimedPromiseResult<TPromiseResult> {
+    Result: TPromiseResult;
+    Elapsed: number;
+}
+export async function TimePromise<TPromiseResult>(promiseFactory: () => Promise<TPromiseResult>): Promise<TimedPromiseResult<TPromiseResult>> {
+    let start = +(new Date);
+    let result = await promiseFactory();
+    let end = +(new Date);
+    return {
+        Result: result,
+        Elapsed: end - start
+    };
+}
