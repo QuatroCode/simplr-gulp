@@ -117,6 +117,7 @@ export class DirectTypescriptBuilder {
     }
 
     public async Lint(files: string[], lintDefinitions: boolean = false): Promise<LintResult[]> {
+        //TODO: Use custom tslint configuration file
         let tslintConfigPath = path.normalize(`${process.cwd()}/tslint.json`);
         let configurationFile = Linter.loadConfigurationFromPath(tslintConfigPath);
         let options: ILinterOptionsRaw = {
