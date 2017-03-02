@@ -128,7 +128,9 @@ export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
             pathList[0] = Configuration.GulpConfig.Directories.Build;
             return path.join(...pathList);
         } else {
-            LoggerInstance.warn(`WarcherTasksHandler.changeRootPathToBuild(): "${pathName}" path root is not under Source directory (${Configuration.GulpConfig.Directories.Source}) `);
+            LoggerInstance
+                .withType("WarcherTasksHandler.changeRootPathToBuild()")
+                .warn(`"${pathName}" path root is not under Source directory (${Configuration.GulpConfig.Directories.Source}) `);
             return pathName;
         }
     }

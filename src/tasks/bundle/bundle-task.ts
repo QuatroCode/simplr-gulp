@@ -6,7 +6,7 @@ import * as path from 'path';
 import { LoggerInstance } from '../../utils/logger';
 import * as fs from 'fs';
 
-export default class BundleTask extends TaskBase {
+export class BundleTask extends TaskBase {
 
     Name = "Bundle";
 

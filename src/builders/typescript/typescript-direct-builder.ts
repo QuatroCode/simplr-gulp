@@ -145,7 +145,7 @@ export class DirectTypescriptBuilder {
     }
 
     public PrintTypescriptVersion(logger: Logger) {
-        logger.withType("TS").info(`Using Typescript@${ts.version}`);
+        logger.withType("TS").info(`Using 'Typescript@${ts.version}'`);
     }
 
     public PrintDiagnostics(diagnostics: ts.Diagnostic[], logger: Logger, production: boolean) {

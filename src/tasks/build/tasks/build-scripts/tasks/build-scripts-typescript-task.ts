@@ -5,10 +5,11 @@ import { TimePromise } from "../../../../../utils/helpers";
 import * as gulp from "gulp";
 import * as uglify from "gulp-uglify";
 
-export default class BuildScriptsTask extends TaskBase {
+export class BuildScriptsTask extends TaskBase {
     constructor() {
         super();
         this.Builder = new DirectTypescriptBuilder();
+        this.Builder.PrintTypescriptVersion(LoggerInstance);
     }
 
     Name = "Build.Scripts.Typescript";
@@ -19,7 +20,7 @@ export default class BuildScriptsTask extends TaskBase {
     TaskFunction = async (production: boolean, done: () => void) => {
         await this.Build(production);
 
-        if (production || true) {
+        if (production) {
             await this.Uglify(production);
         }
 
