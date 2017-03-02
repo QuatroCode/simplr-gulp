@@ -21,12 +21,12 @@ interface CompileResult {
 export class DirectTypescriptBuilder {
 
     constructor(logger: Logger) {
-        if (DirectTypescriptBuilder.typescriptProgram == null) {
+        if (DirectTypescriptBuilder.TypescriptProgram == null) {
             this.PrintTypescriptVersion(logger);
         }
     }
 
-    protected static typescriptProgram: ts.Program | undefined;
+    protected static TypescriptProgram: ts.Program | undefined;
 
     public async Build(files: string[] | undefined, production: boolean, fullBuild: boolean = true): Promise<ts.Diagnostic[]> {
         return new Promise<ts.Diagnostic[]>(async (resolve, reject) => {
@@ -75,14 +75,14 @@ export class DirectTypescriptBuilder {
 
     protected CompileAndEmit(files: string[], compilerOptions: ts.CompilerOptions): CompileResult {
         // Create a program and pass an old program
-        DirectTypescriptBuilder.typescriptProgram = ts.createProgram(files, compilerOptions, undefined, DirectTypescriptBuilder.typescriptProgram);
+        DirectTypescriptBuilder.TypescriptProgram = ts.createProgram(files, compilerOptions, undefined, DirectTypescriptBuilder.TypescriptProgram);
 
         // Gather pre-emit diagnostics
-        let preEmitDiagnostics = ts.getPreEmitDiagnostics(DirectTypescriptBuilder.typescriptProgram);
+        let preEmitDiagnostics = ts.getPreEmitDiagnostics(DirectTypescriptBuilder.TypescriptProgram);
 
         // Compile and emit output
         return {
-            EmitResult: DirectTypescriptBuilder.typescriptProgram.emit(),
+            EmitResult: DirectTypescriptBuilder.TypescriptProgram.emit(),
             PreEmitDiagnostics: preEmitDiagnostics
         };
     }
@@ -136,7 +136,7 @@ export class DirectTypescriptBuilder {
             let stats = await fs.stat(file);
             if (stats.isFile()) {
                 let contents = await fs.readFile(file, "utf8");
-                let linter = new Linter(file, contents, options, DirectTypescriptBuilder.typescriptProgram);
+                let linter = new Linter(file, contents, options, DirectTypescriptBuilder.TypescriptProgram);
                 let result = linter.lint();
                 lintResults.push(result);
             }
