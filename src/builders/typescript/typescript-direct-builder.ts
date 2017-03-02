@@ -57,7 +57,7 @@ export class DirectTypescriptBuilder {
                 // Glob files with patterns from tsconfig.json include and exclude properties
                 let globbedFiles = await this.GlobTypescriptFiles(tsConfigFromJson.include, tsConfigFromJson.exclude);
 
-                // Compile and emit only given files
+                // Compile and emit all globbed files
                 let result = this.CompileAndEmit(globbedFiles, parsedCompilerOptions.options);
 
                 // Resolve with combined diagnostics
