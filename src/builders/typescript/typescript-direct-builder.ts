@@ -19,6 +19,11 @@ interface CompileResult {
 }
 
 export class DirectTypescriptBuilder {
+
+    constructor(logger: Logger) {
+        this.PrintTypescriptVersion(logger);
+    }
+
     protected typescriptProgram: ts.Program;
 
     public async Build(files: string[] | undefined, production: boolean, fullBuild: boolean = true): Promise<ts.Diagnostic[]> {

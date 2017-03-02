@@ -8,8 +8,7 @@ import * as uglify from "gulp-uglify";
 export class BuildScriptsTask extends TaskBase {
     constructor() {
         super();
-        this.Builder = new DirectTypescriptBuilder();
-        this.Builder.PrintTypescriptVersion(LoggerInstance);
+        this.Builder = new DirectTypescriptBuilder(LoggerInstance);
     }
 
     Name = "Build.Scripts.Typescript";

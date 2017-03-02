@@ -15,8 +15,7 @@ export default class WatchScriptsTask extends WatchTaskBase {
      */
     constructor() {
         super();
-        this.Builder = new DirectTypescriptBuilder();
-        this.Builder.PrintTypescriptVersion(LoggerInstance);
+        this.Builder = new DirectTypescriptBuilder(LoggerInstance);
     }
 
     TaskNamePrefix = "Build";
