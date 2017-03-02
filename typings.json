@@ -5,17 +5,16 @@
     "gulp-tslint": "https://raw.githubusercontent.com/panuhorsmalahti/gulp-tslint/master/index.d.ts",
     "gulp-typescript": "registry:dt/gulp-typescript#0.0.0+20160720002434",
     "jspm": "https://gist.githubusercontent.com/GiedriusGrabauskas/c937c59039945ed5a08ef6cf4e34ff66/raw/3f9a82c8d5dd643554c5b356199690f5a8d756f2/any.d.ts",
+    "multi-glob": "https://gist.githubusercontent.com/DovydasNavickas/1623f16adf75ce99ba81e3055d9cbc3d/raw/ff50788656cbd837c6c1d2fe5168cc898eb7f677/multi-glob.d.ts",
     "rimraf": "https://gist.githubusercontent.com/GiedriusGrabauskas/314f7c80bb2105ae00c4e868b1f58f54/raw/4079176122e5f78aa834461dd2b236ea0ae1e630/rimraf.d.ts",
     "source-map": "registry:npm/source-map#0.4.0+20160211003958",
     "through2": "registry:npm/through2#2.0.0+20160723033700",
     "tiny-lr": "https://gist.githubusercontent.com/GiedriusGrabauskas/c937c59039945ed5a08ef6cf4e34ff66/raw/3f9a82c8d5dd643554c5b356199690f5a8d756f2/any.d.ts",
-    "tsconfig-lint": "github:QuatroTypings/npm-tsconfig-lint/0.11.0",
-    "multi-glob": "https://gist.githubusercontent.com/DovydasNavickas/1623f16adf75ce99ba81e3055d9cbc3d/raw/ff50788656cbd837c6c1d2fe5168cc898eb7f677/multi-glob.d.ts"
+    "tsconfig-lint": "github:QuatroTypings/npm-tsconfig-lint/0.11.0"
   },
   "globalDependencies": {
     "chokidar": "registry:dt/chokidar#1.4.3+20160316155526",
     "clean-css": "registry:dt/clean-css#3.4.9+20160316155526",
-    "colors": "https://gist.githubusercontent.com/GiedriusGrabauskas/268589c001176bbd09af51138b6255b0/raw/c78f8518a76e808a89d9ed402f2b62307221bb1b/colors.d.ts",
     "connect": "registry:dt/connect#3.4.0+20160317120654",
     "connect-livereload": "registry:dt/connect-livereload#0.5.3+20160317120654",
     "express": "registry:dt/express#4.0.0+20160317120654",

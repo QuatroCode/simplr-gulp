@@ -11,6 +11,7 @@ import { CleanBundleTask } from './clean/tasks/clean-bundle-task';
 import { CleanLibsTask } from './clean/tasks/clean-libs-task';
 import { BundleTask } from './bundle/bundle-task';
 import { JspmCdnPathsTask } from './jspm/jspm-cdn-paths-task';
+import { SimplrGulpVersionTask } from "./version/simplr-gulp-version-task";
 
 export default class Tasks extends TasksHandler<Task> {
 
@@ -23,7 +24,8 @@ export default class Tasks extends TasksHandler<Task> {
                 CleanBundleTask,
                 CleanLibsTask,
                 BundleTask,
-                JspmCdnPathsTask
+                JspmCdnPathsTask,
+                SimplrGulpVersionTask
             ];
             config.TasksHandlers = [BuildTasksHandler, CleanTasksHandler];
             return config;

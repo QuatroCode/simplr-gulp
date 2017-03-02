@@ -1,5 +1,4 @@
-import * as Colors from 'colors/safe';
-import { GetTimeNow } from './helpers';
+import { colors, log } from "gulp-util";
 
 enum LogType {
     Default,
@@ -19,59 +18,62 @@ class LoggerType {
 
 export class Logger {
 
-    private styles = (Colors as any).styles;
-
-    private getTimeNowWithStyles() {
-        return `[${this.styles.grey.open}${GetTimeNow()}${this.styles.grey.close}]`;
-    }
-
     private showMessage(type: LogType, loggerType: LoggerType | undefined, ...messages: Array<any>) {
-        let typeString = ` ${LogType[type].toLocaleUpperCase()}`;
-        let log = console.log;
-        let color = this.styles.white.open;
+
+        let isDefaultLogType = false;
+
+        let color,
+            typeString;
+
         switch (type) {
             case LogType.Error: {
-                color = this.styles.red.open;
-                log = console.error;
+                color = colors.styles.red.open;
             } break;
             case LogType.Info: {
-                color = this.styles.cyan.open;
-                log = console.info;
+                color = colors.styles.cyan.open;
             } break;
             case LogType.Warning: {
-                color = this.styles.yellow.open;
-                log = console.warn;
+                color = colors.styles.yellow.open;
             } break;
             default: {
-                typeString = "";
+                color = colors.styles.white.open;
+                isDefaultLogType = true;
             }
+        }
+
+        if (!isDefaultLogType) {
+            typeString = LogType[type].toLocaleUpperCase();
+        } else {
+            typeString = "";
         }
 
         if (loggerType !== undefined) {
             typeString = typeString + " " + loggerType.Type;
         }
-        if (log !== console.log) {
+
+        if (!isDefaultLogType || loggerType !== undefined) {
             typeString = typeString + ":";
         }
 
         let resolvedMessages = this.discernWords(type, color, ...messages);
-        log(`${this.getTimeNowWithStyles()}${this.styles.bold.open}${color}${typeString}`, ...resolvedMessages, this.styles.reset.open);
+
+        log(`${colors.styles.bold.open}${color}${typeString}${resolvedMessages.join(" ")}`, colors.styles.reset.open);
     }
 
-    private discernWords(type: LogType, color: string, ...messages: Array<string | any>): Array<string | any> {
+    private discernWords(type: LogType, ...messages: Array<string | any>): Array<string | any> {
         if (type === LogType.Default || type === LogType.Info) {
 
             let resolveMessages = messages.map(message => {
-                if (typeof message === 'string') {
+                if (typeof message === "string") {
                     let msg: string = message;
                     let openColor = true;
                     while (msg.search("'") !== -1) {
                         if (openColor) {
                             openColor = !openColor;
-                            msg = msg.replace("'", this.styles.magenta.open);
+                            msg = msg.replace("'", colors.styles.magenta.open);
                         } else {
                             openColor = !openColor;
-                            msg = msg.replace("'", color);
+                            msg = msg.replace("'", colors.styles.magenta.close);
                         }
                     }
                     return msg;
@@ -120,4 +122,4 @@ export class Logger {
 }
 
 export let LoggerInstance = new Logger();
-export default LoggerInstance; 
+export default LoggerInstance;
