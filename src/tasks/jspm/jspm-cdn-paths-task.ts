@@ -1,5 +1,5 @@
 import { TaskBase } from '../task-base';
-import JspmCdnPathsBuilder from '../../builders/jspm/jspm-cdn-paths-builder';
+import { JspmCdnPathsBuilder } from '../../builders/jspm/jspm-cdn-paths-builder';
 
 export class JspmCdnPathsTask extends TaskBase {
 

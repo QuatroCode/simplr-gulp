@@ -1,9 +1,9 @@
 import { TaskBase } from '../task-base';
-import WatcherTasksHandler from '../../watchers/watcher-tasks-handler';
-import Server from '../../server';
+import { WatcherTasksHandler } from '../../watchers/watcher-tasks-handler';
+import { Server } from '../../server';
 import * as gulp from 'gulp';
 
-export default class DefaultTask extends TaskBase {
+export class DefaultTask extends TaskBase {
 
     Name = "default";
 

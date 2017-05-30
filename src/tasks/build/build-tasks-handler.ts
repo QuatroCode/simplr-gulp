@@ -8,7 +8,7 @@ import { BuildHtmlTask } from './tasks/build-html/build-html-task';
 import { BuildScriptsTaskHandler } from './tasks/build-scripts/build-scripts-handler';
 import { BuildStylesTask } from './tasks/build-styles/build-styles-task';
 
-export default class BuildTasksHandler extends TasksHandler<Task> {
+export class BuildTasksHandler extends TasksHandler<Task> {
 
     constructor() {
         super(config => {

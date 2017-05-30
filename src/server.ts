@@ -11,7 +11,7 @@ import { Emitter } from './utils/actions-emitter';
 import { ReloadFiles, ReloadPage } from './actions/live-reload/live-reload-actions';
 import { EventSubscription } from "action-emitter";
 
-export default class ServerStarter {
+export class Server {
     public server = express();
     public liveReloadServer = tinyLr({});
 

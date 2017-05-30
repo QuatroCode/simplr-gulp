@@ -6,7 +6,7 @@ import { Paths } from "../../paths/paths";
 import * as cache from "gulp-cached";
 import { LoggerInstance } from "../../utils/logger";
 
-class TslintBuilder extends BuilderBase<void> {
+export class TslintBuilder extends BuilderBase<void> {
     protected build(production: boolean, builder: void, done: () => void) {
         
         gulp.src([
@@ -27,5 +27,3 @@ class TslintBuilder extends BuilderBase<void> {
     }
 
 }
-
-export default new TslintBuilder();

@@ -16,7 +16,7 @@ import { WatchScriptsTask } from './tasks/watch-scripts/watch-scripts-task';
 import { WatchStylesTask } from './tasks/watch-styles/watch-styles-task';
 
 
-export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
+export class WatcherTasksHandler extends TasksHandler<WatchTask> {
 
     constructor() {
         super((config) => {

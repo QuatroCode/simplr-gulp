@@ -4,7 +4,7 @@ import { Task } from '../task-base';
 // Tasks
 import { CleanAllTask } from './tasks/clean-all-task';
 
-export default class CleanTasksHandler extends TasksHandler<Task> {
+export class CleanTasksHandler extends TasksHandler<Task> {
 
     constructor() {
         super(config => {

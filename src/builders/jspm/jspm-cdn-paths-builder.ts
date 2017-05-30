@@ -15,7 +15,7 @@ const CDN_API = {
 
 };
 
-export default class JspmCdnPaths {
+export class JspmCdnPathsBuilder {
 
     public async Start(done: () => void) {
         let packagesList = this.getPackagesList();
