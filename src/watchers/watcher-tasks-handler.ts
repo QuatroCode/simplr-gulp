@@ -9,11 +9,11 @@ import { LiveReloadActionsCreators } from '../actions/live-reload/live-reload-ac
 import { TasksHandler } from '../tasks/tasks-handler';
 
 //Tasks
-import WatchAssetsTask from './tasks/watch-assets/watch-assets-task';
-import WatchConfigsTask from './tasks/watch-configs/watch-configs-task';
-import WatchHtmlTask from './tasks/watch-html/watch-html-task';
-import WatchScriptsTask from './tasks/watch-scripts/watch-scripts-task';
-import WatchStylesTask from './tasks/watch-styles/watch-styles-task';
+import { WatchAssetsTask } from './tasks/watch-assets/watch-assets-task';
+import { WatchConfigsTask } from './tasks/watch-configs/watch-configs-task';
+import { WatchHtmlTask } from './tasks/watch-html/watch-html-task';
+import { WatchScriptsTask } from './tasks/watch-scripts/watch-scripts-task';
+import { WatchStylesTask } from './tasks/watch-styles/watch-styles-task';
 
 
 export default class WatcherTasksHandler extends TasksHandler<WatchTask> {

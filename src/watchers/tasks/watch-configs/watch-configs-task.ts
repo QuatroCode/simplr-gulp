@@ -1,7 +1,7 @@
 import { WatchTaskBase } from '../../watcher-task-base';
 import Paths from '../../../paths/paths';
 
-export default class WatchConfigsTask extends WatchTaskBase {
+export class WatchConfigsTask extends WatchTaskBase {
 
     TaskNamePrefix = "Build";
 
