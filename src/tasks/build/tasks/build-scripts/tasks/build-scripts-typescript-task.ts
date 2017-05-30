@@ -1,7 +1,7 @@
 import TaskBase from '../../../../task-base';
 import { TypescriptBuilder } from '../../../../../builders/typescript/typescript-builder';
 
-export default class BuildScriptsTask extends TaskBase {
+export class BuildScriptsTypeScriptTask extends TaskBase {
 
     Builder = new TypescriptBuilder();
 

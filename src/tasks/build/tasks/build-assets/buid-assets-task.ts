@@ -1,8 +1,8 @@
 import TaskBase from '../../../task-base';
 import * as gulp from 'gulp';
-import Paths from '../../../../paths/paths';
+import { Paths } from '../../../../paths/paths';
 
-export default class BuildAssetsTask extends TaskBase {
+export class BuildAssetsTask extends TaskBase {
 
     Name = "Build.Assets";
 

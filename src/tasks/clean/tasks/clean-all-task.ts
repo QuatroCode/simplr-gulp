@@ -1,8 +1,8 @@
 import TaskBase from '../../task-base';
 import * as rimraf from 'rimraf';
-import Paths from '../../../paths/paths';
+import { Paths } from '../../../paths/paths';
 
-export default class CleanAllTask extends TaskBase {
+export class CleanAllTask extends TaskBase {
 
     Name = "Clean.All";
 
@@ -14,6 +14,4 @@ export default class CleanAllTask extends TaskBase {
             done();
         });
     }
-
-
 }

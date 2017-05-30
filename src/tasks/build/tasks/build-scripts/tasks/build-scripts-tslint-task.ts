@@ -1,7 +1,7 @@
 import TaskBase from '../../../../task-base';
 import TsLintBuilder from '../../../../../builders/tslint/tslint-builder';
 
-export default class BuildScriptsTask extends TaskBase {
+export class BuildScriptsTsLintTask extends TaskBase {
 
     Name = "Build.Scripts.Tslint";
 

@@ -1,9 +1,9 @@
 import TaskBase from '../../../task-base';
 import * as gulp from 'gulp';
-import Paths from '../../../../paths/paths';
+import { Paths } from '../../../../paths/paths';
 import * as cache from 'gulp-cached';
 
-export default class BuildHtmlTask extends TaskBase {
+export class BuildHtmlTask extends TaskBase {
 
     Name = "Build.Html";
 

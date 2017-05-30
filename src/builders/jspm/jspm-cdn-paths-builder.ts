@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as https from 'https';
 import * as url from 'url';
-import Paths from '../../paths/paths';
+import { Paths } from '../../paths/paths';
 import { LoggerInstance } from '../../utils/logger';
 import * as jspm from 'jspm';
 

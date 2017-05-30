@@ -1,4 +1,4 @@
-import Paths from './paths';
+import { Paths } from './paths';
 
 abstract class BuilderBase {
     protected abstract builder(startPath: string, param: string | undefined): string;

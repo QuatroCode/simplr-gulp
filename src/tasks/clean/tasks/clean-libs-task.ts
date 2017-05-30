@@ -1,6 +1,6 @@
 import TaskBase from '../../task-base';
 import * as rimraf from 'rimraf';
-import Paths from '../../../paths/paths';
+import { Paths } from '../../../paths/paths';
 import * as path from 'path';
 
 export class CleanLibsTask extends TaskBase {

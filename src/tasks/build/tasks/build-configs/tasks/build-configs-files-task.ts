@@ -1,12 +1,12 @@
 import TaskBase from '../../../../task-base';
 import * as gulp from 'gulp';
-import Paths from '../../../../../paths/paths';
+import { Paths } from '../../../../../paths/paths';
 import * as through from 'through2';
 import { Configuration } from '../../../../../configuration/configuration';
 import { LoggerInstance } from '../../../../../utils/logger';
 import * as cache from 'gulp-cached';
 
-export default class BuildConfigsFilesTask extends TaskBase {
+export class BuildConfigsFilesTask extends TaskBase {
 
     Name = "Build.Configs.Files";
 

@@ -1,7 +1,7 @@
 import TaskBase from '../../../task-base';
 import { StylesBuilder } from '../../../../builders/styles/styles-builder';
 
-export default class BuildStylesgTask extends TaskBase {
+export class BuildStylesTask extends TaskBase {
 
     Builder: StylesBuilder = new StylesBuilder();
 

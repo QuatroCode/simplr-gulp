@@ -1,5 +1,5 @@
 import { BuilderBase } from '../builder-base';
-import Paths from '../../paths/paths';
+import { Paths } from '../../paths/paths';
 import * as gulp from 'gulp';
 import * as cleanCSS from 'gulp-clean-css';
 import * as sass from 'gulp-sass';

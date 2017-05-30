@@ -1,10 +1,10 @@
 import TaskBase from '../../../../task-base';
 import * as gulp from 'gulp';
 import * as path from 'path';
-import Paths from '../../../../../paths/paths';
+import { Paths } from '../../../../../paths/paths';
 import * as cache from 'gulp-cached';
 
-export default class BuildConfigsFoldersTask extends TaskBase {
+export class BuildConfigsFoldersTask extends TaskBase {
 
     Name = "Build.Configs.Folders";
 

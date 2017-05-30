@@ -1,6 +1,6 @@
 import { Configuration } from '../../configuration/configuration';
 
-export default class DirectoriesBuilder {
+export class DirectoriesBuilder {
     private gulpConfig = Configuration.GulpConfig;
     Source = this.gulpConfig.Directories.Source;
     SourceApp = [this.Source, this.gulpConfig.Directories.App].join("/");

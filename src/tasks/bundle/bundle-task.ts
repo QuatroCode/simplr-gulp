@@ -1,7 +1,7 @@
 import TaskBase from '../task-base';
 import * as jspm from 'jspm';
 import { Configuration } from '../../configuration/configuration';
-import Paths from '../../paths/paths';
+import { Paths } from '../../paths/paths';
 import * as path from 'path';
 import { LoggerInstance } from '../../utils/logger';
 import * as fs from 'fs';

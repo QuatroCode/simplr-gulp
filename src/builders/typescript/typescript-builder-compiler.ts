@@ -1,5 +1,5 @@
 import * as ts from 'gulp-typescript';
-import Paths from '../../paths/paths';
+import { Paths } from '../../paths/paths';
 import * as path from 'path';
 import { LoggerInstance } from '../../utils/logger';
 import { FixSeparator } from '../../utils/helpers';

@@ -2,7 +2,7 @@ import { TasksHandler } from '../tasks-handler';
 import { Task } from '../task-base';
 
 // Tasks
-import CleanAllTask from './tasks/clean-all-task';
+import { CleanAllTask } from './tasks/clean-all-task';
 
 export default class CleanTasksHandler extends TasksHandler<Task> {
 
@@ -14,7 +14,4 @@ export default class CleanTasksHandler extends TasksHandler<Task> {
             return config;
         });
     }
-
-
-
 }
