@@ -7,8 +7,9 @@ import { exec } from 'child_process';
 import * as path from "path";
 import * as connectLiveReload from 'connect-livereload';
 import * as tinyLr from 'tiny-lr';
-import ActionsEmitter, { } from './utils/actions-emitter';
+import { Emitter } from './utils/actions-emitter';
 import { ReloadFiles, ReloadPage } from './actions/live-reload/live-reload-actions';
+import { EventSubscription } from "action-emitter";
 
 export default class ServerStarter {
     public server = express();
@@ -16,7 +17,7 @@ export default class ServerStarter {
 
     Listener: http.Server;
 
-    private actionsListeners = new Array<{ remove: () => void }>();
+    private actionsListeners = new Array<EventSubscription>();
 
     private get isQuiet() {
         return (process.argv.findIndex(x => x === "--quiet") !== -1 || process.argv.findIndex(x => x === "-Q") !== -1);
@@ -34,8 +35,8 @@ export default class ServerStarter {
     }
 
     private addActionsListeners() {
-        this.actionsListeners.push(ActionsEmitter.On(ReloadFiles, this.onReloadFilesList));
-        this.actionsListeners.push(ActionsEmitter.On(ReloadPage, this.onReloadPage));
+        this.actionsListeners.push(Emitter.addListener(ReloadFiles, this.onReloadFilesList));
+        this.actionsListeners.push(Emitter.addListener(ReloadPage, this.onReloadPage));
     }
 
     private removeActionsListeners() {
