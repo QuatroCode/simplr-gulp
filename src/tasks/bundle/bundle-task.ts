@@ -29,9 +29,6 @@ export class BundleTask extends TaskBase {
             bundleCmd += ` - ${BundleConfig.Exclude[i]}`;
         }
 
-        // Exclude css files
-        bundleCmd += ` - [app/**/*.css!]`;
-
         let builder = new jspm.Builder();
 
         LoggerInstance.log(`jspm bundle ${bundleCmd} ${buildDest}`);
