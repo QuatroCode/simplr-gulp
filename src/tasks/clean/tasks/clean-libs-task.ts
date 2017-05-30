@@ -3,7 +3,7 @@ import * as rimraf from 'rimraf';
 import Paths from '../../../paths/paths';
 import * as path from 'path';
 
-export default class CleanLibsTask extends TaskBase {
+export class CleanLibsTask extends TaskBase {
 
     Name = "Clean.Libs";
 
@@ -15,6 +15,4 @@ export default class CleanLibsTask extends TaskBase {
             done();
         });
     }
-
-
 }

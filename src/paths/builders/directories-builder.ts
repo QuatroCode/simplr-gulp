@@ -1,4 +1,4 @@
-import Configuration from '../../configuration/configuration';
+import { Configuration } from '../../configuration/configuration';
 
 export default class DirectoriesBuilder {
     private gulpConfig = Configuration.GulpConfig;

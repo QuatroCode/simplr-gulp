@@ -1,7 +1,7 @@
 import * as ts from 'gulp-typescript';
 import Paths from '../../paths/paths';
 import * as path from 'path';
-import Logger from '../../utils/logger';
+import { LoggerInstance } from '../../utils/logger';
 import { FixSeparator } from '../../utils/helpers';
 
 interface TsConfig extends ts.TsConfig {
@@ -40,7 +40,7 @@ export class TypescriptBuilderCompiler {
 
     private createTsProject(configFile: string): ts.Project {
         let requiredTypescript = require("typescript");
-        Logger.withType("TS").info(`Using Typescript@${requiredTypescript.version}`);
+        LoggerInstance.withType("TS").info(`Using TypeScript@${requiredTypescript.version}`);
         return ts.createProject(configFile, {
             typescript: requiredTypescript
         });

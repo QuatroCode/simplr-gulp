@@ -1,6 +1,6 @@
 {
   "name": "simplr-gulp",
-  "version": "2.7.1",
+  "version": "2.8.0-alpha.4",
   "description": "Fully functional gulpfile.js implementation. Tailored for Single Page Application. Written in TypeScript.",
   "keywords": [
     "gulp",
@@ -30,36 +30,36 @@
     "*.md"
   ],
   "devDependencies": {
-    "@types/gulp-cached": "0.0.29",
-    "@types/node": "^7.0.5",
-    "rollup": "0.34.1",
-    "rollup-plugin-typescript": "0.7.7",
-    "rollup-watch": "2.5.0",
-    "tslint": "3.14.0",
-    "typescript": "^2.1.4",
-    "typings": "2.0.0"
+    "@types/gulp-cached": "0.0.30",
+    "@types/node": "^7.0.22",
+    "rollup": "0.41.6",
+    "rollup-plugin-typescript": "0.8.1",
+    "rollup-watch": "3.2.2",
+    "tslint": "5.3.2",
+    "typescript": "^2.3.3",
+    "typings": "2.1.1"
   },
   "peerDependencies": {
     "typescript": ">=1.8.9"
   },
   "dependencies": {
     "colors": "^1.1.2",
-    "connect-livereload": "^0.5.4",
-    "express": "^4.14.0",
+    "connect-livereload": "^0.6.0",
+    "express": "^4.15.3",
     "gulp": "github:gulpjs/gulp#4.0",
-    "gulp-autoprefixer": "^3.1.1",
+    "gulp-autoprefixer": "^4.0.0",
     "gulp-cached": "^1.1.1",
-    "gulp-clean-css": "^2.0.11",
-    "gulp-sass": "^2.3.2",
-    "gulp-sourcemaps": "^1.6.0",
-    "gulp-tslint": "^6.0.2",
-    "gulp-typescript": "^3.1.4",
-    "gulp-uglify": "^1.5.4",
+    "gulp-clean-css": "^3.4.0",
+    "gulp-sass": "^3.1.0",
+    "gulp-sourcemaps": "^2.6.0",
+    "gulp-tslint": "^8.1.0",
+    "gulp-typescript": "^3.1.7",
+    "gulp-uglify": "^3.0.0",
     "jspm": "0.17.0-beta.25",
-    "rimraf": "^2.5.4",
-    "through2": "^2.0.1",
-    "tiny-lr": "^0.2.1",
-    "tsconfig-lint": "^0.11.0"
+    "rimraf": "^2.6.1",
+    "through2": "^2.0.3",
+    "tiny-lr": "^1.0.4",
+    "tsconfig-lint": "^0.12.0"
   },
   "engines": {
     "node": ">=6.0.0"

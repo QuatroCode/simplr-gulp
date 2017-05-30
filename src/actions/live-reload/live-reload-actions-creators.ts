@@ -1,7 +1,7 @@
 import { ReloadFiles, ReloadPage } from './live-reload-actions';
 import ActionsEmitter from '../../utils/actions-emitter';
 
-class LiveReloadActionsCreators {
+class LiveReloadActionsCreatorsClass {
 
     private reloadFiles: Array<string> | undefined = [];
     private timer: number | undefined;
@@ -46,4 +46,4 @@ class LiveReloadActionsCreators {
 
 }
 
-export default new LiveReloadActionsCreators();
+export const LiveReloadActionsCreators = new LiveReloadActionsCreatorsClass();

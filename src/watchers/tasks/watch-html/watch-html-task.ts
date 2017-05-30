@@ -1,4 +1,4 @@
-import WatchTaskBase from '../../watcher-task-base';
+import { WatchTaskBase } from '../../watcher-task-base';
 import Paths from '../../../paths/paths';
 
 export default class WatchHtmlTask extends WatchTaskBase {

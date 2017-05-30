@@ -1,13 +1,12 @@
 import * as gulp from "gulp";
-import BuilderBase from "../builder-base";
+import { BuilderBase } from "../builder-base";
 import tslint from "gulp-tslint";
 import TsLintFormatter from "./tslint-formatter";
 import Paths from "../../paths/paths";
 import * as cache from "gulp-cached";
-
+import { LoggerInstance } from "../../utils/logger";
 
 class TslintBuilder extends BuilderBase<void> {
-
     protected build(production: boolean, builder: void, done: () => void) {
         
         gulp.src([
@@ -21,8 +20,9 @@ class TslintBuilder extends BuilderBase<void> {
             .on("end", done);
     }
 
-
     protected initBuilder(production: boolean) {
+        const { Linter } = require("tslint");
+        LoggerInstance.withType("TSLint").info(`Using TSLint@${Linter.VERSION}`);
         return;
     }
 

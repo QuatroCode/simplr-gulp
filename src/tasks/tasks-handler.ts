@@ -1,9 +1,8 @@
 import * as gulp from 'gulp';
 import { TaskConstructor, TasksHandlerContructor } from './tasks-contracts';
 import { Task } from './task-base';
-import Logger from '../utils/logger';
+import { LoggerInstance } from '../utils/logger';
 import { GetClassName } from '../utils/helpers';
-
 
 interface Configuration<T> {
     TasksSufix: string;
@@ -15,13 +14,11 @@ interface Configuration<T> {
     HandlerAsTask: boolean;
 }
 
-
-abstract class TasksHandler<T extends Task> {
-
+export abstract class TasksHandler<T extends Task> {
     constructor(config: (context: Configuration<T>) => Configuration<T>) {
         this.configuration = config(this.initConfiguration);
         this.constructedTasks = this.registerTasks(this.configuration.Tasks);
-        this.constructedTasksHander = this.loadTasksHandlers(this.configuration.TasksHandlers);
+        this.constructedTasksHandler = this.loadTasksHandlers(this.configuration.TasksHandlers);
         if (this.configuration.HandlerAsTask) {
             this.registerMainTask();
         }
@@ -30,7 +27,7 @@ abstract class TasksHandler<T extends Task> {
     private configuration: Configuration<T>;
 
     protected constructedTasks: { [name: string]: T };
-    protected constructedTasksHander: { [name: string]: TasksHandler<any> };
+    protected constructedTasksHandler: { [name: string]: TasksHandler<any> };
 
     private readonly _className = GetClassName(this.constructor);
 
@@ -56,7 +53,7 @@ abstract class TasksHandler<T extends Task> {
         let constructedTasks: { [name: string]: T } = {};
 
         if (tasks == null || tasks.length === 0) {
-            Logger.warn(`(${this._moduleName}) The tasks list is empty.`);
+            LoggerInstance.warn(`(${this._moduleName}) The tasks list is empty.`);
             return constructedTasks;
         }
 
@@ -64,7 +61,7 @@ abstract class TasksHandler<T extends Task> {
             let constructedTask = new task();
             let fullName = this.generateName(constructedTask.Name);
             if (constructedTasks[fullName] != null) {
-                Logger.warn(`(${this._moduleName}) Task "${fullName}" already exist.`);
+                LoggerInstance.warn(`(${this._moduleName}) Task "${fullName}" already exist.`);
             } else {
                 constructedTasks[fullName] = constructedTask;
                 this.registerTaskFunction(fullName, false, constructedTask);
@@ -97,7 +94,7 @@ abstract class TasksHandler<T extends Task> {
             let taskHandler = new handler();
             let fullName = taskHandler.TaskName;
             if (constructedTasksHander[fullName] != null) {
-                Logger.warn(`(${this._moduleName}) Tasks handler "${fullName}" already exist.`);
+                LoggerInstance.warn(`(${this._moduleName}) Tasks handler "${fullName}" already exist.`);
             } else {
                 constructedTasksHander[fullName] = taskHandler;
             }
@@ -111,7 +108,7 @@ abstract class TasksHandler<T extends Task> {
         }
 
         let method = this.configuration.TasksAsync ? gulp.parallel : gulp.series;
-        let tasksList = Object.keys(this.constructedTasks).concat(Object.keys(this.constructedTasksHander));
+        let tasksList = Object.keys(this.constructedTasks).concat(Object.keys(this.constructedTasksHandler));
         gulp.task(this.configuration.Name, method(tasksList));
         if (this.configuration.WithProduction) {
             let tasksListProduction = tasksList.map(x => { return `${x}:Production`; });
@@ -135,5 +132,3 @@ abstract class TasksHandler<T extends Task> {
     }
 
 }
-
-export default TasksHandler;

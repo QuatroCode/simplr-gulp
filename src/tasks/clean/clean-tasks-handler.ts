@@ -1,4 +1,4 @@
-import TasksHandler from '../tasks-handler';
+import { TasksHandler } from '../tasks-handler';
 import { Task } from '../task-base';
 
 // Tasks

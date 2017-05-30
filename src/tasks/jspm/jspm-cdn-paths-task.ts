@@ -1,7 +1,7 @@
 import TaskBase from '../task-base';
 import JspmCdnPathsBuilder from '../../builders/jspm/jspm-cdn-paths-builder';
 
-export default class JspmCdnPathsTask extends TaskBase {
+export class JspmCdnPathsTask extends TaskBase {
 
     Name = "Jspm.CdnPaths:Production";
 
@@ -10,5 +10,4 @@ export default class JspmCdnPathsTask extends TaskBase {
     TaskFunction = (production: boolean, done: () => void) => {
         new JspmCdnPathsBuilder().Start(done);
     }
-
 }

@@ -26,6 +26,6 @@ export default class DefaultTask extends TaskBase {
     }
 
     private get startWithoutBuild() {
-        return (process.argv.findIndex(x => x === "--no-build") !== -1);
+        return (process.argv.findIndex(x => x.toLowerCase() === "--nobuild") !== -1);
     }
 }

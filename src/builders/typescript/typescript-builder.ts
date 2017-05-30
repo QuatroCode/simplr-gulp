@@ -1,5 +1,5 @@
-import BuilderBase from "../builder-base";
-import Configuration from "../../configuration/configuration";
+import { BuilderBase } from "../builder-base";
+import { Configuration } from "../../configuration/configuration";
 import * as gulp from "gulp";
 import * as uglify from "gulp-uglify";
 import * as sourcemaps from "gulp-sourcemaps";
@@ -7,7 +7,7 @@ import { TypescriptBuilderCompiler } from "./typescript-builder-compiler";
 import * as cache from "gulp-cached";
 import { Reporter } from "./typescript-reporter";
 
-class TypescriptBuilder extends BuilderBase<TypescriptBuilderCompiler> {
+export class TypescriptBuilder extends BuilderBase<TypescriptBuilderCompiler> {
 
     private reporter = new Reporter();
 
@@ -45,5 +45,3 @@ class TypescriptBuilder extends BuilderBase<TypescriptBuilderCompiler> {
         return Configuration.GulpConfig.TypeScriptConfig;
     }
 }
-
-export default new TypescriptBuilder();
