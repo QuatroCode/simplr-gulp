@@ -107,12 +107,11 @@ After first run, `gulpconfig.json` file will be generated for you to edit for yo
 
 ## Development
 #### Prerequisites
-You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp-cli), [`typings`](https://github.com/typings/registry), [`jspm`](https://github.com/jspm/jspm-cli), [`rollup`](https://github.com/rollup/rollup)):
+You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp-cli), [`typings`](https://github.com/typings/registry), [`jspm`](https://github.com/jspm/jspm-cli)):
 
 1. `npm install gulp-cli -g`
 2. `npm install typings -g`
 3. `npm install jspm -g`
-4. `npm install rollup -g`
 
 #### If you want to update `simplr-gulp` package yourself
 1. `git clone https://github.com/QuatroCode/simplr-gulp.git`
@@ -122,12 +121,9 @@ You need global npm packages ([`gulp`](https://github.com/gulpjs/gulp-cli), [`ty
 4. `builder.bat -watch:sample`
 5. Make changes
 
-#### builder.bat available commands
+#### Build project
 ```cmd
-builder.bat -build	            # build code to /dist
-builder.bat -build:sample	    # build code to /example
-builder.bat -watch	            # build and start watcher to /dist
-builder.bat -watch:sample	    # build and start watcher to /example
+tsc -p .
 ```
 ## License
 [AGPL-3.0](LICENSE)
@@ -138,6 +134,5 @@ builder.bat -watch:sample	    # build and start watcher to /example
 * [Gulp](https://github.com/gulpjs/gulp)
 * [Typings](https://github.com/typings/registry)
 * [jspm](https://github.com/jspm/jspm-cli)
-* [rollup](https://github.com/rollup/rollup)
 * [TsLint](https://github.com/palantir/tslint)
 * [NodeJS](https://nodejs.org)
