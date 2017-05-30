@@ -1,4 +1,4 @@
-import TaskBase, { Task } from '../tasks/task-base';
+import { Task, TaskBase } from '../tasks/task-base';
 import * as gulp from 'gulp';
 import * as fs from "fs";
 import { LoggerInstance } from "../utils/logger";

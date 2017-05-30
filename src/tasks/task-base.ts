@@ -19,11 +19,9 @@ interface TaskFunction {
  * @class TaskBase
  * @implements {Task}
  */
-abstract class TaskBase implements Task {
+export abstract class TaskBase implements Task {
     public abstract Name: string;
     public abstract TaskFunction: TaskFunction;
     public abstract Description: string;
     protected readonly _className = GetClassName(this.constructor);
 }
-
-export default TaskBase;

@@ -1,6 +1,6 @@
 import { Paths } from './paths';
 
-abstract class BuilderBase {
+export abstract class BuilderBase {
     protected abstract builder(startPath: string, param: string | undefined): string;
 
     InSource(param?: string | undefined) {
@@ -27,5 +27,3 @@ abstract class BuilderBase {
         return pathsList.join("/");
     }
 }
-
-export default BuilderBase;

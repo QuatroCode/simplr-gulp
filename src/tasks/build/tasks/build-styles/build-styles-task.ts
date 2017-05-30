@@ -1,4 +1,4 @@
-import TaskBase from '../../../task-base';
+import { TaskBase } from '../../../task-base';
 import { StylesBuilder } from '../../../../builders/styles/styles-builder';
 
 export class BuildStylesTask extends TaskBase {

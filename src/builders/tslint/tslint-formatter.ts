@@ -2,7 +2,7 @@ import * as Formatters from "tslint/lib/formatters";
 import { RuleFailure } from "tslint";
 import { LoggerInstance } from '../../utils/logger';
 
-export default class ErrorHandler extends Formatters.AbstractFormatter {
+export class TsLintFormatter extends Formatters.AbstractFormatter {
     public format(failures: RuleFailure[]) {
         let lines = new Array<string>();
         failures.forEach(failure => {

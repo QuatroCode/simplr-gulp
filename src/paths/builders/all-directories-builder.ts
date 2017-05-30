@@ -1,4 +1,4 @@
-import BuilderBase from '../paths-builder-base';
+import { BuilderBase } from '../paths-builder-base';
 
 export class AllDirectoriesBuilder extends BuilderBase {
     protected builder(startPath: string, name: string | undefined) {

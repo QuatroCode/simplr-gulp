@@ -1,4 +1,4 @@
-import TaskBase from '../task-base';
+import { TaskBase } from '../task-base';
 import WatcherTasksHandler from '../../watchers/watcher-tasks-handler';
 import Server from '../../server';
 import * as gulp from 'gulp';

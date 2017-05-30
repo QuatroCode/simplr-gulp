@@ -1,4 +1,4 @@
-import TaskBase from '../../../../task-base';
+import { TaskBase } from '../../../../task-base';
 import * as gulp from 'gulp';
 import { Paths } from '../../../../../paths/paths';
 import * as through from 'through2';

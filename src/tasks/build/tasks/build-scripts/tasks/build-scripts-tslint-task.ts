@@ -1,4 +1,4 @@
-import TaskBase from '../../../../task-base';
+import { TaskBase } from '../../../../task-base';
 import TsLintBuilder from '../../../../../builders/tslint/tslint-builder';
 
 export class BuildScriptsTsLintTask extends TaskBase {

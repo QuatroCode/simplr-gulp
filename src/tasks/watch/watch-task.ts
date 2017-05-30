@@ -1,4 +1,4 @@
-import TaskBase from '../task-base';
+import { TaskBase } from '../task-base';
 import WatcherTasksHandler from '../../watchers/watcher-tasks-handler';
 
 export default class WatchTask extends TaskBase {

@@ -1,4 +1,4 @@
-import TaskBase from '../../task-base';
+import { TaskBase } from '../../task-base';
 import * as rimraf from 'rimraf';
 import { Paths } from '../../../paths/paths';
 import { Configuration } from '../../../configuration/configuration';

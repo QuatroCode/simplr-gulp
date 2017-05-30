@@ -1,4 +1,4 @@
-import TaskBase from '../../../../task-base';
+import { TaskBase } from '../../../../task-base';
 import { TypescriptBuilder } from '../../../../../builders/typescript/typescript-builder';
 
 export class BuildScriptsTypeScriptTask extends TaskBase {

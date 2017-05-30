@@ -1,7 +1,7 @@
 import * as gulp from "gulp";
 import { BuilderBase } from "../builder-base";
 import tslint from "gulp-tslint";
-import TsLintFormatter from "./tslint-formatter";
+import { TsLintFormatter } from "./tslint-formatter";
 import { Paths } from "../../paths/paths";
 import * as cache from "gulp-cached";
 import { LoggerInstance } from "../../utils/logger";

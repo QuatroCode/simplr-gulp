@@ -1,4 +1,4 @@
-import TaskBase from "../task-base";
+import { TaskBase } from "../task-base";
 import * as path from "path";
 import { LoggerInstance } from "../../utils/logger";
 
