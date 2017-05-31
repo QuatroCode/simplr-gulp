@@ -3,7 +3,7 @@ import { TypescriptBuilder } from '../../../../../builders/typescript/typescript
 
 export class BuildScriptsTypeScriptTask extends TaskBase {
 
-    Builder = new TypescriptBuilder();
+    Builder = TypescriptBuilder;
 
     Name = "Build.Scripts.Typescript";
 

@@ -7,7 +7,7 @@ import { TypescriptBuilderCompiler } from "./typescript-builder-compiler";
 import * as cache from "gulp-cached";
 import { Reporter } from "./typescript-reporter";
 
-export class TypescriptBuilder extends BuilderBase<TypescriptBuilderCompiler> {
+class TypescriptBuilderClass extends BuilderBase<TypescriptBuilderCompiler> {
 
     private reporter = new Reporter();
 
@@ -37,6 +37,10 @@ export class TypescriptBuilder extends BuilderBase<TypescriptBuilderCompiler> {
         }
     }
 
+    public GetBuilder(production: boolean) {
+        return this.getBuilder(production);
+    }
+
     private get directories() {
         return Configuration.GulpConfig.Directories;
     }
@@ -45,3 +49,5 @@ export class TypescriptBuilder extends BuilderBase<TypescriptBuilderCompiler> {
         return Configuration.GulpConfig.TypeScriptConfig;
     }
 }
+
+export const TypescriptBuilder = new TypescriptBuilderClass();
