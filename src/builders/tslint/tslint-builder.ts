@@ -7,32 +7,32 @@ import { Paths } from "../../paths/paths";
 import * as cache from "gulp-cached";
 import { LoggerInstance } from "../../utils/logger";
 // import { TypescriptBuilder } from "../typescript/typescript-builder";
-import { Configuration } from "../../configuration/configuration";
-import * as ts from "typescript";
+// import { Configuration } from "../../configuration/configuration";
+// import * as ts from "typescript";
 
-export class TslintBuilder extends BuilderBase<ts.Program> {
-    protected build(production: boolean, builder: ts.Program, done: () => void) {
+export class TslintBuilder extends BuilderBase<void> {
+    protected build(production: boolean, builder: void, done: () => void) {
         gulp.src([
             Paths.Builders.AllFiles.InSourceApp(".ts*"),
             `!${Paths.Builders.AllFiles.InSourceApp("d.ts")}`
         ])
             .pipe(cache("scripts.tslint"))
             .pipe(gulpTsLint({
-                formatter: TsLintFormatter,
-                program: builder
+                formatter: TsLintFormatter
+                // program: builder
             }))
             .on("end", done);
     }
 
-    protected initBuilder(production: boolean): ts.Program {
+    protected initBuilder(production: boolean): void {
         LoggerInstance.withType("TSLint").info(`Using TSLint@${tslint.Linter.VERSION}`);
-        let configurationFile: string;
-        if (production) {
-            configurationFile = Configuration.GulpConfig.TypeScriptConfig.Production;
-        } else {
-            configurationFile = Configuration.GulpConfig.TypeScriptConfig.Development;
-        }
-        return tslint.Linter.createProgram(configurationFile);
+        // let configurationFile: string;
+        // if (production) {
+        //     configurationFile = Configuration.GulpConfig.TypeScriptConfig.Production;
+        // } else {
+        //     configurationFile = Configuration.GulpConfig.TypeScriptConfig.Development;
+        // }
+        // return tslint.Linter.createProgram(configurationFile);
     }
 
 }
