@@ -50,7 +50,7 @@ export class StylesBuilder extends BuilderBase<undefined> {
         if (!production) {
             sassResults = sassResults.pipe(sourcemaps.write());
         } else {
-            sassResults = sassResults.pipe(cleanCSS({ processImportFrom: ['local'] }));
+            sassResults = sassResults.pipe(cleanCSS({ processImportFrom: ['local'], rebase: false }));
         }
 
         sassResults.pipe(gulp.dest(Paths.Directories.BuildApp))
