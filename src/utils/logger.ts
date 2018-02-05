@@ -58,10 +58,10 @@ export class LoggerClass {
 
         // const resolvedMessages = this.discernWords(type, color, ...messages);
 
-        log(`${colors.bold}${color}${typeString}${  .join(" ")}`, colors.reset);
+        log(`${colors.bold}${color}${typeString}${messages.join(" ")}`, colors.reset);
     }
 
-    // FIXME: Memory errors?
+    // FIXME: Memory errors.
     // private discernWords(type: LogType, ...messages: Array<string | any>): Array<string | any> {
     //     if (type === LogType.Default || type === LogType.Info) {
     //         const resolveMessages = messages.map(message => {
