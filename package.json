@@ -40,7 +40,7 @@
     "@types/express": "^4.11.1",
     "@types/connect-livereload": "^0.5.31",
     "tslint": "5.9.1",
-    "typescript": "^2.2.1",
+    "typescript": "^2.7.1",
     "npm-check-updates": "^2.14.0"
   },
   "dependencies": {
