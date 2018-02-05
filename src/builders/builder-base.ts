@@ -1,5 +1,4 @@
-import { LoggerInstance } from '../utils/logger';
-
+import { Logger } from "../utils/logger";
 
 export interface BuildersList<TClass> {
     Production: TClass | undefined;
@@ -11,19 +10,22 @@ export abstract class BuilderBase<TClass> {
     protected abstract initBuilder(production: boolean): TClass;
 
     public Build = (production: boolean, done: () => void) => {
-        let compiler = this.getBuilder(production);
-        let maybePromise = this.build(production, compiler, done);
+        const compiler = this.getBuilder(production);
+        const maybePromise = this.build(production, compiler, done);
         if (maybePromise !== undefined) {
-            maybePromise.then(() => {
-                done();
-            }, error => {
-                LoggerInstance.error(error);
-                done();
-            });
+            maybePromise.then(
+                () => {
+                    done();
+                },
+                error => {
+                    Logger.error(error);
+                    done();
+                }
+            );
         }
-    }
+    };
 
-    protected getBuilder(production: boolean) {
+    protected getBuilder(production: boolean): TClass {
         if (production) {
             if (this.builders.Production === undefined) {
                 this.builders.Production = this.initBuilder(production);

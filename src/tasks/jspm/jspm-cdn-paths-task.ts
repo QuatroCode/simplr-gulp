@@ -1,13 +1,11 @@
-import TaskBase from '../task-base';
-import JspmCdnPathsBuilder from '../../builders/jspm/jspm-cdn-paths-builder';
+import { TaskBase } from "../task-base";
+import { JspmCdnPaths } from "../../builders/jspm/jspm-cdn-paths-builder";
 
 export class JspmCdnPathsTask extends TaskBase {
+    public Name: string = "Jspm.CdnPaths:Production";
+    public Description: string = "Generate CDN paths into 'src/configs/jspm.config.production.js' (cdnjs.com)";
 
-    Name = "Jspm.CdnPaths:Production";
-
-    Description = "Generate CDN paths into 'src/configs/jspm.config.production.js' (cdnjs.com)";
-
-    TaskFunction = (production: boolean, done: () => void) => {
-        new JspmCdnPathsBuilder().Start(done);
-    }
+    public TaskFunction = (production: boolean, done: () => void) => {
+        new JspmCdnPaths().Start(done);
+    };
 }

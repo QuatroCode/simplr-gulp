@@ -1,17 +1,17 @@
-import TaskBase from '../../../task-base';
-import * as gulp from 'gulp';
-import Paths from '../../../../paths/paths';
+import * as gulp from "gulp";
 
-export default class BuildAssetsTask extends TaskBase {
+import { TaskBase } from "../../../task-base";
+import { Paths } from "../../../../paths/paths";
 
-    Name = "Build.Assets";
+export class BuildAssetsTask extends TaskBase {
+    public Name: string = "Build.Assets";
 
-    Description = "Copies all assets folders and their contents from source to build directory";
+    public Description: string = "Copies all assets folders and their contents from source to build directory";
 
-    TaskFunction  = (production: boolean, done: () => void) => {
-        gulp.src(Paths.Builders.AllDirectories.InSource("assets"))
+    public TaskFunction = (production: boolean, done: () => void) => {
+        gulp
+            .src(Paths.Builders.AllDirectories.InSource("assets"))
             .pipe(gulp.dest(Paths.Directories.Build))
             .on("end", done);
-    }
-
+    };
 }

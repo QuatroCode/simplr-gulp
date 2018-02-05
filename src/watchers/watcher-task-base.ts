@@ -1,7 +1,7 @@
-import TaskBase, { Task } from '../tasks/task-base';
-import * as gulp from 'gulp';
+import { Task, TaskBase } from "../tasks/task-base";
+import * as gulp from "gulp";
 import * as fs from "fs";
-import { LoggerInstance } from "../utils/logger";
+import { Logger } from "../utils/logger";
 
 export interface WatchTask extends Task {
     Globs: gulp.Globs;
@@ -23,59 +23,56 @@ export interface OnCallback {
 
 /**
  * Abstract watch task base
- * 
+ *
  * @abstract
  * @class WatchTaskBase
  * @extends {TaskBase}
  */
-abstract class WatchTaskBase extends TaskBase implements WatchTask {
-
-    abstract Globs: string | Array<string>;
-
-    abstract TaskNamePrefix: string;
+export abstract class WatchTaskBase extends TaskBase implements WatchTask {
+    public abstract Globs: string | string[];
+    public abstract TaskNamePrefix: string;
 
     protected WatchTaskFunction: (production: boolean, done?: () => void) => void | Promise<any>;
 
-    protected UseWatchTaskFunctionOnly = false;
+    protected UseWatchTaskFunctionOnly: boolean = false;
 
-    Description = "Watch source files and start tasks";
+    public Description: string = "Watch source files and start tasks";
 
-    TaskFunction = (production: boolean, done: () => void) => {
+    public TaskFunction = (production: boolean, done: () => void) => {
         let taskName = `${this.TaskNamePrefix}.${this.Name}`;
         if (production) {
             taskName = this.addTasksProductionSuffix(taskName);
         }
 
-        let completeTask = () => {
+        const completeTask = () => {
             this.emit("end");
             done();
         };
 
         if (this.UseWatchTaskFunctionOnly) {
             if (this.WatchTaskFunction == null) {
-                LoggerInstance.withType(`in class ${this._className}`)
-                    .error(`Cannot use "UseWatchTaskFunctionOnly" without "WatchTaskFunction" function.`);
+                Logger.withType(`in class ${this._className}`).error(
+                    `Cannot use "UseWatchTaskFunctionOnly" without "WatchTaskFunction" function.`
+                );
                 completeTask();
                 return;
             }
 
-            let maybePromise = this.WatchTaskFunction(production, done);
+            const maybePromise = this.WatchTaskFunction(production, done);
 
             if (maybePromise != null && maybePromise.then != null) {
-                maybePromise
-                    .then(completeTask)
-                    .catch((error) => {
-                        LoggerInstance.withType(taskName).error(error);
-                        completeTask();
-                    });
+                maybePromise.then(completeTask).catch(error => {
+                    Logger.withType(taskName).error(error);
+                    completeTask();
+                });
             }
         } else {
             return gulp.parallel(this.getStarterFunction(taskName), taskName)(completeTask);
         }
-    }
+    };
 
-    private getStarterFunction(taskName: string) {
-        let func: gulp.TaskFunction = (done: () => void) => {
+    private getStarterFunction(taskName: string): gulp.TaskFunction {
+        const func: gulp.TaskFunction = (done: () => void) => {
             this.emit("start");
             done();
         };
@@ -83,29 +80,26 @@ abstract class WatchTaskBase extends TaskBase implements WatchTask {
         return func;
     }
 
-    protected addTasksProductionSuffix(text: string) {
+    protected addTasksProductionSuffix(text: string): string {
         return text + ":Production";
     }
 
-
-
     private listeners: { [uniqId: string]: Listener } = {};
-    private uniqId = 0;
+    private uniqId: number = 0;
 
     private get UniqueId(): number {
         return this.uniqId++;
     }
 
     public On(eventName: WatchEvents, callback: Function): OnCallback {
-        let id = this.UniqueId;
+        const id = this.UniqueId;
         this.listeners[id] = { Callback: callback, Event: eventName };
         return { remove: this.removeListener.bind(this, id) };
     }
 
-
-    private emit(eventName: WatchEvents, ...params: Array<any>): void {
+    private emit(eventName: WatchEvents, ...params: any[]): void {
         Object.keys(this.listeners).forEach(key => {
-            let listener = this.listeners[key];
+            const listener = this.listeners[key];
             if (listener.Event === eventName) {
                 listener.Callback(params);
             }
@@ -118,5 +112,3 @@ abstract class WatchTaskBase extends TaskBase implements WatchTask {
         }
     }
 }
-
-export default WatchTaskBase;

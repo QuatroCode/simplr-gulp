@@ -12,8 +12,8 @@ export interface TypeScriptConfig {
 export interface Bundle {
     AppFile: string;
     BuildFile: string;
-    Include: Array<string>;
-    Exclude: Array<string>;
+    Include: string[];
+    Exclude: string[];
 }
 
 export interface ServerConfiguration {
@@ -29,4 +29,4 @@ export interface GulpConfig {
     ServerConfig: ServerConfiguration;
     WebConfig: string | null;
     CfgVersion: number;
- }
+}

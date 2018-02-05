@@ -1,43 +1,42 @@
-import TaskBase from '../../../../task-base';
-import * as gulp from 'gulp';
-import Paths from '../../../../../paths/paths';
-import * as through from 'through2';
-import Configuration from '../../../../../configuration/configuration';
-import { LoggerInstance } from '../../../../../utils/logger';
-import * as cache from 'gulp-cached';
+import * as gulp from "gulp";
+import * as through from "through2";
+import * as cache from "gulp-cached";
+import * as stream from "stream";
 
-export default class BuildConfigsFilesTask extends TaskBase {
+import { TaskBase } from "../../../../task-base";
+import { Paths } from "../../../../../paths/paths";
+import { Configuration } from "../../../../../configuration/configuration";
+import { Logger } from "../../../../../utils/logger";
 
-    Name = "Build.Configs.Files";
+export class BuildConfigsFilesTask extends TaskBase {
+    public Name: string = "Build.Configs.Files";
+    public Description: string = "Copy `jspm.config.js` file from source to build directory with production enviroment (production only)";
 
-    Description = "Copy `jspm.config.js` file from source to build directory with production enviroment (production only)";
-
-    TaskFunction = (production: boolean, done: () => void) => {
-
-        let tasks = new Array<gulp.TaskFunction>();
+    public TaskFunction = (production: boolean, done: () => void) => {
+        const tasks = new Array<gulp.TaskFunction>();
         if (production) {
-            let jspmConfigFileName = this.readJspmConfigFileName();
+            const jspmConfigFileName = this.readJspmConfigFileName();
 
-            let task: gulp.TaskFunction = this.prepareJspmConfigForProduction.bind(this, jspmConfigFileName);
+            const task: gulp.TaskFunction = this.prepareJspmConfigForProduction.bind(this, jspmConfigFileName);
             task.displayName = this.Name + ".JspmConfigForProduction";
             tasks.push(task);
             return gulp.parallel(tasks)(done);
         } else {
             done();
         }
-    }
+    };
 
-    private readJspmConfigFileName() {
+    private readJspmConfigFileName(): string | undefined {
         if (Configuration.Package != null) {
-            let jspmConfig: { [key: string]: any } = Configuration.Package['jspm'];
+            const jspmConfig: { [key: string]: any } = Configuration.Package["jspm"];
             if (jspmConfig != null) {
-                let file: string = jspmConfig['configFile'];
+                let file: string = jspmConfig["configFile"];
                 if (file != null) {
                     return file;
                 } else {
-                    let configFiles = jspmConfig['configFiles'];
+                    const configFiles = jspmConfig["configFiles"];
                     if (configFiles != null) {
-                        file = configFiles['jspm'];
+                        file = configFiles["jspm"];
                         if (file != null) {
                             return file;
                         }
@@ -47,46 +46,47 @@ export default class BuildConfigsFilesTask extends TaskBase {
         }
     }
 
-    private prepareJspmConfigForProduction(source: string) {
-        return gulp.src(source)
+    private prepareJspmConfigForProduction(source: string): NodeJS.ReadWriteStream {
+        return gulp
+            .src(source)
             .pipe(cache("configs.files"))
             .pipe(this.setSystemJSConfigProductionEnviroment(source))
             .pipe(gulp.dest(Paths.Builders.OneDirectory.InBuild("configs")));
     }
 
-
-    private setSystemJSConfigProductionEnviroment(fullFileName: string) {
+    private setSystemJSConfigProductionEnviroment(fullFileName: string): stream.Transform {
         return through.obj((file, encoding, callback) => {
-            let content: string = file.contents.toString();
+            const content: string = file.contents.toString();
             if (content.length > 0) {
-                var regex = /SystemJS\.config\(({[\s\S.]*?})\)/;
-                var json = content.match(regex);
+                const regex = /SystemJS\.config\(({[\s\S.]*?})\)/;
+                const json = content.match(regex);
                 if (json != null) {
+                    // tslint:disable-next-line:prefer-const
                     let jsonObj: any | undefined;
                     try {
-                        eval('jsonObj = ' + json[1]);
+                        // TODO: eval?
+                        // tslint:disable-next-line:no-eval
+                        eval("jsonObj = " + json[1]);
                         if (jsonObj != null) {
-                            jsonObj['production'] = true;
+                            jsonObj["production"] = true;
                             let resultString = JSON.stringify(jsonObj, null, 4);
                             resultString = `SystemJS.config(${resultString})`;
-                            let result = content.replace(new RegExp(regex), resultString);
-                            file.contents = new Buffer(result, 'utf8');
+                            const result = content.replace(new RegExp(regex), resultString);
+                            file.contents = new Buffer(result, "utf8");
                         } else {
-                            LoggerInstance.error(`'${fullFileName}': SystemJS.config not found.`);
+                            Logger.error(`'${fullFileName}': SystemJS.config not found.`);
                         }
                     } catch (error) {
-                        LoggerInstance.error(`'${fullFileName}' file content is not valid.`);
-                        LoggerInstance.error(error);
+                        Logger.error(`'${fullFileName}' file content is not valid.`);
+                        Logger.error(error);
                     }
-
                 } else {
-                    LoggerInstance.warn(`'${fullFileName}' file content is not valid.`);
+                    Logger.warn(`'${fullFileName}' file content is not valid.`);
                 }
             } else {
-                LoggerInstance.warn(`'${fullFileName}' file content is empty.`);
+                Logger.warn(`'${fullFileName}' file content is empty.`);
             }
             callback(null, file);
         });
     }
-
 }

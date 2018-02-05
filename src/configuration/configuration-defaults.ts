@@ -1,4 +1,4 @@
-import { GulpConfig } from './configuration-contracts';
+import { GulpConfig } from "./configuration-contracts";
 
 export const DEFAULT_TYPESCRIPT_CONFIG = {
     compilerOptions: {
@@ -10,10 +10,7 @@ export const DEFAULT_TYPESCRIPT_CONFIG = {
         sourceMap: true,
         inlineSources: true
     },
-    exclude: [
-        "node_modules",
-        "src/libs"
-    ]
+    exclude: ["node_modules", "src/libs"]
 };
 
 export const DEFAULT_GULP_CONFIG: GulpConfig = {
@@ -35,14 +32,14 @@ export const DEFAULT_GULP_CONFIG: GulpConfig = {
         AppFile: "app.js",
         BuildFile: "build.js",
         Include: [],
-        Exclude: ['[app/**/*]']
+        Exclude: ["[app/**/*]"]
     },
     WebConfig: null,
     CfgVersion: 2.02
 };
 
 export const DEFAULT_EXTENSIONS_MAP: { [ext: string]: string } = {
-    "ts": "js",
-    "tsx": "js",
-    "scss": "css"
-}; 
+    ts: "js",
+    tsx: "js",
+    scss: "css"
+};

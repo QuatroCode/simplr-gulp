@@ -1,45 +1,53 @@
-import * as fs from 'fs';
-import Console from '../utils/logger';
-import { WriteToFileAsJson } from '../utils/helpers';
-import { GulpConfig } from './configuration-contracts';
-import { DEFAULT_EXTENSIONS_MAP, DEFAULT_GULP_CONFIG, DEFAULT_TYPESCRIPT_CONFIG } from './configuration-defaults';
+import * as fs from "fs";
 
+import { Logger } from "../utils/logger";
+import { WriteToFileAsJson } from "../utils/helpers";
+import { GulpConfig } from "./configuration-contracts";
+import { DEFAULT_EXTENSIONS_MAP, DEFAULT_GULP_CONFIG, DEFAULT_TYPESCRIPT_CONFIG } from "./configuration-defaults";
 
+export interface PackageJson {
+    [key: string]: any;
+}
 
 class ConfigurationLoader {
-
     private config: GulpConfig;
 
-    public Init() { }
+    // TODO: Inspect where is this used.
+    // tslint:disable-next-line:no-empty
+    public Init(): void {}
 
-    private packageJson: { [key: string]: any };
+    private packageJson: PackageJson;
 
     constructor() {
         this.tryToReadConfigurationFile();
         this.checkTypeScriptConfigurationFiles();
         this.readPackageJSON();
-    };
-
-    private readPackageJSON() {
-        this.packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
     }
 
-    private tryToReadConfigurationFile(cfgFileName: string = 'gulpconfig') {
+    private readPackageJSON(): void {
+        this.packageJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
+    }
+
+    private tryToReadConfigurationFile(cfgFileName: string = "gulpconfig"): void {
         try {
-            let config = JSON.parse(fs.readFileSync(`./${cfgFileName}.json`, "utf8")) as GulpConfig;
+            const config = JSON.parse(fs.readFileSync(`./${cfgFileName}.json`, "utf8")) as GulpConfig;
             let valid = true;
             if (config.CfgVersion !== DEFAULT_GULP_CONFIG.CfgVersion) {
-                Console.warn(`'${cfgFileName}.json' file major version is not valid (v${config.CfgVersion} != v${DEFAULT_GULP_CONFIG.CfgVersion})!`);
+                Logger.warn(
+                    `'${cfgFileName}.json' file major version is not valid (v${config.CfgVersion} != v${DEFAULT_GULP_CONFIG.CfgVersion})!`
+                );
                 valid = false;
             } else if (config.CfgVersion < DEFAULT_GULP_CONFIG.CfgVersion) {
-                Console.warn(`'${cfgFileName}.json' file version is too old (v${config.CfgVersion} < v${DEFAULT_GULP_CONFIG.CfgVersion})!`);
+                Logger.warn(
+                    `'${cfgFileName}.json' file version is too old (v${config.CfgVersion} < v${DEFAULT_GULP_CONFIG.CfgVersion})!`
+                );
                 valid = false;
             } else {
                 this.config = config;
             }
 
             if (!valid) {
-                Console.warn("Creating new file with default configuration.");
+                Logger.warn("Creating new file with default configuration.");
                 WriteToFileAsJson(`${cfgFileName}-v${config.CfgVersion}.json`, config);
                 this.config = DEFAULT_GULP_CONFIG;
                 WriteToFileAsJson(`${cfgFileName}.json`, this.config);
@@ -47,46 +55,49 @@ class ConfigurationLoader {
         } catch (e) {
             this.config = DEFAULT_GULP_CONFIG;
             WriteToFileAsJson(`${cfgFileName}.json`, this.config);
-            Console.warn("'gulpconfig.json' was not found or is not valid. Creating default configuration file.");
+            Logger.warn("'gulpconfig.json' was not found or is not valid. Creating default configuration file.");
         }
     }
 
-    private checkTypeScriptConfigurationFiles() {
+    private checkTypeScriptConfigurationFiles(): void {
         try {
-            if (!fs.statSync(`./${this.config.TypeScriptConfig.Development}`).isFile()) throw new Error();
+            if (!fs.statSync(`./${this.config.TypeScriptConfig.Development}`).isFile()) {
+                throw new Error();
+            }
         } catch (e) {
-            let tsConfig = {
+            const tsConfig = {
                 compilerOptions: DEFAULT_TYPESCRIPT_CONFIG.compilerOptions,
                 exclude: DEFAULT_TYPESCRIPT_CONFIG.exclude
             };
             tsConfig.exclude.push(this.config.Directories.Build);
             WriteToFileAsJson(this.config.TypeScriptConfig.Development, tsConfig);
-            Console.warn(`'${this.config.TypeScriptConfig.Development}' was not found. Creating default TypeScript configuration file.`);
+            Logger.warn(`'${this.config.TypeScriptConfig.Development}' was not found. Creating default TypeScript configuration file.`);
         }
         try {
-            if (!fs.statSync(`./${this.config.TypeScriptConfig.Production}`).isFile()) throw new Error();
-        } catch (e) {
-            let tsConfig = DEFAULT_TYPESCRIPT_CONFIG;
+            if (!fs.statSync(`./${this.config.TypeScriptConfig.Production}`).isFile()) {
+                throw new Error();
+            }
+        } catch (error) {
+            const tsConfig = DEFAULT_TYPESCRIPT_CONFIG;
             tsConfig.compilerOptions.inlineSources = false;
             tsConfig.compilerOptions.removeComments = true;
             tsConfig.compilerOptions.sourceMap = false;
             WriteToFileAsJson(this.config.TypeScriptConfig.Production, tsConfig);
-            Console.warn(`'${this.config.TypeScriptConfig.Production}' was not found. Creating default TypeScript configuration file.`);
+            Logger.warn(`'${this.config.TypeScriptConfig.Production}' was not found. Creating default TypeScript configuration file.`);
         }
     }
 
-    get GulpConfig() {
+    public get GulpConfig(): GulpConfig {
         return this.config;
     }
 
-    get DefaultExtensions() {
+    public get DefaultExtensions(): { [key: string]: string } {
         return DEFAULT_EXTENSIONS_MAP;
     }
 
-    get Package() {
+    public get Package(): PackageJson {
         return this.packageJson;
     }
-
 }
 
-export default new ConfigurationLoader();
+export const Configuration = new ConfigurationLoader();

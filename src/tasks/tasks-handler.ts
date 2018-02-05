@@ -1,9 +1,8 @@
-import * as gulp from 'gulp';
-import { TaskConstructor, TasksHandlerContructor } from './tasks-contracts';
-import { Task } from './task-base';
-import { LoggerInstance } from '../utils/logger';
-import { GetClassName } from '../utils/helpers';
-
+import * as gulp from "gulp";
+import { TaskConstructor, TasksHandlerContructor } from "./tasks-contracts";
+import { Task } from "./task-base";
+import { Logger } from "../utils/logger";
+import { GetClassName } from "../utils/helpers";
 
 interface Configuration<T> {
     TasksSufix: string;
@@ -15,9 +14,7 @@ interface Configuration<T> {
     HandlerAsTask: boolean;
 }
 
-
-abstract class TasksHandler<T extends Task> {
-
+export abstract class TasksHandler<T extends Task> {
     constructor(config: (context: Configuration<T>) => Configuration<T>) {
         this.configuration = config(this.initConfiguration);
         this.constructedTasks = this.registerTasks(this.configuration.Tasks);
@@ -32,13 +29,15 @@ abstract class TasksHandler<T extends Task> {
     protected constructedTasks: { [name: string]: T };
     protected constructedTasksHandler: { [name: string]: TasksHandler<any> };
 
-    private readonly _className = GetClassName(this.constructor);
+    // tslint:disable-next-line:variable-name
+    private readonly _className: string = GetClassName(this.constructor);
 
-    private readonly _moduleName = `TasksHandler.${this._className}`;
+    // tslint:disable-next-line:variable-name
+    private readonly _moduleName: string = `TasksHandler.${this._className}`;
 
-    public get TaskName() {
+    public get TaskName(): string {
         return this.configuration.Name;
-    };
+    }
 
     private get initConfiguration(): Configuration<T> {
         return {
@@ -52,19 +51,20 @@ abstract class TasksHandler<T extends Task> {
         };
     }
 
+    // tslint:disable-next-line:typedef
     private registerTasks(tasks: Array<TaskConstructor<T>>) {
-        let constructedTasks: { [name: string]: T } = {};
+        const constructedTasks: { [name: string]: T } = {};
 
         if (tasks == null || tasks.length === 0) {
-            LoggerInstance.warn(`(${this._moduleName}) The tasks list is empty.`);
+            Logger.warn(`(${this._moduleName}) The tasks list is empty.`);
             return constructedTasks;
         }
 
         tasks.forEach(task => {
-            let constructedTask = new task();
-            let fullName = this.generateName(constructedTask.Name);
+            const constructedTask = new task();
+            const fullName = this.generateName(constructedTask.Name);
             if (constructedTasks[fullName] != null) {
-                LoggerInstance.warn(`(${this._moduleName}) Task "${fullName}" already exist.`);
+                Logger.warn(`(${this._moduleName}) Task "${fullName}" already exist.`);
             } else {
                 constructedTasks[fullName] = constructedTask;
                 this.registerTaskFunction(fullName, false, constructedTask);
@@ -77,8 +77,8 @@ abstract class TasksHandler<T extends Task> {
         return constructedTasks;
     }
 
-    private registerTaskFunction(name: string, production: boolean, constructedTask: T) {
-        let func: gulp.TaskFunction = constructedTask.TaskFunction.bind(this, production);
+    private registerTaskFunction(name: string, production: boolean, constructedTask: T): void {
+        const func: gulp.TaskFunction = constructedTask.TaskFunction.bind(this, production);
         func.displayName = name;
         if (constructedTask.Description != null && !production) {
             func.description = "# " + constructedTask.Description;
@@ -86,18 +86,18 @@ abstract class TasksHandler<T extends Task> {
         gulp.task(name, func);
     }
 
-
+    // tslint:disable-next-line:typedef
     private loadTasksHandlers(tasksHandlers: Array<TasksHandlerContructor<TasksHandler<any>>>) {
-        let constructedTasksHander: { [name: string]: TasksHandler<any> } = {};
+        const constructedTasksHander: { [name: string]: TasksHandler<any> } = {};
         if (tasksHandlers == null || tasksHandlers.length === 0) {
             return constructedTasksHander;
         }
 
         tasksHandlers.forEach(handler => {
-            let taskHandler = new handler();
-            let fullName = taskHandler.TaskName;
+            const taskHandler = new handler();
+            const fullName = taskHandler.TaskName;
             if (constructedTasksHander[fullName] != null) {
-                LoggerInstance.warn(`(${this._moduleName}) Tasks handler "${fullName}" already exist.`);
+                Logger.warn(`(${this._moduleName}) Tasks handler "${fullName}" already exist.`);
             } else {
                 constructedTasksHander[fullName] = taskHandler;
             }
@@ -105,21 +105,21 @@ abstract class TasksHandler<T extends Task> {
         return constructedTasksHander;
     }
 
-    private registerMainTask() {
+    private registerMainTask(): void {
         if (this.configuration.Name == null || this.configuration.Name.length === 0) {
             return;
         }
 
-        let method = this.configuration.TasksAsync ? gulp.parallel : gulp.series;
-        let tasksList = Object.keys(this.constructedTasks).concat(Object.keys(this.constructedTasksHandler));
+        const method = this.configuration.TasksAsync ? gulp.parallel : gulp.series;
+        const tasksList = Object.keys(this.constructedTasks).concat(Object.keys(this.constructedTasksHandler));
         gulp.task(this.configuration.Name, method(tasksList));
         if (this.configuration.WithProduction) {
-            let tasksListProduction = tasksList.map(x => { return `${x}:Production`; });
+            const tasksListProduction = tasksList.map(x => `${x}:Production`);
             gulp.task(`${this.configuration.Name}:Production`, method(tasksListProduction));
         }
     }
 
-    protected generateName(taskName: string) {
+    protected generateName(taskName: string): string {
         let name = taskName;
 
         if (this.configuration.Name != null && this.configuration.Name.length > 0) {
@@ -133,7 +133,4 @@ abstract class TasksHandler<T extends Task> {
         }
         return name;
     }
-
 }
-
-export default TasksHandler;
