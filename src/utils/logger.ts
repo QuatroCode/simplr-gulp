@@ -16,6 +16,7 @@ class LoggerType {
 }
 
 export class LoggerClass {
+    // FIXME: Colors.
     private showMessage(type: LogType, loggerType: LoggerType | undefined, ...messages: any[]): void {
         const isDefaultLogType = false;
         // let color
