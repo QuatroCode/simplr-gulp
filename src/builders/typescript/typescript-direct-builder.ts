@@ -5,8 +5,8 @@ import { Linter } from "tslint";
 import { glob } from "multi-glob";
 import { LintResult, ILinterOptions } from "tslint";
 
-import Configuration from "../../configuration/configuration";
-import { Logger } from "../../utils/logger";
+import { Configuration } from "../../configuration/configuration";
+import { LoggerClass } from "../../utils/logger";
 
 interface TsConfig {
     compilerOptions: any;
@@ -20,7 +20,7 @@ interface CompileResult {
 }
 
 export class DirectTypescriptBuilder {
-    constructor(logger: Logger) {
+    constructor(logger: LoggerClass) {
         if (DirectTypescriptBuilder.TypescriptProgram == null) {
             this.PrintTypescriptVersion(logger);
         }
@@ -157,11 +157,11 @@ export class DirectTypescriptBuilder {
         return await this.Lint(globbedFiles);
     }
 
-    public PrintTypescriptVersion(logger: Logger): void {
+    public PrintTypescriptVersion(logger: LoggerClass): void {
         logger.withType("TS").info(`Using 'Typescript@${ts.version}'`);
     }
 
-    public PrintDiagnostics(diagnostics: ts.Diagnostic[], logger: Logger, production: boolean): void {
+    public PrintDiagnostics(diagnostics: ts.Diagnostic[], logger: LoggerClass, production: boolean): void {
         const tsConfig = this.LoadTsConfig(production);
         const skipDefaultLibCheck = tsConfig.compilerOptions.skipDefaultLibCheck;
         for (const diagnostic of diagnostics) {
@@ -179,7 +179,7 @@ export class DirectTypescriptBuilder {
         }
     }
 
-    public PrintLintResults(results: LintResult[], logger: Logger, production: boolean): void {
+    public PrintLintResults(results: LintResult[], logger: LoggerClass, production: boolean): void {
         const tsConfig = this.LoadTsConfig(production);
         const skipDefaultLibCheck = tsConfig.compilerOptions.skipDefaultLibCheck;
 

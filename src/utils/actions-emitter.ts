@@ -11,7 +11,8 @@ export class ActionsEmitterClass {
         return this.uniqId++;
     }
 
-    public On(action: any, callback: Function): {} {
+    // tslint:disable-next-line:typedef
+    public On(action: any, callback: Function) {
         const id = this.UniqueId;
         this.listeners[id] = { Action: action, Callback: callback };
         return { remove: this.removeListener.bind(this, id) };

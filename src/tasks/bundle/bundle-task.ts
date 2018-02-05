@@ -5,7 +5,7 @@ import * as path from "path";
 import { TaskBase } from "../task-base";
 import { Configuration } from "../../configuration/configuration";
 import { Paths } from "../../paths/paths";
-import { LoggerInstance } from "../../utils/logger";
+import { Logger } from "../../utils/logger";
 
 export class BundleTask extends TaskBase {
     public Name: string = "Bundle";
@@ -35,7 +35,7 @@ export class BundleTask extends TaskBase {
 
         const builder = new jspm.Builder();
 
-        LoggerInstance.log(`jspm bundle ${bundleCmd} ${buildDest}`);
+        Logger.log(`jspm bundle ${bundleCmd} ${buildDest}`);
         builder
             .bundle(bundleCmd, {
                 minify: true,
@@ -47,7 +47,7 @@ export class BundleTask extends TaskBase {
             })
             .catch((e: any) => {
                 done();
-                LoggerInstance.info("Please make sure that you have installed jspm packages ('jspm install')");
+                Logger.info("Please make sure that you have installed jspm packages ('jspm install')");
                 throw e;
             });
     };

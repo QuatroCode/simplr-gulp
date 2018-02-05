@@ -6,7 +6,7 @@ import * as stream from "stream";
 import { TaskBase } from "../../../../task-base";
 import { Paths } from "../../../../../paths/paths";
 import { Configuration } from "../../../../../configuration/configuration";
-import { LoggerInstance } from "../../../../../utils/logger";
+import { Logger } from "../../../../../utils/logger";
 
 export class BuildConfigsFilesTask extends TaskBase {
     public Name: string = "Build.Configs.Files";
@@ -74,17 +74,17 @@ export class BuildConfigsFilesTask extends TaskBase {
                             const result = content.replace(new RegExp(regex), resultString);
                             file.contents = new Buffer(result, "utf8");
                         } else {
-                            LoggerInstance.error(`'${fullFileName}': SystemJS.config not found.`);
+                            Logger.error(`'${fullFileName}': SystemJS.config not found.`);
                         }
                     } catch (error) {
-                        LoggerInstance.error(`'${fullFileName}' file content is not valid.`);
-                        LoggerInstance.error(error);
+                        Logger.error(`'${fullFileName}' file content is not valid.`);
+                        Logger.error(error);
                     }
                 } else {
-                    LoggerInstance.warn(`'${fullFileName}' file content is not valid.`);
+                    Logger.warn(`'${fullFileName}' file content is not valid.`);
                 }
             } else {
-                LoggerInstance.warn(`'${fullFileName}' file content is empty.`);
+                Logger.warn(`'${fullFileName}' file content is empty.`);
             }
             callback(null, file);
         });

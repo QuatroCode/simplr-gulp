@@ -15,30 +15,29 @@ class LoggerType {
     }
 }
 
-export class Logger {
+export class LoggerClass {
     private showMessage(type: LogType, loggerType: LoggerType | undefined, ...messages: any[]): void {
         let isDefaultLogType = false;
-
         let color, typeString;
 
         switch (type) {
             case LogType.Error:
                 {
-                    color = colors.styles.red.open;
+                    color = colors.red;
                 }
                 break;
             case LogType.Info:
                 {
-                    color = colors.styles.cyan.open;
+                    color = colors.cyan;
                 }
                 break;
             case LogType.Warning:
                 {
-                    color = colors.styles.yellow.open;
+                    color = colors.yellow;
                 }
                 break;
             default: {
-                color = colors.styles.white.open;
+                color = colors.white;
                 isDefaultLogType = true;
             }
         }
@@ -59,7 +58,7 @@ export class Logger {
 
         const resolvedMessages = this.discernWords(type, color, ...messages);
 
-        log(`${colors.styles.bold.open}${color}${typeString}${resolvedMessages.join(" ")}`, colors.styles.reset.open);
+        log(`${colors.bold}${color}${typeString}${resolvedMessages.join(" ")}`, colors.reset);
     }
 
     private discernWords(type: LogType, ...messages: Array<string | any>): Array<string | any> {
@@ -71,10 +70,10 @@ export class Logger {
                     while (msg.search("'") !== -1) {
                         if (openColor) {
                             openColor = !openColor;
-                            msg = msg.replace("'", colors.styles.magenta.open);
+                            msg = msg.replace("'", colors.magenta);
                         } else {
                             openColor = !openColor;
-                            msg = msg.replace("'", colors.styles.magenta.close);
+                            msg = msg.replace("'", colors.magenta);
                         }
                     }
                     return msg;
@@ -123,4 +122,4 @@ export class Logger {
     }
 }
 
-export const LoggerInstance = new Logger();
+export const Logger = new LoggerClass();

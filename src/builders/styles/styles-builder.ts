@@ -7,8 +7,8 @@ import { Duplex } from "stream";
 import * as cache from "gulp-cached";
 
 import { BuilderBase } from "../builder-base";
-import Paths from "../../paths/paths";
-import { LoggerInstance } from "../../utils/logger";
+import { Paths } from "../../paths/paths";
+import { Logger } from "../../utils/logger";
 
 //TODO: Temporary solution for this interface
 interface ErrorDto {
@@ -28,14 +28,8 @@ interface ErrorDto {
 }
 
 export class StylesBuilder extends BuilderBase<undefined> {
-    protected build(
-        production: boolean,
-        builder: undefined,
-        done: () => void
-    ): void {
-        let sassResults: Duplex | NodeJS.ReadWriteStream = gulp
-            .src(Paths.Builders.AllFiles.InSourceApp(".scss"))
-            .pipe(cache("styles"));
+    protected build(production: boolean, builder: undefined, done: () => void): void {
+        let sassResults: Duplex | NodeJS.ReadWriteStream = gulp.src(Paths.Builders.AllFiles.InSourceApp(".scss")).pipe(cache("styles"));
 
         if (!production) {
             sassResults = sassResults.pipe(sourcemaps.init());
@@ -53,9 +47,7 @@ export class StylesBuilder extends BuilderBase<undefined> {
         if (!production) {
             sassResults = sassResults.pipe(sourcemaps.write());
         } else {
-            sassResults = sassResults.pipe(
-                cleanCSS({ processImportFrom: ["local"] })
-            );
+            sassResults = sassResults.pipe(cleanCSS({ processImportFrom: ["local"] }));
         }
 
         sassResults.pipe(gulp.dest(Paths.Directories.BuildApp)).on("end", done);
@@ -63,22 +55,13 @@ export class StylesBuilder extends BuilderBase<undefined> {
 
     private errorHandler(error: ErrorDto): void {
         if (error != null) {
-            if (
-                error.relativePath != null &&
-                error.line != null &&
-                error.column != null &&
-                error.messageOriginal != null
-            ) {
-                LoggerInstance.withType("SCSS").error(
-                    `${error.relativePath}[${error.line}, ${error.column}]: ${
-                        error.messageOriginal
-                    }`
-                );
+            if (error.relativePath != null && error.line != null && error.column != null && error.messageOriginal != null) {
+                Logger.withType("SCSS").error(`${error.relativePath}[${error.line}, ${error.column}]: ${error.messageOriginal}`);
             } else {
-                LoggerInstance.error("Error in 'gulp-sass' plugin: \n", error);
+                Logger.error("Error in 'gulp-sass' plugin: \n", error);
             }
         } else {
-            LoggerInstance.error(`Unknown error in 'gulp-sass' plugin.`);
+            Logger.error(`Unknown error in 'gulp-sass' plugin.`);
         }
     }
 

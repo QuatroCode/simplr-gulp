@@ -3,7 +3,7 @@ import { LintResult } from "tslint";
 
 import { WatchTaskBase } from "../../watcher-task-base";
 import { Paths } from "../../../paths/paths";
-import { LoggerInstance } from "../../../utils/logger";
+import { Logger } from "../../../utils/logger";
 import { DirectTypescriptBuilder } from "../../../builders/typescript/typescript-direct-builder";
 import { TimePromise, TimedPromiseResult } from "../../../utils/helpers";
 
@@ -13,7 +13,7 @@ const noTsLintFlag: string = "--noTsLint";
 export class WatchScriptsTask extends WatchTaskBase {
     constructor() {
         super();
-        this.Builder = new DirectTypescriptBuilder(LoggerInstance);
+        this.Builder = new DirectTypescriptBuilder(Logger);
     }
 
     public Builder: DirectTypescriptBuilder;
@@ -28,7 +28,7 @@ export class WatchScriptsTask extends WatchTaskBase {
 
     protected WatchTaskFunction = async (production: boolean) =>
         new Promise(async (resolve, reject) => {
-            const logger = LoggerInstance.withType("Scripts");
+            const logger = Logger.withType("Scripts");
 
             if (this.noTs && this.noTsLint) {
                 logger.warn(`Both ${noTsFlag} and ${noTsLintFlag} flags are active. Nothing to do here...`);
@@ -39,7 +39,7 @@ export class WatchScriptsTask extends WatchTaskBase {
                 const timedBuild = await TimePromise(() => this.Builder.Build([this.changedFile.Name], production, !this.buildSingleFile));
                 const diagnostics = timedBuild.Result;
                 logger.info(`Compilation done in ${timedBuild.Elapsed}ms.`);
-                this.Builder.PrintDiagnostics(diagnostics, LoggerInstance, production);
+                this.Builder.PrintDiagnostics(diagnostics, Logger, production);
             }
 
             // Resolve prematurely
@@ -56,7 +56,7 @@ export class WatchScriptsTask extends WatchTaskBase {
                 }
                 const lintResults = timedLint.Result;
                 logger.info(`Linting done in ${timedLint.Elapsed}ms.`);
-                this.Builder.PrintLintResults(lintResults, LoggerInstance, production);
+                this.Builder.PrintLintResults(lintResults, Logger, production);
             }
         });
 

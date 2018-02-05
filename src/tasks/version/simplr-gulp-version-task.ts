@@ -1,6 +1,6 @@
 import * as path from "path";
 import { TaskBase } from "../task-base";
-import { LoggerInstance } from "../../utils/logger";
+import { Logger } from "../../utils/logger";
 
 export class SimplrGulpVersionTask extends TaskBase {
     public Name: string = "Version";
@@ -8,7 +8,7 @@ export class SimplrGulpVersionTask extends TaskBase {
 
     public TaskFunction = (production: boolean, done: () => void) => {
         const packageJson = require(path.join(__dirname, "../../../", "package.json"));
-        LoggerInstance.info(`Using '${packageJson.name}@${packageJson.version}'`);
+        Logger.info(`Using '${packageJson.name}@${packageJson.version}'`);
         done();
     };
 }

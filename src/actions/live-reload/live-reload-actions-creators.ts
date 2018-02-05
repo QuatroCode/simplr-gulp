@@ -1,5 +1,5 @@
 import { ReloadFiles, ReloadPage } from "./live-reload-actions";
-import ActionsEmitterClass from "../../utils/actions-emitter";
+import { ActionsEmitter } from "../../utils/actions-emitter";
 
 class LiveReloadActionsCreatorsClass {
     private reloadFiles: string[] | undefined = [];
@@ -34,9 +34,9 @@ class LiveReloadActionsCreatorsClass {
 
     private emitOnDebounced = () => {
         if (this.reloadFiles !== undefined) {
-            ActionsEmitterClass.Emit(new ReloadFiles(this.reloadFiles));
+            ActionsEmitter.Emit(new ReloadFiles(this.reloadFiles));
         } else {
-            ActionsEmitterClass.Emit(new ReloadPage());
+            ActionsEmitter.Emit(new ReloadPage());
         }
         this.reloadFiles = [];
         this.tryToClearTimer();

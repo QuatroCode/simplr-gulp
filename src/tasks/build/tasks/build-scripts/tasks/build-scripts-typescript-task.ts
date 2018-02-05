@@ -3,13 +3,13 @@ import * as uglify from "gulp-uglify";
 
 import { TaskBase } from "../../../../task-base";
 import { DirectTypescriptBuilder } from "../../../../../builders/typescript/typescript-direct-builder";
-import { LoggerInstance } from "../../../../../utils/logger";
+import { Logger } from "../../../../../utils/logger";
 import { TimePromise } from "../../../../../utils/helpers";
 
 export class BuildScriptsTask extends TaskBase {
     constructor() {
         super();
-        this.Builder = new DirectTypescriptBuilder(LoggerInstance);
+        this.Builder = new DirectTypescriptBuilder(Logger);
     }
 
     public Name: string = "Build.Scripts.Typescript";
@@ -32,26 +32,26 @@ export class BuildScriptsTask extends TaskBase {
     };
 
     protected async Build(production: boolean): Promise<void> {
-        const logger = LoggerInstance.withType("Scripts.TypeScript");
+        const logger = Logger.withType("Scripts.TypeScript");
         logger.info("Compiling...");
         const timedBuild = await TimePromise(() => this.Builder.Build(undefined, production, true));
         const diagnostics = timedBuild.Result;
         logger.info(`Compilation done in ${timedBuild.Elapsed}ms.`);
-        this.Builder.PrintDiagnostics(diagnostics, LoggerInstance, production);
+        this.Builder.PrintDiagnostics(diagnostics, Logger, production);
     }
 
     protected async Lint(production: boolean): Promise<void> {
-        const logger = LoggerInstance.withType("Scripts.TypeScript");
+        const logger = Logger.withType("Scripts.TypeScript");
         logger.info("Async linting...");
         const timedLint = await TimePromise(() => this.Builder.LintAll(production));
         const lintResults = timedLint.Result;
         logger.info(`Linting done in ${timedLint.Elapsed}ms.`);
-        this.Builder.PrintLintResults(lintResults, LoggerInstance, production);
+        this.Builder.PrintLintResults(lintResults, Logger, production);
     }
 
     protected Uglify(production: boolean): Promise<{}> {
         return new Promise(resolve => {
-            const logger = LoggerInstance.withType("Scripts.TypeScript");
+            const logger = Logger.withType("Scripts.TypeScript");
             logger.info("Uglifying...");
             const start = +new Date();
             const tsConfig = this.Builder.LoadTsConfig(production);

@@ -1,4 +1,4 @@
-import { LoggerInstance } from "../utils/logger";
+import { Logger } from "../utils/logger";
 
 export interface BuildersList<TClass> {
     Production: TClass | undefined;
@@ -18,7 +18,7 @@ export abstract class BuilderBase<TClass> {
                     done();
                 },
                 error => {
-                    LoggerInstance.error(error);
+                    Logger.error(error);
                     done();
                 }
             );
