@@ -33,15 +33,16 @@
     "*.md"
   ],
   "devDependencies": {
+    "@types/connect-livereload": "^0.5.31",
+    "@types/express": "^4.11.1",
     "@types/gulp-cached": "0.0.31",
     "@types/gulp-util": "^3.0.30",
     "@types/mz": "0.0.32",
     "@types/node": "^9.4.0",
-    "@types/express": "^4.11.1",
-    "@types/connect-livereload": "^0.5.31",
+    "npm-check-updates": "^2.14.0",
+    "simplr-tslint": "0.0.1",
     "tslint": "5.9.1",
-    "typescript": "^2.7.1",
-    "npm-check-updates": "^2.14.0"
+    "typescript": "^2.7.1"
   },
   "dependencies": {
     "connect-livereload": "^0.6.0",
