@@ -10,7 +10,7 @@ import { LoggerClass } from "../../utils/logger";
 
 interface TsConfig {
     compilerOptions: any;
-    include: string[];
+    include?: string[];
     exclude?: string[];
 }
 
@@ -62,11 +62,12 @@ export class DirectTypescriptBuilder {
                 // Full build...
 
                 // Glob files with patterns from tsconfig.json include and exclude properties
-                const globbedFiles = await this.GlobTypescriptFiles(tsConfigFromJson.include, tsConfigFromJson.exclude);
+                const globbedFiles = await this.GlobTypescriptFiles(tsConfigFromJson.include || [], tsConfigFromJson.exclude || []);
+                const allFiles = globbedFiles.concat(files || []);
 
                 // Compile and emit all globbed files
                 // tslint:disable-next-line:prefer-const
-                let result = this.CompileAndEmit(globbedFiles, parsedCompilerOptions.options);
+                let result = this.CompileAndEmit(allFiles, parsedCompilerOptions.options);
 
                 // Resolve with combined diagnostics
                 resolve(result.PreEmitDiagnostics.concat(result.EmitResult.diagnostics));
@@ -151,7 +152,7 @@ export class DirectTypescriptBuilder {
 
     public async LintAll(production: boolean): Promise<LintResult[]> {
         const tsConfigFromJson: TsConfig = this.LoadTsConfig(production);
-        const globbedFiles = await this.GlobTypescriptFiles(tsConfigFromJson.include, tsConfigFromJson.exclude);
+        const globbedFiles = await this.GlobTypescriptFiles(tsConfigFromJson.include || [], tsConfigFromJson.exclude || []);
 
         return await this.Lint(globbedFiles);
     }
