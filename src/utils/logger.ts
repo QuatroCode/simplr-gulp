@@ -1,4 +1,4 @@
-import { colors, log } from "gulp-util";
+import { log } from "gulp-util";
 
 enum LogType {
     Default,
@@ -17,30 +17,31 @@ class LoggerType {
 
 export class LoggerClass {
     private showMessage(type: LogType, loggerType: LoggerType | undefined, ...messages: any[]): void {
-        let isDefaultLogType = false;
-        let color, typeString;
+        const isDefaultLogType = false;
+        // let color
+        let typeString: string;
 
-        switch (type) {
-            case LogType.Error:
-                {
-                    color = colors.red;
-                }
-                break;
-            case LogType.Info:
-                {
-                    color = colors.cyan;
-                }
-                break;
-            case LogType.Warning:
-                {
-                    color = colors.yellow;
-                }
-                break;
-            default: {
-                color = colors.white;
-                isDefaultLogType = true;
-            }
-        }
+        // switch (type) {
+        //     case LogType.Error:
+        //         {
+        //             color = colors.red;
+        //         }
+        //         break;
+        //     case LogType.Info:
+        //         {
+        //             color = colors.cyan;
+        //         }
+        //         break;
+        //     case LogType.Warning:
+        //         {
+        //             color = colors.yellow;
+        //         }
+        //         break;
+        //     default: {
+        //         color = colors.white;
+        //         isDefaultLogType = true;
+        //     }
+        // }
 
         if (!isDefaultLogType) {
             typeString = LogType[type].toLocaleUpperCase();
@@ -56,12 +57,11 @@ export class LoggerClass {
             typeString = typeString + ":";
         }
 
-        // const resolvedMessages = this.discernWords(type, color, ...messages);
+        // const resolvedMessages = this.discernWords(type, ...messages);
 
-        log(`${colors.bold}${color}${typeString}${messages.join(" ")}`, colors.reset);
+        log(`${typeString}${messages.join(" ")}`);
     }
 
-    // FIXME: Memory errors.
     // private discernWords(type: LogType, ...messages: Array<string | any>): Array<string | any> {
     //     if (type === LogType.Default || type === LogType.Info) {
     //         const resolveMessages = messages.map(message => {

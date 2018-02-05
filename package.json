@@ -1,6 +1,6 @@
 {
   "name": "simplr-gulp",
-  "version": "3.0.0-beta.6",
+  "version": "3.0.0-beta.7",
   "description": "Fully functional gulpfile.js implementation. Tailored for Single Page Application. Written in TypeScript.",
   "keywords": [
     "gulp",
