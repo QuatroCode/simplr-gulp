@@ -34,7 +34,7 @@ export class BuildScriptsTask extends TaskBase {
     protected async Build(production: boolean): Promise<void> {
         const logger = Logger.withType("Scripts.TypeScript");
         logger.info("Compiling...");
-        const timedBuild = await TimePromise(() => this.Builder.Build(undefined, production, true));
+        const timedBuild = await TimePromise(async () => this.Builder.Build(undefined, production, true));
         const diagnostics = timedBuild.Result;
         logger.info(`Compilation done in ${timedBuild.Elapsed}ms.`);
         this.Builder.PrintDiagnostics(diagnostics, Logger, production);
@@ -43,13 +43,13 @@ export class BuildScriptsTask extends TaskBase {
     protected async Lint(production: boolean): Promise<void> {
         const logger = Logger.withType("Scripts.TypeScript");
         logger.info("Async linting...");
-        const timedLint = await TimePromise(() => this.Builder.LintAll(production));
+        const timedLint = await TimePromise(async () => this.Builder.LintAll(production));
         const lintResults = timedLint.Result;
         logger.info(`Linting done in ${timedLint.Elapsed}ms.`);
         this.Builder.PrintLintResults(lintResults, Logger, production);
     }
 
-    protected Uglify(production: boolean): Promise<{}> {
+    protected async Uglify(production: boolean): Promise<{}> {
         return new Promise(resolve => {
             const logger = Logger.withType("Scripts.TypeScript");
             logger.info("Uglifying...");

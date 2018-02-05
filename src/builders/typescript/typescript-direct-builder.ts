@@ -130,21 +130,20 @@ export class DirectTypescriptBuilder {
     }
 
     public async Lint(files: string[], lintDefinitions: boolean = false): Promise<LintResult[]> {
-        //TODO: Use custom tslint configuration file
-        const tslintConfigPath = path.normalize(`${process.cwd()}/tslint.json`);
-        const configurationFile = Linter.loadConfigurationFromPath(tslintConfigPath);
+        // //TODO: Use custom tslint configuration file
+        // const tslintConfigPath = path.normalize(`${process.cwd()}/tslint.json`);
         const options: ILinterOptions = {
             formatter: "verbose",
-            configuration: configurationFile
+            fix: false
         };
         const lintResults: LintResult[] = [];
         for (const file of files) {
             const stats = await fs.stat(file);
             if (stats.isFile()) {
                 const contents = await fs.readFile(file, "utf8");
-                const linter = new Linter(file, contents, options, DirectTypescriptBuilder.TypescriptProgram);
-                const result = linter.lint();
-                lintResults.push(result);
+                const linter = new Linter(options, DirectTypescriptBuilder.TypescriptProgram);
+                linter.lint(file, contents);
+                lintResults.push(linter.getResult());
             }
         }
         return lintResults;
@@ -183,7 +182,7 @@ export class DirectTypescriptBuilder {
         const tsConfig = this.LoadTsConfig(production);
         const skipDefaultLibCheck = tsConfig.compilerOptions.skipDefaultLibCheck;
 
-        for (const lintResult of results.filter(x => x.failureCount > 0)) {
+        for (const lintResult of results.filter(x => x.errorCount > 0)) {
             for (const failure of lintResult.failures) {
                 const fileName = failure.getFileName();
 

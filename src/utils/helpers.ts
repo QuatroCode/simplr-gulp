@@ -5,7 +5,9 @@ import * as path from "path";
  * Write JSON object to file
  */
 export function WriteToFileAsJson(fileName: string, content: Object): void {
-    fs.writeFile(fileName, JSON.stringify(content, null, 4));
+    fs.writeFile(fileName, JSON.stringify(content, null, 4), err => {
+        console.error(err);
+    });
 }
 
 /**

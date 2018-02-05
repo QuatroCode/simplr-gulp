@@ -36,7 +36,9 @@ export class WatchScriptsTask extends WatchTaskBase {
 
             if (!this.noTs) {
                 logger.info("Compiling...");
-                const timedBuild = await TimePromise(() => this.Builder.Build([this.changedFile.Name], production, !this.buildSingleFile));
+                const timedBuild = await TimePromise(async () =>
+                    this.Builder.Build([this.changedFile.Name], production, !this.buildSingleFile)
+                );
                 const diagnostics = timedBuild.Result;
                 logger.info(`Compilation done in ${timedBuild.Elapsed}ms.`);
                 this.Builder.PrintDiagnostics(diagnostics, Logger, production);
@@ -50,9 +52,9 @@ export class WatchScriptsTask extends WatchTaskBase {
                 logger.info("Linting...");
                 let timedLint: TimedPromiseResult<LintResult[]>;
                 if (this.buildSingleFile) {
-                    timedLint = await TimePromise(() => this.Builder.Lint([this.changedFile.Name]));
+                    timedLint = await TimePromise(async () => this.Builder.Lint([this.changedFile.Name]));
                 } else {
-                    timedLint = await TimePromise(() => this.Builder.LintAll(production));
+                    timedLint = await TimePromise(async () => this.Builder.LintAll(production));
                 }
                 const lintResults = timedLint.Result;
                 logger.info(`Linting done in ${timedLint.Elapsed}ms.`);
