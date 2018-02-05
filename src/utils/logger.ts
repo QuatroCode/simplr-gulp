@@ -56,35 +56,36 @@ export class LoggerClass {
             typeString = typeString + ":";
         }
 
-        const resolvedMessages = this.discernWords(type, color, ...messages);
+        // const resolvedMessages = this.discernWords(type, color, ...messages);
 
-        log(`${colors.bold}${color}${typeString}${resolvedMessages.join(" ")}`, colors.reset);
+        log(`${colors.bold}${color}${typeString}${  .join(" ")}`, colors.reset);
     }
 
-    private discernWords(type: LogType, ...messages: Array<string | any>): Array<string | any> {
-        if (type === LogType.Default || type === LogType.Info) {
-            const resolveMessages = messages.map(message => {
-                if (typeof message === "string") {
-                    let msg: string = message;
-                    let openColor = true;
-                    while (msg.search("'") !== -1) {
-                        if (openColor) {
-                            openColor = !openColor;
-                            msg = msg.replace("'", colors.magenta);
-                        } else {
-                            openColor = !openColor;
-                            msg = msg.replace("'", colors.magenta);
-                        }
-                    }
-                    return msg;
-                }
-                return message;
-            });
-            return resolveMessages;
-        } else {
-            return messages;
-        }
-    }
+    // FIXME: Memory errors?
+    // private discernWords(type: LogType, ...messages: Array<string | any>): Array<string | any> {
+    //     if (type === LogType.Default || type === LogType.Info) {
+    //         const resolveMessages = messages.map(message => {
+    //             if (typeof message === "string") {
+    //                 let msg: string = message;
+    //                 let openColor = true;
+    //                 while (msg.search("'") !== -1) {
+    //                     if (openColor) {
+    //                         openColor = !openColor;
+    //                         msg = msg.replace("'", colors.magenta);
+    //                     } else {
+    //                         openColor = !openColor;
+    //                         msg = msg.replace("'", colors.magenta);
+    //                     }
+    //                 }
+    //                 return msg;
+    //             }
+    //             return message;
+    //         });
+    //         return resolveMessages;
+    //     } else {
+    //         return messages;
+    //     }
+    // }
 
     private getLoggerTypeFromMessages(messages: any[]): any {
         return messages[0] instanceof LoggerType ? messages.shift() : undefined;
