@@ -14,11 +14,8 @@
     "noImplicitThis": true,
     "noUnusedParameters": false,
     "noUnusedLocals": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "typeRoots": ["@types"]
   },
-  "exclude": [
-    "node_modules",
-    "dist",
-    "example"
-  ]
+  "exclude": ["node_modules", "dist", "example"]
 }
