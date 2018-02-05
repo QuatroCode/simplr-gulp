@@ -1,5 +1,5 @@
 import { Duplex } from "stream";
-import { GetClassName } from '../utils/helpers';
+import { GetClassName } from "../utils/helpers";
 
 export interface Task {
     Name: string;
@@ -7,23 +7,21 @@ export interface Task {
     Description: string;
 }
 
-
-interface TaskFunction {
-    (production?: boolean, done?: Function): void | Promise<any> | Duplex | NodeJS.Process;
+export interface TaskFunction {
+    (production?: boolean, done?: Function): void | Promise<any> | Duplex | NodeJS.ReadWriteStream;
 }
 
 /**
  * Abstract task base
- * 
+ *
  * @abstract
  * @class TaskBase
  * @implements {Task}
  */
-abstract class TaskBase implements Task {
+export abstract class TaskBase implements Task {
     public abstract Name: string;
     public abstract TaskFunction: TaskFunction;
     public abstract Description: string;
-    protected readonly _className = GetClassName(this.constructor);
+    // tslint:disable-next-line:variable-name
+    protected readonly _className: string = GetClassName(this.constructor);
 }
-
-export default TaskBase;

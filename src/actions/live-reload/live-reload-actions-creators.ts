@@ -1,12 +1,11 @@
-import { ReloadFiles, ReloadPage } from './live-reload-actions';
-import ActionsEmitter from '../../utils/actions-emitter';
+import { ReloadFiles, ReloadPage } from "./live-reload-actions";
+import ActionsEmitterClass from "../../utils/actions-emitter";
 
-class LiveReloadActionsCreators {
+class LiveReloadActionsCreatorsClass {
+    private reloadFiles: string[] | undefined = [];
+    private timer: NodeJS.Timer | undefined;
 
-    private reloadFiles: Array<string> | undefined = [];
-    private timer: number | undefined;
-
-    private tryToClearTimer() {
+    private tryToClearTimer(): boolean {
         let result = false;
         if (this.timer !== undefined) {
             result = true;
@@ -16,17 +15,16 @@ class LiveReloadActionsCreators {
         return result;
     }
 
-    private setTimer(func: Function) {
+    private setTimer(func: () => void): void {
         this.timer = setTimeout(func, 300);
     }
 
-    ReloadPage() {
+    public ReloadPage(): void {
         this.tryToClearTimer();
         this.setTimer(this.emitOnDebounced);
-
     }
 
-    ReloadFiles(...filesNames: Array<string>) {
+    public ReloadFiles(...filesNames: string[]): void {
         this.tryToClearTimer();
         if (this.reloadFiles !== undefined) {
             this.reloadFiles = this.reloadFiles.concat(filesNames);
@@ -36,14 +34,13 @@ class LiveReloadActionsCreators {
 
     private emitOnDebounced = () => {
         if (this.reloadFiles !== undefined) {
-            ActionsEmitter.Emit(new ReloadFiles(this.reloadFiles));
+            ActionsEmitterClass.Emit(new ReloadFiles(this.reloadFiles));
         } else {
-            ActionsEmitter.Emit(new ReloadPage());
+            ActionsEmitterClass.Emit(new ReloadPage());
         }
         this.reloadFiles = [];
         this.tryToClearTimer();
-    }
-
+    };
 }
 
-export default new LiveReloadActionsCreators();
+export const LiveReloadActionsCreators = new LiveReloadActionsCreatorsClass();

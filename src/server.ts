@@ -1,16 +1,16 @@
-import * as express from 'express';
-import * as http from 'http';
-import { RequestHandler } from 'express-serve-static-core';
-import { LoggerInstance } from './utils/logger';
-import Configuration from './configuration/configuration';
-import { exec } from 'child_process';
+import * as express from "express";
+import * as http from "http";
+import { RequestHandler } from "express-serve-static-core";
+import { LoggerInstance } from "./utils/logger";
+import Configuration from "./configuration/configuration";
+import { exec } from "child_process";
 import * as path from "path";
-import * as connectLiveReload from 'connect-livereload';
-import * as tinyLr from 'tiny-lr';
-import ActionsEmitter, { } from './utils/actions-emitter';
-import { ReloadFiles, ReloadPage } from './actions/live-reload/live-reload-actions';
+import * as connectLiveReload from "connect-livereload";
+import * as tinyLr from "tiny-lr";
+import ActionsEmitterClass from "./utils/actions-emitter";
+import { ReloadFiles, ReloadPage } from "./actions/live-reload/live-reload-actions";
 
-export default class ServerStarter {
+export class ServerStarter {
     public server = express();
     public liveReloadServer = tinyLr({});
 
@@ -19,7 +19,7 @@ export default class ServerStarter {
     private actionsListeners = new Array<{ remove: () => void }>();
 
     private get isQuiet() {
-        return (process.argv.findIndex(x => x === "--quiet") !== -1 || process.argv.findIndex(x => x === "-Q") !== -1);
+        return process.argv.findIndex(x => x === "--quiet") !== -1 || process.argv.findIndex(x => x === "-Q") !== -1;
     }
 
     constructor() {
@@ -34,22 +34,24 @@ export default class ServerStarter {
     }
 
     private addActionsListeners() {
-        this.actionsListeners.push(ActionsEmitter.On(ReloadFiles, this.onReloadFilesList));
-        this.actionsListeners.push(ActionsEmitter.On(ReloadPage, this.onReloadPage));
+        this.actionsListeners.push(ActionsEmitterClass.On(ReloadFiles, this.onReloadFilesList));
+        this.actionsListeners.push(ActionsEmitterClass.On(ReloadPage, this.onReloadPage));
     }
 
     private removeActionsListeners() {
-        this.actionsListeners.forEach(x => { x.remove(); });
+        this.actionsListeners.forEach(x => {
+            x.remove();
+        });
         this.actionsListeners = new Array();
     }
 
     private onReloadFilesList = (action: ReloadFiles) => {
         this.reloadFiles(action.FilesNames.join(","));
-    }
+    };
 
     private onReloadPage = (action: ReloadPage) => {
         this.reloadFiles("index.html");
-    }
+    };
 
     private reloadFiles(files: string) {
         http.get({
@@ -59,7 +61,6 @@ export default class ServerStarter {
             agent: false
         });
     }
-
 
     private configureServer(wwwroot: string) {
         this.server.use(connectLiveReload({ port: Configuration.GulpConfig.ServerConfig.LiveReloadPort }));
@@ -71,19 +72,18 @@ export default class ServerStarter {
         this.liveReloadServer.listen(liveReloadServerPort);
     }
 
-
     private openBrowser(serverUrl: string) {
         if (!this.isQuiet) {
-            let opener = '';
+            let opener = "";
             switch (process.platform) {
-                case 'darwin':
-                    opener = 'open';
+                case "darwin":
+                    opener = "open";
                     break;
-                case 'win32':
+                case "win32":
                     opener = 'start ""';
                     break;
                 default:
-                    opener = path.join(__dirname, '../vendor/xdg-open');
+                    opener = path.join(__dirname, "../vendor/xdg-open");
                     break;
             }
 
@@ -101,26 +101,31 @@ export default class ServerStarter {
 
     private onRequest: RequestHandler = (req, res) => {
         let { Build } = Configuration.GulpConfig.Directories;
-        res.sendFile('index.html', { root: Build });
-    }
+        res.sendFile("index.html", { root: Build });
+    };
 
     private addEventListeners() {
         this.Listener.once("close", this.onClose);
-        this.Listener.once('error', this.onError);
-        this.server.all('/*', this.onRequest);
+        this.Listener.once("error", this.onError);
+        this.server.all("/*", this.onRequest);
     }
 
     private onClose = () => {
         LoggerInstance.info(`Server closed.`);
         this.removeActionsListeners();
-    }
+    };
 
     private onError = (err: NodeJS.ErrnoException) => {
-        if (err.code === 'EADDRINUSE') {
+        if (err.code === "EADDRINUSE") {
             LoggerInstance.error(`Port ${Configuration.GulpConfig.ServerConfig.Port} already in use.`);
             this.Listener.close();
         } else {
-            LoggerInstance.error(`Exeption not handled. Please create issues with error code "${err.code}" here: https://github.com/QuatroCode/simplr-gulp/issues \n`, err);
+            LoggerInstance.error(
+                `Exeption not handled. Please create issues with error code "${
+                    err.code
+                }" here: https://github.com/QuatroCode/simplr-gulp/issues \n`,
+                err
+            );
         }
-    }
+    };
 }

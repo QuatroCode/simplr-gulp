@@ -1,12 +1,8 @@
-import WatchTaskBase from '../../watcher-task-base';
-import Paths from '../../../paths/paths';
+import { WatchTaskBase } from "../../watcher-task-base";
+import { Paths } from "../../../paths/paths";
 
-export default class WatchStylesTask extends WatchTaskBase {
-
-    Name = "Styles";
-    
-    TaskNamePrefix = "Build";
-
-    Globs = Paths.Builders.AllFiles.InSource(".scss");
-
+export class WatchStylesTask extends WatchTaskBase {
+    public Name: string = "Styles";
+    public TaskNamePrefix: string = "Build";
+    public Globs: string = Paths.Builders.AllFiles.InSource(".scss");
 }

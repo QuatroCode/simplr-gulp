@@ -1,5 +1,5 @@
-import TaskBase, { Task } from '../tasks/task-base';
-import * as gulp from 'gulp';
+import { Task, TaskBase } from "../tasks/task-base";
+import * as gulp from "gulp";
 import * as fs from "fs";
 import { LoggerInstance } from "../utils/logger";
 
@@ -23,13 +23,12 @@ export interface OnCallback {
 
 /**
  * Abstract watch task base
- * 
+ *
  * @abstract
  * @class WatchTaskBase
  * @extends {TaskBase}
  */
-abstract class WatchTaskBase extends TaskBase implements WatchTask {
-
+export abstract class WatchTaskBase extends TaskBase implements WatchTask {
     abstract Globs: string | Array<string>;
 
     abstract TaskNamePrefix: string;
@@ -53,8 +52,9 @@ abstract class WatchTaskBase extends TaskBase implements WatchTask {
 
         if (this.UseWatchTaskFunctionOnly) {
             if (this.WatchTaskFunction == null) {
-                LoggerInstance.withType(`in class ${this._className}`)
-                    .error(`Cannot use "UseWatchTaskFunctionOnly" without "WatchTaskFunction" function.`);
+                LoggerInstance.withType(`in class ${this._className}`).error(
+                    `Cannot use "UseWatchTaskFunctionOnly" without "WatchTaskFunction" function.`
+                );
                 completeTask();
                 return;
             }
@@ -62,17 +62,15 @@ abstract class WatchTaskBase extends TaskBase implements WatchTask {
             let maybePromise = this.WatchTaskFunction(production, done);
 
             if (maybePromise != null && maybePromise.then != null) {
-                maybePromise
-                    .then(completeTask)
-                    .catch((error) => {
-                        LoggerInstance.withType(taskName).error(error);
-                        completeTask();
-                    });
+                maybePromise.then(completeTask).catch(error => {
+                    LoggerInstance.withType(taskName).error(error);
+                    completeTask();
+                });
             }
         } else {
             return gulp.parallel(this.getStarterFunction(taskName), taskName)(completeTask);
         }
-    }
+    };
 
     private getStarterFunction(taskName: string) {
         let func: gulp.TaskFunction = (done: () => void) => {
@@ -87,8 +85,6 @@ abstract class WatchTaskBase extends TaskBase implements WatchTask {
         return text + ":Production";
     }
 
-
-
     private listeners: { [uniqId: string]: Listener } = {};
     private uniqId = 0;
 
@@ -101,7 +97,6 @@ abstract class WatchTaskBase extends TaskBase implements WatchTask {
         this.listeners[id] = { Callback: callback, Event: eventName };
         return { remove: this.removeListener.bind(this, id) };
     }
-
 
     private emit(eventName: WatchEvents, ...params: Array<any>): void {
         Object.keys(this.listeners).forEach(key => {
@@ -118,5 +113,3 @@ abstract class WatchTaskBase extends TaskBase implements WatchTask {
         }
     }
 }
-
-export default WatchTaskBase;

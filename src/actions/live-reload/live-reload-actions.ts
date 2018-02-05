@@ -1,12 +1,9 @@
-
-
 export class ReloadFiles {
-    constructor(private filesNames: Array<string>) { }
-    get FilesNames() {
+    constructor(private filesNames: string[]) {}
+
+    public get FilesNames(): string[] {
         return this.filesNames;
     }
 }
 
-export class ReloadPage {
-    constructor() { }
-}
+export class ReloadPage {}

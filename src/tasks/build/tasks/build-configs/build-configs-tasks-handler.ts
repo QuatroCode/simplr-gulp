@@ -1,16 +1,15 @@
-import TasksHandler from '../../../tasks-handler';
-import { Task } from '../../../task-base';
+import { TasksHandler } from "../../../tasks-handler";
+import { Task } from "../../../task-base";
 
-//Tasks
-import BuildConfigsFiles from './tasks/build-configs-files-task';
-import BuildConfigsFolders from './tasks/build-configs-folders-task';
+// Tasks
+import { BuildConfigsFilesTask } from "./tasks/build-configs-files-task";
+import { BuildConfigsFoldersTask } from "./tasks/build-configs-folders-task";
 
-export default class Tasks extends TasksHandler<Task> {
-
+export class BuildConfigsTaskHandler extends TasksHandler<Task> {
     constructor() {
         super(config => {
             config.Name = "Build.Configs";
-            config.Tasks = [BuildConfigsFolders, BuildConfigsFiles];
+            config.Tasks = [BuildConfigsFoldersTask, BuildConfigsFilesTask];
             config.WithProduction = true;
             config.TasksAsync = false;
             return config;

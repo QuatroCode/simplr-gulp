@@ -1,7 +1,7 @@
-import BuilderBase from '../paths-builder-base';
+import { BuilderBase } from "../paths-builder-base";
 
-export default class OneDirectoryBuilder extends BuilderBase {
-    protected builder(startPath: string, name: string | undefined) {
+export class OneDirectoryBuilder extends BuilderBase {
+    protected builder(startPath: string, name: string | undefined): string {
         if (name != null) {
             return this.joinPaths(startPath, name);
         } else {

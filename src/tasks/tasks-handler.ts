@@ -1,9 +1,8 @@
-import * as gulp from 'gulp';
-import { TaskConstructor, TasksHandlerContructor } from './tasks-contracts';
-import { Task } from './task-base';
-import { LoggerInstance } from '../utils/logger';
-import { GetClassName } from '../utils/helpers';
-
+import * as gulp from "gulp";
+import { TaskConstructor, TasksHandlerContructor } from "./tasks-contracts";
+import { Task } from "./task-base";
+import { LoggerInstance } from "../utils/logger";
+import { GetClassName } from "../utils/helpers";
 
 interface Configuration<T> {
     TasksSufix: string;
@@ -15,9 +14,7 @@ interface Configuration<T> {
     HandlerAsTask: boolean;
 }
 
-
-abstract class TasksHandler<T extends Task> {
-
+export abstract class TasksHandler<T extends Task> {
     constructor(config: (context: Configuration<T>) => Configuration<T>) {
         this.configuration = config(this.initConfiguration);
         this.constructedTasks = this.registerTasks(this.configuration.Tasks);
@@ -38,7 +35,7 @@ abstract class TasksHandler<T extends Task> {
 
     public get TaskName() {
         return this.configuration.Name;
-    };
+    }
 
     private get initConfiguration(): Configuration<T> {
         return {
@@ -86,7 +83,6 @@ abstract class TasksHandler<T extends Task> {
         gulp.task(name, func);
     }
 
-
     private loadTasksHandlers(tasksHandlers: Array<TasksHandlerContructor<TasksHandler<any>>>) {
         let constructedTasksHander: { [name: string]: TasksHandler<any> } = {};
         if (tasksHandlers == null || tasksHandlers.length === 0) {
@@ -114,7 +110,9 @@ abstract class TasksHandler<T extends Task> {
         let tasksList = Object.keys(this.constructedTasks).concat(Object.keys(this.constructedTasksHandler));
         gulp.task(this.configuration.Name, method(tasksList));
         if (this.configuration.WithProduction) {
-            let tasksListProduction = tasksList.map(x => { return `${x}:Production`; });
+            let tasksListProduction = tasksList.map(x => {
+                return `${x}:Production`;
+            });
             gulp.task(`${this.configuration.Name}:Production`, method(tasksListProduction));
         }
     }
@@ -133,7 +131,4 @@ abstract class TasksHandler<T extends Task> {
         }
         return name;
     }
-
 }
-
-export default TasksHandler;

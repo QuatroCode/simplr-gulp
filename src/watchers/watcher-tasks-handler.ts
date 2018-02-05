@@ -1,25 +1,23 @@
-import * as gulp from 'gulp';
-import * as fs from 'fs';
-import Configuration from '../configuration/configuration';
-import { LoggerInstance } from '../utils/logger';
-import * as path from 'path';
-import { WatchTask } from './watcher-task-base';
-import LiveReloadActionsCreators from '../actions/live-reload/live-reload-actions-creators';
+import * as gulp from "gulp";
+import * as fs from "fs";
+import Configuration from "../configuration/configuration";
+import { LoggerInstance } from "../utils/logger";
+import * as path from "path";
+import { WatchTask } from "./watcher-task-base";
+import LiveReloadActionsCreators from "../actions/live-reload/live-reload-actions-creators";
 
-import TasksHandler from '../tasks/tasks-handler';
+import TasksHandler from "../tasks/tasks-handler";
 
 //Tasks
-import WatchAssetsTask from './tasks/watch-assets/watch-assets-task';
-import WatchConfigsTask from './tasks/watch-configs/watch-configs-task';
-import WatchHtmlTask from './tasks/watch-html/watch-html-task';
-import WatchScriptsTask from './tasks/watch-scripts/watch-scripts-task';
-import WatchStylesTask from './tasks/watch-styles/watch-styles-task';
+import WatchAssetsTask from "./tasks/watch-assets/watch-assets-task";
+import WatchConfigsTask from "./tasks/watch-configs/watch-configs-task";
+import WatchHtmlTask from "./tasks/watch-html/watch-html-task";
+import WatchScriptsTask from "./tasks/watch-scripts/watch-scripts-task";
+import WatchStylesTask from "./tasks/watch-styles/watch-styles-task";
 
-
-export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
-
+export class WatcherTasksHandler extends TasksHandler<WatchTask> {
     constructor() {
-        super((config) => {
+        super(config => {
             config.Name = "Watch";
             config.Tasks = [WatchAssetsTask, WatchConfigsTask, WatchHtmlTask, WatchScriptsTask, WatchStylesTask];
             return config;
@@ -57,7 +55,7 @@ export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
 
     private onTaskStart = (taskName: string) => {
         this.runningTasks.push(taskName);
-    }
+    };
 
     private onTaskEnd = (taskName: string) => {
         let found = this.runningTasks.indexOf(taskName);
@@ -67,7 +65,7 @@ export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
         if (this.runningTasks.length === 0) {
             this.onAllTaskEnded();
         }
-    }
+    };
 
     private onAllTaskEnded() {
         LiveReloadActionsCreators.ReloadFiles(...this.pendingReloadFiles);
@@ -81,13 +79,12 @@ export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
         targetPathName = this.changeExtensionToBuilded(targetPathName);
         this.pendingReloadFiles.push(targetPathName);
         LoggerInstance.log(`'${pathName}' was changed.`);
-    }
-
+    };
 
     private fileUnlinkHandler = (pathName: string) => {
         let targetPathName = this.changeExtensionToBuilded(pathName);
         targetPathName = this.changeRootPathToBuild(targetPathName);
-        fs.unlink(targetPathName, (err) => {
+        fs.unlink(targetPathName, err => {
             if (err != null) {
                 if (err.code === "ENOENT") {
                     LoggerInstance.warn(`'${targetPathName}' has already been deleted.`);
@@ -98,7 +95,7 @@ export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
                 LoggerInstance.log(`'${targetPathName}' was deleted successfully.`);
             }
         });
-    }
+    };
 
     private removeRootSourcePath(pathName: string) {
         let pathList = pathName.split(path.sep);
@@ -128,9 +125,9 @@ export default class WatcherTasksHandler extends TasksHandler<WatchTask> {
             pathList[0] = Configuration.GulpConfig.Directories.Build;
             return path.join(...pathList);
         } else {
-            LoggerInstance
-                .withType("WarcherTasksHandler.changeRootPathToBuild()")
-                .warn(`"${pathName}" path root is not under Source directory (${Configuration.GulpConfig.Directories.Source}) `);
+            LoggerInstance.withType("WarcherTasksHandler.changeRootPathToBuild()").warn(
+                `"${pathName}" path root is not under Source directory (${Configuration.GulpConfig.Directories.Source}) `
+            );
             return pathName;
         }
     }

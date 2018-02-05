@@ -1,11 +1,10 @@
-import TasksHandler from '../../../tasks-handler';
-import { Task } from '../../../task-base';
+import { TasksHandler } from "../../../tasks-handler";
+import { Task } from "../../../task-base";
 
-//Tasks
-import { BuildScriptsTask } from './tasks/build-scripts-typescript-task';
+// Tasks
+import { BuildScriptsTask } from "./tasks/build-scripts-typescript-task";
 
-export default class Tasks extends TasksHandler<Task> {
-
+export class BuildScriptsTaskHandler extends TasksHandler<Task> {
     constructor() {
         super(config => {
             config.Name = "Build.Scripts";

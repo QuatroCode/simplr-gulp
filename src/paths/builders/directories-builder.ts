@@ -1,9 +1,11 @@
-import Configuration from '../../configuration/configuration';
+import { Configuration } from "../../configuration/configuration";
+import { GulpConfig } from "../../configuration/configuration-contracts";
 
-export default class DirectoriesBuilder {
-    private gulpConfig = Configuration.GulpConfig;
-    Source = this.gulpConfig.Directories.Source;
-    SourceApp = [this.Source, this.gulpConfig.Directories.App].join("/");
-    Build = this.gulpConfig.Directories.Build;
-    BuildApp = [this.Build, this.gulpConfig.Directories.App].join("/");
+export class DirectoriesBuilder {
+    private gulpConfig: GulpConfig = Configuration.GulpConfig;
+
+    public Source: string = this.gulpConfig.Directories.Source;
+    public SourceApp: string = [this.Source, this.gulpConfig.Directories.App].join("/");
+    public Build: string = this.gulpConfig.Directories.Build;
+    public BuildApp: string = [this.Build, this.gulpConfig.Directories.App].join("/");
 }

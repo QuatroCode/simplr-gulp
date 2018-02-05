@@ -1,20 +1,18 @@
 export namespace CdnJsApi {
-
     export interface ItemAssetDto {
         version: string;
-        files: Array<string>;
+        files: string[];
     }
 
     export interface ItemDto {
         name: string;
         latest: string;
         version: string;
-        assets: Array<ItemAssetDto>;
-
+        assets: ItemAssetDto[];
     }
 
     export interface ResponseDto {
-        results: Array<ItemDto>;
+        results: ItemDto[];
         total: number;
     }
 }
@@ -32,8 +30,8 @@ export interface PackageItem {
 }
 
 export interface JspmPathsLists {
-    Resolved: Array<PackageItem>;
-    Unresolved: Array<PackageItem>;
+    Resolved: PackageItem[];
+    Unresolved: PackageItem[];
     Paths: JspmPaths;
 }
 export type JspmPaths = { [fullName: string]: string };

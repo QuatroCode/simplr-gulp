@@ -1,31 +1,29 @@
-import Paths from './paths';
+import { Paths } from "./paths";
 
-abstract class BuilderBase {
+export abstract class BuilderBase {
     protected abstract builder(startPath: string, param: string | undefined): string;
 
-    InSource(param?: string | undefined) {
-        let startPath = Paths.Directories.Source;
+    public InSource(param?: string | undefined): string {
+        const startPath = Paths.Directories.Source;
         return this.builder(startPath, param);
     }
 
-    InSourceApp(param?: string) {
-        let startPath = Paths.Directories.SourceApp;
+    public InSourceApp(param?: string): string {
+        const startPath = Paths.Directories.SourceApp;
         return this.builder(startPath, param);
     }
 
-    InBuild(param?: string) {
-        let startPath = Paths.Directories.Build;
+    public InBuild(param?: string): string {
+        const startPath = Paths.Directories.Build;
         return this.builder(startPath, param);
     }
 
-    InBuildApp(param?: string) {
-        let startPath = Paths.Directories.BuildApp;
+    public InBuildApp(param?: string): string {
+        const startPath = Paths.Directories.BuildApp;
         return this.builder(startPath, param);
     }
 
-    protected joinPaths(...pathsList: Array<string>): string {
+    protected joinPaths(...pathsList: string[]): string {
         return pathsList.join("/");
     }
 }
-
-export default BuilderBase;

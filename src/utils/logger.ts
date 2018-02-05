@@ -8,33 +8,35 @@ enum LogType {
 }
 
 class LoggerType {
-    constructor(private type: string) {
-    }
+    constructor(private type: string) {}
 
-    get Type() {
+    public get Type(): string {
         return this.type;
     }
 }
 
 export class Logger {
-
-    private showMessage(type: LogType, loggerType: LoggerType | undefined, ...messages: Array<any>) {
-
+    private showMessage(type: LogType, loggerType: LoggerType | undefined, ...messages: any[]): void {
         let isDefaultLogType = false;
 
-        let color,
-            typeString;
+        let color, typeString;
 
         switch (type) {
-            case LogType.Error: {
-                color = colors.styles.red.open;
-            } break;
-            case LogType.Info: {
-                color = colors.styles.cyan.open;
-            } break;
-            case LogType.Warning: {
-                color = colors.styles.yellow.open;
-            } break;
+            case LogType.Error:
+                {
+                    color = colors.styles.red.open;
+                }
+                break;
+            case LogType.Info:
+                {
+                    color = colors.styles.cyan.open;
+                }
+                break;
+            case LogType.Warning:
+                {
+                    color = colors.styles.yellow.open;
+                }
+                break;
             default: {
                 color = colors.styles.white.open;
                 isDefaultLogType = true;
@@ -48,22 +50,21 @@ export class Logger {
         }
 
         if (loggerType !== undefined) {
-            typeString = typeString + " " + loggerType.Type;
+            typeString = `${typeString} ${loggerType.Type}`;
         }
 
         if (!isDefaultLogType || loggerType !== undefined) {
             typeString = typeString + ":";
         }
 
-        let resolvedMessages = this.discernWords(type, color, ...messages);
+        const resolvedMessages = this.discernWords(type, color, ...messages);
 
         log(`${colors.styles.bold.open}${color}${typeString}${resolvedMessages.join(" ")}`, colors.styles.reset.open);
     }
 
     private discernWords(type: LogType, ...messages: Array<string | any>): Array<string | any> {
         if (type === LogType.Default || type === LogType.Info) {
-
-            let resolveMessages = messages.map(message => {
+            const resolveMessages = messages.map(message => {
                 if (typeof message === "string") {
                     let msg: string = message;
                     let openColor = true;
@@ -80,38 +81,39 @@ export class Logger {
                 }
                 return message;
             });
-            return (resolveMessages);
+            return resolveMessages;
         } else {
-            return (messages);
+            return messages;
         }
     }
 
-    private getLoggerTypeFromMessages(messages: Array<any>) {
-        return (messages[0] instanceof LoggerType) ? messages.shift() : undefined;
+    private getLoggerTypeFromMessages(messages: any[]): any {
+        return messages[0] instanceof LoggerType ? messages.shift() : undefined;
     }
 
-    log(...messages: Array<any>) {
-        let loggerType = this.getLoggerTypeFromMessages(messages);
+    public log(...messages: any[]): void {
+        const loggerType = this.getLoggerTypeFromMessages(messages);
         this.showMessage(LogType.Default, loggerType, ...messages);
     }
 
-    error(...messages: Array<any>) {
-        let loggerType = this.getLoggerTypeFromMessages(messages);
+    public error(...messages: any[]): void {
+        const loggerType = this.getLoggerTypeFromMessages(messages);
         this.showMessage(LogType.Error, loggerType, ...messages);
     }
 
-    info(...messages: Array<any>) {
-        let loggerType = this.getLoggerTypeFromMessages(messages);
+    public info(...messages: any[]): void {
+        const loggerType = this.getLoggerTypeFromMessages(messages);
         this.showMessage(LogType.Info, loggerType, ...messages);
     }
 
-    warn(...messages: Array<any>) {
-        let loggerType = this.getLoggerTypeFromMessages(messages);
+    public warn(...messages: any[]): void {
+        const loggerType = this.getLoggerTypeFromMessages(messages);
         this.showMessage(LogType.Warning, loggerType, ...messages);
     }
 
-    withType(type: string) {
-        let loggerType = new LoggerType(type);
+    // tslint:disable-next-line:typedef
+    public withType(type: string) {
+        const loggerType = new LoggerType(type);
         return {
             log: this.log.bind(this, loggerType),
             error: this.error.bind(this, loggerType),
@@ -121,5 +123,4 @@ export class Logger {
     }
 }
 
-export let LoggerInstance = new Logger();
-export default LoggerInstance;
+export const LoggerInstance = new Logger();

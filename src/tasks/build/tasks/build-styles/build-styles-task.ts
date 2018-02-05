@@ -1,16 +1,9 @@
-import TaskBase from '../../../task-base';
-import { StylesBuilder } from '../../../../builders/styles/styles-builder';
+import { TaskBase, TaskFunction } from "../../../task-base";
+import { StylesBuilder } from "../../../../builders/styles/styles-builder";
 
-export default class BuildStylesgTask extends TaskBase {
-    constructor() {
-        super();
-    }
-
-    Builder: StylesBuilder = new StylesBuilder();;
-
-    Name = "Build.Styles";
-
-    Description = "Compiles *.scss files from source to build directory";
-
-    TaskFunction = this.Builder.Build;
+export class BuildStylesTask extends TaskBase {
+    public Builder: StylesBuilder = new StylesBuilder();
+    public Name: string = "Build.Styles";
+    public Description: string = "Compiles *.scss files from source to build directory";
+    public TaskFunction: TaskFunction = this.Builder.Build;
 }

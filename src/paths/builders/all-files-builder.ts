@@ -1,11 +1,11 @@
-import BuilderBase from '../paths-builder-base';
+import { BuilderBase } from "../paths-builder-base";
 
-export default class AllFilesBuilder extends BuilderBase {
-    protected builder(startPath: string, name: string) {
+export class AllFilesBuilder extends BuilderBase {
+    protected builder(startPath: string, name: string): string {
         if (name !== undefined) {
-            return this.joinPaths(startPath, '**', '*' + name);
+            return this.joinPaths(startPath, "**", "*" + name);
         } else {
-            return this.joinPaths(startPath, '**', '*');
+            return this.joinPaths(startPath, "**", "*");
         }
     }
 }
