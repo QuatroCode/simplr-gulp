@@ -15,14 +15,14 @@
   ],
   "author": "Giedrius Grabauskas <giedrius@quatrodev.com> (https://github.com/GiedriusGrabauskas)",
   "contributors": [
-    "Dovydas Navickas <dovydas@quatrodev.com> (https://github.com/DovydasNavickas)"
+    "Dovydas Navickas <dovydas@quatrodev.com> (https://github.com/DovydasNavickas)",
+    "Martynas Žilinskas <martynas@quatrodev.com> (https://github.com/MartynasZilinskas)"
   ],
   "main": "dist/main.js",
   "scripts": {
-    "typings-init": "typings install",
     "prepublishOnly": "npm run build",
     "build": "tsc -p .",
-    "test": "npm run typings-init && tsc -p . --noEmit && echo Test completed."
+    "test": "tsc -p . --noEmit && echo Test completed."
   },
   "bugs": "https://github.com/QuatroCode/simplr-gulp/issues",
   "repository": "QuatroCode/simplr-gulp",
