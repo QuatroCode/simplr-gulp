@@ -1,6 +1,6 @@
 {
   "name": "simplr-gulp",
-  "version": "3.0.0-beta.3",
+  "version": "3.0.0-beta.5",
   "description": "Fully functional gulpfile.js implementation. Tailored for Single Page Application. Written in TypeScript.",
   "keywords": [
     "gulp",
@@ -20,6 +20,7 @@
   "main": "dist/main.js",
   "scripts": {
     "typings-init": "typings install",
+    "prepublishOnly": "npm run build",
     "build": "tsc -p .",
     "test": "npm run typings-init && tsc -p . --noEmit && echo Test completed."
   },
@@ -38,10 +39,7 @@
     "@types/node": "^7.0.5",
     "tslint": "3.14.0",
     "typescript": "^2.2.1",
-    "typings": "2.0.0"
-  },
-  "peerDependencies": {
-    "typescript": ">=1.8.9"
+    "npm-check-updates": "^2.14.0"
   },
   "dependencies": {
     "connect-livereload": "^0.5.4",
@@ -50,7 +48,7 @@
     "gulp-autoprefixer": "^3.1.1",
     "gulp-cached": "^1.1.1",
     "gulp-clean-css": "^2.0.11",
-    "gulp-sass": "^2.3.2",
+    "gulp-sass": "^3.1.0",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-tslint": "^6.0.2",
     "gulp-typescript": "^3.1.4",
