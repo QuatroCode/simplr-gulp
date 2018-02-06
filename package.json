@@ -1,6 +1,6 @@
 {
   "name": "simplr-gulp",
-  "version": "3.0.0-beta.7",
+  "version": "3.0.0-beta.14",
   "description": "Fully functional gulpfile.js implementation. Tailored for Single Page Application. Written in TypeScript.",
   "keywords": [
     "gulp",
@@ -36,6 +36,7 @@
     "@types/connect-livereload": "^0.5.31",
     "@types/express": "^4.11.1",
     "@types/gulp-cached": "0.0.31",
+    "@types/gulp-uglify": "^3.0.4",
     "@types/gulp-util": "^3.0.30",
     "@types/mz": "0.0.32",
     "@types/node": "^9.4.0",
@@ -55,7 +56,7 @@
     "gulp-sass": "^3.1.0",
     "gulp-sourcemaps": "^2.6.4",
     "gulp-tslint": "^8.1.2",
-    "gulp-typescript": "^3.1.4",
+    "gulp-typescript": "^3.2.4",
     "gulp-uglify": "^3.0.0",
     "gulp-util": "^3.0.8",
     "jspm": "0.17.0-beta.25",

@@ -96,7 +96,7 @@ export class DirectTypescriptBuilder {
 
     protected async GlobTypescriptFiles(include: string[], exclude?: string[], allowedExtensions?: string[]): Promise<string[]> {
         return new Promise<string[]>((resolve, reject) => {
-            let patterns: string[] = include;
+            let patterns: string[] = include || [];
             if (exclude != null) {
                 const excluded = exclude.map(item => `!${item}`);
                 patterns = patterns.concat(excluded);

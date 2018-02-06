@@ -1,5 +1,7 @@
 import * as gulp from "gulp";
 import * as uglify from "gulp-uglify";
+import * as typescript from "typescript";
+import * as ts from "gulp-typescript";
 
 import { TaskBase } from "../../../../task-base";
 import { DirectTypescriptBuilder } from "../../../../../builders/typescript/typescript-direct-builder";
@@ -56,8 +58,18 @@ export class BuildScriptsTask extends TaskBase {
             const start = +new Date();
             const tsConfig = this.Builder.LoadTsConfig(production);
             const jsFilesPattern = `${tsConfig.compilerOptions.outDir}/**/*.js`;
+
+            const tsOptions: ts.Settings = {
+                declaration: true,
+                target: "es5",
+                typescript: typescript
+            };
+
+            const reporter: ts.reporter.Reporter = ts.reporter.nullReporter();
+
             gulp
                 .src(jsFilesPattern)
+                .pipe(ts(tsOptions, reporter))
                 .pipe(uglify({ mangle: true }))
                 .pipe(gulp.dest(tsConfig.compilerOptions.outDir))
                 .on("end", () => {
