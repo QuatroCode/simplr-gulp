@@ -9,7 +9,9 @@ import * as path from 'path';
  * @param {Object} content
  */
 export function WriteToFileAsJson(fileName: string, content: Object): void {
-    fs.writeFile(fileName, JSON.stringify(content, null, 4));
+    fs.writeFile(fileName, JSON.stringify(content, null, 4), (error) => {
+        console.error(error);   
+    });
 }
 
 /**

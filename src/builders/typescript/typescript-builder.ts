@@ -41,9 +41,9 @@ class TypescriptBuilderClass extends BuilderBase<TypescriptBuilderCompiler> {
         return this.getBuilder(production);
     }
 
-    private get directories() {
-        return Configuration.GulpConfig.Directories;
-    }
+    // private get directories() {
+    //     return Configuration.GulpConfig.Directories;
+    // }
 
     private get typescriptConfig() {
         return Configuration.GulpConfig.TypeScriptConfig;

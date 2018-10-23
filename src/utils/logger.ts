@@ -1,4 +1,5 @@
-import { colors, log } from "gulp-util";
+import * as colors from "ansi-colors";
+import * as log from "fancy-log";
 
 enum LogType {
     Default,
@@ -8,8 +9,7 @@ enum LogType {
 }
 
 class LoggerType {
-    constructor(private type: string) {
-    }
+    constructor(private type: string) {}
 
     get Type() {
         return this.type;
@@ -17,24 +17,27 @@ class LoggerType {
 }
 
 export class Logger {
-
     private showMessage(type: LogType, loggerType: LoggerType | undefined, ...messages: Array<any>) {
-
         let isDefaultLogType = false;
 
-        let color,
-            typeString;
+        let color, typeString;
 
         switch (type) {
-            case LogType.Error: {
-                color = colors.styles.red.open;
-            } break;
-            case LogType.Info: {
-                color = colors.styles.cyan.open;
-            } break;
-            case LogType.Warning: {
-                color = colors.styles.yellow.open;
-            } break;
+            case LogType.Error:
+                {
+                    color = colors.styles.red.open;
+                }
+                break;
+            case LogType.Info:
+                {
+                    color = colors.styles.cyan.open;
+                }
+                break;
+            case LogType.Warning:
+                {
+                    color = colors.styles.yellow.open;
+                }
+                break;
             default: {
                 color = colors.styles.white.open;
                 isDefaultLogType = true;
@@ -62,7 +65,6 @@ export class Logger {
 
     private discernWords(type: LogType, ...messages: Array<string | any>): Array<string | any> {
         if (type === LogType.Default || type === LogType.Info) {
-
             let resolveMessages = messages.map(message => {
                 if (typeof message === "string") {
                     let msg: string = message;
@@ -80,14 +82,14 @@ export class Logger {
                 }
                 return message;
             });
-            return (resolveMessages);
+            return resolveMessages;
         } else {
-            return (messages);
+            return messages;
         }
     }
 
     private getLoggerTypeFromMessages(messages: Array<any>) {
-        return (messages[0] instanceof LoggerType) ? messages.shift() : undefined;
+        return messages[0] instanceof LoggerType ? messages.shift() : undefined;
     }
 
     log(...messages: Array<any>) {
